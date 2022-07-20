@@ -1,7 +1,8 @@
 package com.example.demo.Service.impl;
 
-import com.example.demo.DTO.LoginDto;
-import com.example.demo.DTO.SignUpDto;
+import com.example.demo.dto.request.LoginDto;
+import com.example.demo.dto.Mapper;
+import com.example.demo.dto.request.SignUpDto;
 import com.example.demo.Entity.Role;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.RoleRepo;
@@ -10,12 +11,14 @@ import com.example.demo.Service.CustomUserDetailsService;
 import com.example.demo.Service.IUserService;
 import com.example.demo.auth.CustomUserDetails;
 import com.example.demo.auth.JwtManager;
+import com.example.demo.dto.entity.UserDto;
+import com.example.demo.dto.response.JwtAuthenticationResponse;
+import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.example.demo.Utils.Constant.ROLE_ADMIN;
 import static com.example.demo.Utils.Constant.ROLE_USER;
 
 @Service
@@ -47,37 +49,34 @@ public class UserService implements IUserService {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
-    public SignUpDto signUp(SignUpDto signUpDto) {
+    public UserDto signUp(SignUpDto signUpDto) {
         log.info("Sign up Service");
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = bCryptPasswordEncoder.encode(signUpDto.getPassword());
-
-
-
-
-
+        Set<Role> roles = new HashSet<>();
+        if(userRepo.existsByUsername(signUpDto.getUsername())){
+            throw new ResourceNotFoundException("User", "Username", signUpDto.getUsername());
+        }
+        if(userRepo.existsByEmail(signUpDto.getEmail())){
+            throw new ResourceNotFoundException("User", "Email", signUpDto.getEmail());
+        }
+        Set<Role> role = new HashSet<>();
+        role.add(
+                roleRepo.findRoleByRoleName(ROLE_USER).orElseThrow(
+                        () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
+                ));
         User user = User.builder()
-                .username(signUpDto.getUsername())
-                .password(encodedPassword)
-                .email(signUpDto.getEmail())
-                .build();
-        userRepo.save(user);
-
-        Set<Role> authorities = new HashSet<>();
-        authorities.add(Role.builder().user(user).name(ROLE_USER).build());
-        authorities.add(Role.builder().user(user).name(ROLE_ADMIN).build());
-        roleRepo.saveAll(authorities);
-
-        return SignUpDto.builder()
                 .username(signUpDto.getUsername())
                 .password(signUpDto.getPassword())
                 .email(signUpDto.getEmail())
-                .status("Success")
+                .isActive(true)
+                .roles(role)
                 .build();
+        userRepo.save(user);
+        return Mapper.toUserDto(user);
+
     }
 
     @Override
-    public LoginDto login(LoginDto loginDto) {
+    public JwtAuthenticationResponse login(LoginDto loginDto) {
         log.info("Login service");
         CustomUserDetails userDetails;
         try {
@@ -98,7 +97,7 @@ public class UserService implements IUserService {
             claims.put("userId", userDetails.getId());
             String subject = userDetails.getUsername();
             String jwt = jwtManager.generateToken(claims, subject);
-            return LoginDto.builder().token(jwt).build();
+            return Mapper.toJwtAuthenticationRepsonse(jwt, userDetails);
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized");

@@ -1,14 +1,13 @@
 package com.example.demo.auth;
 
+import com.example.demo.Entity.Role;
 import com.example.demo.Entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -16,16 +15,19 @@ public class CustomUserDetails implements UserDetails {
 
     private static final Long serialVersionUID = 1L;
 
+    private final Set<GrantedAuthority> authorities;
+
     private User user;
 
     public CustomUserDetails(User user){
         this.user =user;
+        this.authorities = (Set<GrantedAuthority>) this.getAuthorities();
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
+        Set<GrantedAuthority> authorities = new HashSet<>();
         List<String> authorityList = user.getRoles().stream().map(
-                role -> role.getName()
+                Role::getRoleName
         ).collect(Collectors.toList());
         for (String authority :
                 authorityList) {
@@ -61,7 +63,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getIsActive();
     }
 
     public Long getId(){

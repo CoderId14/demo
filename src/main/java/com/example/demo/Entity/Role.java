@@ -2,33 +2,30 @@ package com.example.demo.Entity;
 
 
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+
 
 import javax.persistence.*;
+import java.util.Set;
 
+@Entity
+@Table(name = "tbl_role")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder(toBuilder = true)
-@EntityListeners(AuditingEntityListener.class)
-@Entity
-@Table(name = "role")
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Builder
+@PersistenceContext
+public class Role extends BaseEntity {
 
-    @Column(name = "name", nullable = true, unique = false, length = 100)
-    private String name;
+    @Column(name = "RoleName", unique = true, nullable = false)
+    private String roleName;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
-    private User user;
 
+    @ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    private Set<User> users;
 }

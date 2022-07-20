@@ -1,10 +1,12 @@
 package com.example.demo.Service;
 
-import com.example.demo.DTO.LoginDto;
-import com.example.demo.DTO.SignUpDto;
+import com.example.demo.dto.request.LoginDto;
+import com.example.demo.dto.request.SignUpDto;
+import com.example.demo.dto.entity.UserDto;
+import com.example.demo.dto.response.JwtAuthenticationResponse;
 
 public interface IUserService {
-    SignUpDto signUp(SignUpDto signUpDto);
-    LoginDto login(LoginDto loginDto);
+    UserDto signUp(SignUpDto signUpDto);
+    JwtAuthenticationResponse login(LoginDto loginDto);
 
 }

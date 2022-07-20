@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("api/auth/login","/api/auth/signUp" ).permitAll()
+                .authorizeRequests().antMatchers("/api/auth/login","/api/auth/signUp" ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling().

@@ -1,61 +1,54 @@
 package com.example.demo.Entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Set;
 
-@Getter
-@Setter
+@Entity
+@Table(name = "tbl_user")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-@EntityListeners(AuditingEntityListener.class)
-@Entity
-@Table(name = "user")
-public class User implements Serializable {
+@Getter
+@Setter
+@Builder
+public class User extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(name = "username", nullable = false, unique = true, length = 500)
+    @Column(name = "Username", length = 30, nullable = false, unique = true)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true, length = 500)
-    private String email;
-
-    @Column(name = "password", nullable = false, length = 500)
+    @Column(name = "Password", length = 100, nullable = false)
     private String password;
 
-    @Column(name = "first_name", nullable = true, length = 500)
-    private String firstName;
+    @Column(name = "Email", length = 40, nullable = false, unique = true)
+    private String email;
 
-    @Column(name = "last_name", nullable = true, length = 500)
-    private String lastName;
+    @Column(name = "Name", columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
+    private String name;
 
-    @Default
-    @OneToMany(mappedBy = "user", targetEntity = Role.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Role> roles = new HashSet<>();
+    @Lob
+    @Column(name = "Avatar")
+    private String avatar;
 
-    @CreatedDate
-    @Column(name = "created", nullable = true)
-    private LocalDateTime created;
+    @Column(name = "IsActive", nullable = false)
+    private Boolean isActive;
 
-    @LastModifiedDate
-    @Column(name = "modified", nullable = true)
-    private LocalDateTime modified;
+    @Column(name = "Verification_code", updatable = false)
+    private String verificationCode;
+
+    @Column(name = "Reset_password_code")
+    private String resetPasswordCode;
+
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    @JoinTable(name = "tbl_user_role", joinColumns = {
+            @JoinColumn(name = "UserId")},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "RoleId")})
+    private Set<Role> roles;
 }
