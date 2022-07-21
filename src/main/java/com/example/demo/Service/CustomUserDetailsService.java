@@ -1,12 +1,9 @@
 package com.example.demo.Service;
 
-import com.example.demo.Entity.User;
+import com.example.demo.entity.User;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.auth.CustomUserDetails;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

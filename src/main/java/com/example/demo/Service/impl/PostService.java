@@ -1,6 +1,6 @@
 package com.example.demo.Service.impl;
 
-import com.example.demo.Entity.Post;
+import com.example.demo.entity.Post;
 import com.example.demo.Repository.PostRepo;
 import com.example.demo.Service.IPostService;
 import org.springframework.beans.factory.annotation.Autowired;

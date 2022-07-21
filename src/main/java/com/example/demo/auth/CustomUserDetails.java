@@ -1,7 +1,7 @@
 package com.example.demo.auth;
 
-import com.example.demo.Entity.Role;
-import com.example.demo.Entity.User;
+import com.example.demo.entity.Role;
+import com.example.demo.entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

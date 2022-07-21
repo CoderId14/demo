@@ -1,9 +1,7 @@
-package com.example.demo.Entity;
+package com.example.demo.entity;
 
 
 
-import com.example.demo.Entity.supports.CustomDateSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -28,7 +26,6 @@ public abstract class BaseEntity {
 
     @Column
     @CreatedDate
-    @JsonSerialize(using = CustomDateSerializer.class)
     private Date createdDate;
 
     @Column
@@ -37,7 +34,6 @@ public abstract class BaseEntity {
 
     @Column
     @LastModifiedDate
-    @JsonSerialize(using = CustomDateSerializer.class)
     private Date modifiedDate;
 
     public long getId() {

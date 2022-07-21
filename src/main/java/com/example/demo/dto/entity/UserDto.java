@@ -1,8 +1,6 @@
 package com.example.demo.dto.entity;
 
-import com.example.demo.Entity.Role;
-import com.example.demo.Entity.supports.CustomDateSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.example.demo.entity.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -26,8 +24,6 @@ public class UserDto {
     private String avatar;
     private Set<Role> roles;
 
-    @JsonSerialize(using = CustomDateSerializer.class)
     private Date createDate;
-    @JsonSerialize(using = CustomDateSerializer.class)
     private Date modifyDate;
 }
