@@ -21,7 +21,6 @@ import javax.validation.Valid;
 public class AuthController {
     private final UserService userService;
 
-    private final ConfirmationTokenService confirmationTokenService;
 
     @PostMapping("/signUp")
     public ResponseEntity<UserDto> signUp(@RequestBody @Valid SignUpDto signUpRequest) {

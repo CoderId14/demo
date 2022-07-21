@@ -1,6 +1,11 @@
 package com.example.demo.Service.impl;
 
 import com.example.demo.Utils.MailBuilder;
+import com.example.demo.dto.request.ChangePasswordDto;
+import com.example.demo.dto.request.ForgotPasswordDto;
+import com.example.demo.dto.response.ChangePasswordResponse;
+import com.example.demo.dto.response.ForgotPasswordResponse;
+import com.example.demo.dto.response.TokenResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.dto.request.LoginDto;
 import com.example.demo.dto.Mapper;
@@ -28,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.Constant.ROLE_USER;
@@ -54,6 +60,67 @@ public class UserService implements IUserService {
 
     private final CustomUserDetailsService customUserDetailsService;
 
+    public ChangePasswordResponse updatePasswordByToken(ChangePasswordDto changePasswordDto){
+        log.info("Service: updatePassword");
+        User user;
+        ConfirmationToken token = confirmationTokenService.getToken(changePasswordDto.getToken()).orElseThrow(
+                () -> new IllegalStateException("Token not found")
+        );
+
+        String usernameOrEmail = changePasswordDto.getUsernameOrEmail();
+        if(isEmail(usernameOrEmail)){
+            user = userRepo.findByEmail(usernameOrEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Email", usernameOrEmail)
+            );
+        }
+        else{
+            user = userRepo.findByUsername(usernameOrEmail).orElseThrow(
+                    ()-> new ResourceNotFoundException("User", "Username", usernameOrEmail)
+            );
+        }
+        if(user.getId() == token.getUser().getId()){
+            user.setPassword(passwordEncoder.encode(changePasswordDto.getPassword()));
+            userRepo.save(user);
+            return ChangePasswordResponse.builder()
+                    .username(usernameOrEmail)
+                    .password(changePasswordDto.getPassword())
+                    .build();
+        }
+
+        throw new RuntimeException("Token invalid");
+
+    }
+
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordDto forgotPasswordDto){
+        log.info("forgotPassword Service");
+        User user;
+        String usernameOrEmail = forgotPasswordDto.getUsernameOrEmail();
+        if(isEmail(usernameOrEmail)){
+            user = userRepo.findByEmail(usernameOrEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Email", usernameOrEmail)
+            );
+        }
+        else{
+            user = userRepo.findByUsername(usernameOrEmail).orElseThrow(
+                    ()-> new ResourceNotFoundException("User", "Username", usernameOrEmail)
+            );
+        }
+        String token = confirmationTokenService.generateConfirmationToken(user);
+
+        String link = "http://localhost:8080/api/user/forgot-password?token="+token;
+        emailService.send(user.getEmail(),
+                mailBuilder.buildEmailForgotPassword(user.getUsername(),link));
+        return new ForgotPasswordResponse("Check your email: " + user.getEmail());
+    }
+
+    public Boolean isEmail(String email){
+        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+
+        Pattern pattern = Pattern.compile(regex);
+
+        return pattern.matcher(email).matches();
+    }
+
     @Override
     public UserDto signUp(SignUpDto signUpDto) {
         log.info("Sign up Service");
@@ -76,19 +143,12 @@ public class UserService implements IUserService {
                 .roles(roles)
                 .build();
         userRepo.save(user);
-        String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = ConfirmationToken.builder()
-                .token(token)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .expireDate(LocalDateTime.now().plusMinutes(15))
-                .user(user)
-                .build();
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
+
+        String token = confirmationTokenService.generateConfirmationToken(user);
 
         String link = "http://localhost:8080/api/auth/signUp/confirm?token="+token;
         emailService.send(signUpDto.getEmail(),
-                mailBuilder.buildEmail(signUpDto.getUsername(),link));
+                mailBuilder.buildEmailSignUp(signUpDto.getUsername(),link));
         return Mapper.toUserDto(user);
 
     }
@@ -133,24 +193,29 @@ public class UserService implements IUserService {
         return true;
     }
 
+    public TokenResponse getUserFromToken(String token){
+        log.info("Service: Get user from token: " + token);
+        ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
+                () -> new IllegalStateException("Token not found")
+        );
+        return TokenResponse.builder()
+                .token(confirmationToken.getToken())
+                .build();
+    }
+
     @Transactional
     public String confirmToken(String token){
         log.info("Confirm token");
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
                 () -> new IllegalStateException("Token not found")
         );
+        if(!confirmationTokenService.isTokenExpired(token)){
+            confirmationTokenService.setConfirmDate(token);
 
-        if(confirmationToken.getConfirmedDate() != null)
-            throw new IllegalStateException("Token already confirmed");
-
-        LocalDateTime expiredDate = confirmationToken.getExpireDate();
-        if(expiredDate.isBefore(LocalDateTime.now()))
-            throw new IllegalStateException("Token expired");
-        confirmationTokenService.setConfirmDate(token);
-
-        this.activeUser(confirmationToken.getUser().getUsername());
-
-        return "confirmed";
+            this.activeUser(confirmationToken.getUser().getUsername());
+            return "confirmed";
+        }
+        throw new IllegalStateException("Token expired");
     }
 
     public void activeUser(String username){
@@ -159,4 +224,6 @@ public class UserService implements IUserService {
         );
         user.setIsActive(true);
     }
+
+
 }

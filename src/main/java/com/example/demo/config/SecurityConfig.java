@@ -38,7 +38,9 @@ public class SecurityConfig {
                 .csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/auth/login/**","/api/auth/signUp/**" ).permitAll()
+                .authorizeRequests().antMatchers("/api/auth/login/**",
+                        "/api/auth/signUp/**",
+                        "/api/user/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin()
                 .and()
