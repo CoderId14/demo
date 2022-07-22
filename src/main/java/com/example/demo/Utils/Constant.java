@@ -9,5 +9,7 @@ public class Constant {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
+    public static final String EMAIL_SEND_FROM = "danghieu14th@gmail.com";
+
 
 }

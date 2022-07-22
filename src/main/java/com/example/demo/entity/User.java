@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.entity.supports.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -35,11 +36,11 @@ public class User extends BaseEntity {
     @Column(name = "IsActive", nullable = false)
     private Boolean isActive;
 
-    @Column(name = "Verification_code", updatable = false)
-    private String verificationCode;
+    @Column(name ="Provider")
+    private AuthProvider provider;
+    @Column(name = "ProviderId")
+    private String providerId;
 
-    @Column(name = "Reset_password_code")
-    private String resetPasswordCode;
 
 
     @ManyToMany(fetch = FetchType.EAGER)

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class TokenResponse {
+public class UserTokenResponse {
+    private String username;
     private String token;
 }

@@ -1,25 +1,26 @@
 package com.example.demo.Service.impl;
 
-import com.example.demo.Utils.MailBuilder;
-import com.example.demo.dto.request.ChangePasswordDto;
-import com.example.demo.dto.request.ForgotPasswordDto;
-import com.example.demo.dto.response.ChangePasswordResponse;
-import com.example.demo.dto.response.ForgotPasswordResponse;
-import com.example.demo.dto.response.TokenResponse;
-import com.example.demo.entity.ConfirmationToken;
-import com.example.demo.dto.request.LoginDto;
-import com.example.demo.dto.Mapper;
-import com.example.demo.dto.request.SignUpDto;
-import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
 import com.example.demo.Repository.RoleRepo;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.Service.IEmailSender;
 import com.example.demo.Service.IUserService;
-import com.example.demo.auth.CustomUserDetails;
+import com.example.demo.Utils.MailBuilder;
+import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.auth.JwtManager;
+import com.example.demo.dto.Mapper;
 import com.example.demo.dto.entity.UserDto;
+import com.example.demo.dto.request.ChangePasswordDto;
+import com.example.demo.dto.request.ForgotPasswordDto;
+import com.example.demo.dto.request.LoginDto;
+import com.example.demo.dto.request.SignUpDto;
+import com.example.demo.dto.response.ChangePasswordResponse;
+import com.example.demo.dto.response.ForgotPasswordResponse;
 import com.example.demo.dto.response.JwtAuthenticationResponse;
+import com.example.demo.dto.response.UserTokenResponse;
+import com.example.demo.entity.ConfirmationToken;
+import com.example.demo.entity.Role;
+import com.example.demo.entity.User;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -44,6 +47,9 @@ import static com.example.demo.Utils.Constant.ROLE_USER;
 @Slf4j
 public class UserService implements IUserService {
 
+    private final String LINK_VERIFY = "http://localhost:8080/api/auth/signUp/confirm?token=";
+    private final String LINK_FORGOT_PASSWORD = "http://localhost:8080/api/user/forgot-password?token=";
+
     private final JwtManager jwtManager;
 
     private final UserRepo userRepo;
@@ -52,7 +58,7 @@ public class UserService implements IUserService {
 
     private final ConfirmationTokenService confirmationTokenService;
 
-    private final EmailService emailService;
+    private final IEmailSender emailService;
 
     private final MailBuilder mailBuilder;
 
@@ -107,10 +113,10 @@ public class UserService implements IUserService {
         }
         String token = confirmationTokenService.generateConfirmationToken(user);
 
-        String link = "http://localhost:8080/api/user/forgot-password?token="+token;
+        String link = LINK_FORGOT_PASSWORD + token;
         emailService.send(user.getEmail(),
                 mailBuilder.buildEmailForgotPassword(user.getUsername(),link));
-        return new ForgotPasswordResponse("Check your email: " + user.getEmail());
+        return new ForgotPasswordResponse("Check your email: " + user.getEmail(), token);
     }
 
     public Boolean isEmail(String email){
@@ -146,7 +152,7 @@ public class UserService implements IUserService {
 
         String token = confirmationTokenService.generateConfirmationToken(user);
 
-        String link = "http://localhost:8080/api/auth/signUp/confirm?token="+token;
+        String link = LINK_VERIFY + token;
         emailService.send(signUpDto.getEmail(),
                 mailBuilder.buildEmailSignUp(signUpDto.getUsername(),link));
         return Mapper.toUserDto(user);
@@ -193,12 +199,13 @@ public class UserService implements IUserService {
         return true;
     }
 
-    public TokenResponse getUserFromToken(String token){
+    public UserTokenResponse getUserFromToken(String token){
         log.info("Service: Get user from token: " + token);
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
                 () -> new IllegalStateException("Token not found")
         );
-        return TokenResponse.builder()
+        return UserTokenResponse.builder()
+                .username(confirmationToken.getUser().getUsername())
                 .token(confirmationToken.getToken())
                 .build();
     }
@@ -209,7 +216,7 @@ public class UserService implements IUserService {
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
                 () -> new IllegalStateException("Token not found")
         );
-        if(!confirmationTokenService.isTokenExpired(token)){
+        if(!confirmationTokenService.isTokenValid(token)){
             confirmationTokenService.setConfirmDate(token);
 
             this.activeUser(confirmationToken.getUser().getUsername());

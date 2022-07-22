@@ -1,6 +1,7 @@
 package com.example.demo.auth;
 
 import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.auth.user.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

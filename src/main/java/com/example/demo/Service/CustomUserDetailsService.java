@@ -2,7 +2,7 @@ package com.example.demo.Service;
 
 import com.example.demo.entity.User;
 import com.example.demo.Repository.UserRepo;
-import com.example.demo.auth.CustomUserDetails;
+import com.example.demo.auth.user.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

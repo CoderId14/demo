@@ -11,5 +11,4 @@ import lombok.Data;
 public class ChangePasswordResponse {
     private String username;
     private String password;
-    private String token;
 }

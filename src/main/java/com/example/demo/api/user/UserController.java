@@ -7,7 +7,8 @@ import com.example.demo.dto.request.ChangePasswordDto;
 import com.example.demo.dto.request.ForgotPasswordDto;
 import com.example.demo.dto.response.ChangePasswordResponse;
 import com.example.demo.dto.response.ForgotPasswordResponse;
-import com.example.demo.dto.response.TokenResponse;
+
+import com.example.demo.dto.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +23,20 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-
+//    2
     @GetMapping("/forgot-password")
-    public TokenResponse formForgotPassword(@RequestParam("token") String token){
+    public UserTokenResponse formForgotPassword(@RequestParam("token") String token){
         log.info("Controller: get user from token");
-        TokenResponse tokenResponse = userService.getUserFromToken(token);
-        return tokenResponse;
+        UserTokenResponse userTokenResponse = userService.getUserFromToken(token);
+        return userTokenResponse;
     }
-
+//    3
     @PostMapping("/change-password")
     public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordDto changePasswordDto){
         ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordDto);
         return ResponseEntity.ok(changePasswordResponse);
     }
-
+//    1
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDto request){
         log.info("forgot password controller");

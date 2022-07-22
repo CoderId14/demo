@@ -40,9 +40,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests().antMatchers("/api/auth/login/**",
                         "/api/auth/signUp/**",
-                        "/api/user/**").permitAll()
+                        "/api/user/**",
+                        "/**").permitAll()
                 .anyRequest().authenticated()
-                .and().formLogin()
                 .and()
                 .addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling().
                 authenticationEntryPoint(authenticationEntryPoint);

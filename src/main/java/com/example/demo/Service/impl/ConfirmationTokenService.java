@@ -41,17 +41,21 @@ public class ConfirmationTokenService implements IConfirmationTokenService {
     public int setConfirmDate(String token){
         return confirmationTokenRepo.updateConfirmedDate(token, LocalDateTime.now());
     }
-    public Boolean isTokenExpired(String token){
+    public Boolean isTokenValid(String token){
         ConfirmationToken confirmationToken = this.getToken(token).orElseThrow(
                 () -> new IllegalStateException("Token not found")
         );
 
-        if(confirmationToken.getConfirmedDate() != null)
+        if(confirmationToken.getConfirmedDate() != null){
+            log.error("token already use");
             return true;
+        }
 
         LocalDateTime expiredDate = confirmationToken.getExpireDate();
-        if(expiredDate.isBefore(LocalDateTime.now()))
+        if(expiredDate.isBefore(LocalDateTime.now())){
+            log.error("Token has expired");
             return true;
+        }
 
         return false;
     }
