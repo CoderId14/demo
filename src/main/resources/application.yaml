@@ -1,6 +1,9 @@
 server:
   port: 8080
-
+logging:
+  level:
+    root: info
+    org.springframework.boot.security: trace
 spring:
   jpa:
     hibernate:
@@ -32,7 +35,7 @@ spring:
           google:
             clientId: 526186141332-u50rj397qb1gcarsd5avc8qreckpatrr.apps.googleusercontent.com
             clientSecret: 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
-
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - profile
@@ -43,3 +46,4 @@ app:
   jwt:
     expire: 3600
     secret: secret
+  authorizedRedirectUris: http://localhost:3000/oauth2/redirect

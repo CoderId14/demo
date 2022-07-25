@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/oauth2/callback/google")
 public class Test {
-    @GetMapping
-    public Map<String, Object> currentUser(OAuth2AuthenticationToken oAuth2AuthenticationToken){
-        return oAuth2AuthenticationToken.getPrincipal().getAttributes();
+
+    @GetMapping()
+    public String getInfo() {
+        return "Hello Google";
     }
+
+
 }

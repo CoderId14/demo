@@ -21,6 +21,7 @@ import com.example.demo.dto.response.UserTokenResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
+import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +33,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.Constant.ROLE_USER;
+import static com.example.demo.Utils.Vadilate.isEmail;
 
 @Service
 @Transactional
@@ -119,14 +118,21 @@ public class UserService implements IUserService {
         return new ForgotPasswordResponse("Check your email: " + user.getEmail(), token);
     }
 
-    public Boolean isEmail(String email){
-        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
-        Pattern pattern = Pattern.compile(regex);
+    public void processOAuthPostLogin(String email) {
+        Optional<User> existUser = userRepo.findByEmail(email);
 
-        return pattern.matcher(email).matches();
+
+        if (existUser.isEmpty()) {
+            User newUser = User.builder()
+                    .email(email)
+                    .provider(AuthProvider.google)
+                    .isActive(true)
+                    .build();
+            userRepo.save(newUser);
+        }
+
     }
-
     @Override
     public UserDto signUp(SignUpDto signUpDto) {
         log.info("Sign up Service");
@@ -174,7 +180,7 @@ public class UserService implements IUserService {
             log.info("password matched");
 
             Map<String, Object> claims = new HashMap<>();
-            claims.put("username", userDetails.getUsername());
+            claims.put("email", userDetails.getUser().getEmail());
 
             String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(","));

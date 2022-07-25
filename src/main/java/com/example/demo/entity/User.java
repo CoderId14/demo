@@ -17,10 +17,10 @@ import java.util.Set;
 public class User extends BaseEntity {
 
 
-    @Column(name = "Username", length = 30, nullable = false, unique = true)
+    @Column(name = "Username", length = 30, unique = true)
     private String username;
 
-    @Column(name = "Password", length = 100, nullable = false)
+    @Column(name = "Password", length = 100, nullable = true)
     private String password;
 
     @Column(name = "Email", length = 40, nullable = false, unique = true)

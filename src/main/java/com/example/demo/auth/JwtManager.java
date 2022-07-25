@@ -32,6 +32,10 @@ public class JwtManager {
     public String getUsernameFromToken(String token){
         return getClaimsFromToken(token, Claims::getSubject);
     }
+
+    public String getEmailFromToken(String token){
+        return getClaimsFromToken(token, Claims::getSubject);
+    }
     public String getIdFromToken(String token){
         return getClaimsFromToken(token, Claims::getId);
     }
@@ -40,7 +44,7 @@ public class JwtManager {
     }
 
     public Boolean validatedToken(String token, UserDetails userDetails){
-        final String username = getUsernameFromToken(token);
+        final String username = getEmailFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

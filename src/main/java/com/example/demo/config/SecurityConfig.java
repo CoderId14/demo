@@ -1,8 +1,12 @@
 package com.example.demo.config;
 
+import com.example.demo.Service.CustomOAuth2UserService;
 import com.example.demo.Service.CustomUserDetailsService;
 
 import com.example.demo.auth.JwtSecurityFilter;
+import com.example.demo.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.example.demo.auth.oauth2.OAuth2AuthenticationFailureHandler;
+import com.example.demo.auth.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,19 +36,47 @@ public class SecurityConfig {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.cors().and()
                 .csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/auth/login/**",
+                .authorizeRequests().antMatchers("/",
+                        "/api/auth/login/**",
                         "/api/auth/signUp/**",
                         "/api/user/**",
-                        "/**").permitAll()
+                "/oauth2/**",
+                "/auth/**"
+                        ).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling().
+                .oauth2Login()
+                .authorizationEndpoint()
+                    .baseUri("/oauth2/authorize")
+                    .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .and()
+                        .redirectionEndpoint()
+                        .baseUri("/oauth2/callback/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
+                ;
+        http.addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling().
                 authenticationEntryPoint(authenticationEntryPoint);
         return http.build();
     }
