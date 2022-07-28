@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests().antMatchers("/",
                         "/api/auth/login/**",
-                        "/api/auth/signUp/**",
+                        "/api/auth/register/**",
                         "/api/user/**",
                 "/oauth2/**",
                 "/auth/**"

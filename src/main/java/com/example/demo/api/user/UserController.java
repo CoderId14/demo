@@ -5,12 +5,15 @@ import com.example.demo.Service.impl.UserService;
 import com.example.demo.dto.entity.UserDto;
 import com.example.demo.dto.request.ChangePasswordDto;
 import com.example.demo.dto.request.ForgotPasswordDto;
+import com.example.demo.dto.request.LoginDto;
+import com.example.demo.dto.request.SignUpDto;
 import com.example.demo.dto.response.ChangePasswordResponse;
 import com.example.demo.dto.response.ForgotPasswordResponse;
 
 import com.example.demo.dto.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +23,16 @@ import javax.validation.Valid;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto){
+        UserDto userDto = userService.addUser(signUpDto);
+        return ResponseEntity.ok(userDto);
+    }
 //    2
     @GetMapping("/forgot-password")
     public UserTokenResponse formForgotPassword(@RequestParam("token") String token){

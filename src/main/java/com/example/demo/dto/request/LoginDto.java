@@ -18,5 +18,4 @@ public class LoginDto {
     private String username;
     @NotEmpty(message = "Password not empty")
     private String password;
-    private String token;
 }

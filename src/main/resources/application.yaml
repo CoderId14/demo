@@ -40,7 +40,8 @@ spring:
               - email
               - profile
 
-
+cors:
+  allowedOrigins: "*"
 
 app:
   jwt:

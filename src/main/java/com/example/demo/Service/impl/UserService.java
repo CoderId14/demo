@@ -65,6 +65,33 @@ public class UserService implements IUserService {
 
     private final CustomUserDetailsService customUserDetailsService;
 
+//    Test
+    public UserDto addUser(SignUpDto signUpDto){
+
+        if(userRepo.existsByUsername(signUpDto.getUsername())){
+            throw new ResourceNotFoundException("User", "Username", signUpDto.getUsername());
+        }
+        if(userRepo.existsByEmail(signUpDto.getEmail())){
+            throw new ResourceNotFoundException("User", "Email", signUpDto.getEmail());
+        }
+        Set<Role> roles = new HashSet<>();
+        roles.add(
+                roleRepo.findRoleByRoleName(ROLE_USER).orElseThrow(
+                        () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
+                ));
+
+
+        User user = User.builder()
+                .username(signUpDto.getUsername())
+                .password(passwordEncoder.encode(signUpDto.getPassword()))
+                .email(signUpDto.getEmail())
+                .roles(roles)
+                .isActive(true)
+                .build();
+        userRepo.save(user);
+        return Mapper.toUserDto(user);
+    }
+
     public ChangePasswordResponse updatePasswordByToken(ChangePasswordDto changePasswordDto){
         log.info("Service: updatePassword");
         User user;

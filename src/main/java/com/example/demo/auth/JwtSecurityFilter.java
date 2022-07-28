@@ -5,6 +5,8 @@ import com.example.demo.auth.user.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -28,8 +30,18 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
+        response.setHeader("Content-Type", "application/json");
+        if (request.getHeader(HttpHeaders.ORIGIN) != null
+                && request.getMethod().equals(HttpMethod.OPTIONS.name())
+                && request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD) != null) {
+            log.debug("Received an OPTIONS pre-flight request.");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
             final String requestTokenHeader = request.getHeader("Authorization");
 
             String email = null;

@@ -21,5 +21,4 @@ public class SignUpDto {
     @NotEmpty(message = "Username not empty")
     private String username;
     private String password;
-    private String status;
 }

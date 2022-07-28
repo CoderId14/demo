@@ -18,11 +18,12 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class AuthController {
     private final UserService userService;
 
 
-    @PostMapping("/signUp")
+    @PostMapping("/register")
     public ResponseEntity<UserDto> signUp(@RequestBody @Valid SignUpDto signUpRequest) {
         log.info("Signup controller");
         return ResponseEntity.ok(userService.signUp(signUpRequest));
