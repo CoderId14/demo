@@ -44,6 +44,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 //        response.setHeader("Authorization", "Bearer " + targetUrl);
         clearAuthenticationAttributes(request,response);
+
+//        targetUrl = "http://localhost:3000/oauth2/callback";
+
         getRedirectStrategy().sendRedirect(request,response,targetUrl);
 
     }
@@ -51,9 +54,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication){
         Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
-        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())){
-            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
-        }
+//        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())){
+//            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+//        }
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
 
@@ -66,11 +69,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         claims.put("userId", customUserDetails.getId());
         String subject = customUserDetails.getUser().getEmail();
         String token = jwtManager.generateToken(claims,subject);
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
+        String targetUrl = "http://localhost:3000/oauth2/callback";
         CookieUtils.addCookie(response,"token",token,36000);
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
-                .build().toUriString();
+        return UriComponentsBuilder.fromUriString(targetUrl).queryParam("token", token).build().toUriString();
 
     }
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

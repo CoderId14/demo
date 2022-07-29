@@ -32,7 +32,7 @@ public class ConfirmationToken {
     private Long id;
     @Column
     private String token;
-    @ManyToOne
+    @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(nullable = false,
             name = "UserId")
     private User user;

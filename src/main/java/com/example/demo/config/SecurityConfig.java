@@ -8,6 +8,7 @@ import com.example.demo.auth.oauth2.HttpCookieOAuth2AuthorizationRequestReposito
 import com.example.demo.auth.oauth2.OAuth2AuthenticationFailureHandler;
 import com.example.demo.auth.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,8 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    @Value("${app.authorizedRedirectUris}")
+    private String REDIRECT_URL;
 
 
     @Bean

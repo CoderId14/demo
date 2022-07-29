@@ -2,6 +2,7 @@ package com.example.demo.api.user;
 
 
 import com.example.demo.Service.impl.UserService;
+import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.entity.UserDto;
 import com.example.demo.dto.request.ChangePasswordDto;
 import com.example.demo.dto.request.ForgotPasswordDto;
@@ -10,11 +11,16 @@ import com.example.demo.dto.request.SignUpDto;
 import com.example.demo.dto.response.ChangePasswordResponse;
 import com.example.demo.dto.response.ForgotPasswordResponse;
 
+import com.example.demo.dto.response.ObjectResponse;
 import com.example.demo.dto.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +34,11 @@ public class UserController {
 
     private final UserService userService;
 
+
+    @GetMapping
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user){
+        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "", user.getUser().getUsername()));
+    }
     @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto){
         UserDto userDto = userService.addUser(signUpDto);
