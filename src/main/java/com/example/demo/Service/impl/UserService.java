@@ -6,8 +6,8 @@ import com.example.demo.Service.CustomUserDetailsService;
 import com.example.demo.Service.IEmailSender;
 import com.example.demo.Service.IUserService;
 import com.example.demo.Utils.MailBuilder;
-import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.auth.JwtManager;
+import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.Mapper;
 import com.example.demo.dto.entity.UserDto;
 import com.example.demo.dto.request.ChangePasswordDto;
@@ -23,6 +23,7 @@ import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.exceptions.user.ResourceExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.Constant.ROLE_USER;
@@ -65,20 +65,25 @@ public class UserService implements IUserService {
 
     private final CustomUserDetailsService customUserDetailsService;
 
+
+    public User getUser(String username){
+        return userRepo.findByUsername(username).orElseThrow(
+        () -> new ResourceNotFoundException("User", "Username", username)
+        );
+    }
 //    Test
     public UserDto addUser(SignUpDto signUpDto){
 
         if(userRepo.existsByUsername(signUpDto.getUsername())){
-            throw new ResourceNotFoundException("User", "Username", signUpDto.getUsername());
+            throw new ResourceExistsException("User", "Username", signUpDto.getUsername());
         }
         if(userRepo.existsByEmail(signUpDto.getEmail())){
-            throw new ResourceNotFoundException("User", "Email", signUpDto.getEmail());
+            throw new ResourceExistsException("User", "Email", signUpDto.getEmail());
         }
         Set<Role> roles = new HashSet<>();
         roles.add(
-                roleRepo.findRoleByRoleName(ROLE_USER).orElseThrow(
-                        () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
-                ));
+                roleRepo.findRoleByRoleName(ROLE_USER).orElseGet(() ->roleRepo.save(
+                        Role.builder().roleName("ROLE_USER").build())));
 
 
         User user = User.builder()
@@ -164,10 +169,10 @@ public class UserService implements IUserService {
     public UserDto signUp(SignUpDto signUpDto) {
         log.info("Sign up Service");
         if(userRepo.existsByUsername(signUpDto.getUsername())){
-            throw new ResourceNotFoundException("User", "Username", signUpDto.getUsername());
+            throw new ResourceExistsException("User", "Username", signUpDto.getUsername());
         }
         if(userRepo.existsByEmail(signUpDto.getEmail())){
-            throw new ResourceNotFoundException("User", "Email", signUpDto.getEmail());
+            throw new ResourceExistsException("User", "Email", signUpDto.getEmail());
         }
         Set<Role> roles = new HashSet<>();
         roles.add(
@@ -197,13 +202,13 @@ public class UserService implements IUserService {
         log.info("Login service");
         CustomUserDetails userDetails;
         try {
-            userDetails = customUserDetailsService.loadUserByUsername(loginDto.getUsername());
+            userDetails = new CustomUserDetails(userRepo.findByUsername(loginDto.getUsername()).get());
 
         } catch (UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }
-        if (userDetails.isEnabled() &&
-                passwordEncoder.matches(loginDto.getPassword(), userDetails.getPassword())) {
+        if (userDetails.getUser().getIsActive() &&
+                passwordEncoder.matches(loginDto.getPassword(), userDetails.getUser().getPassword())) {
             log.info("password matched");
 
             Map<String, Object> claims = new HashMap<>();

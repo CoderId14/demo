@@ -1,9 +1,9 @@
 server:
   port: 8080
-logging:
-  level:
-    root: info
-    org.springframework.boot.security: trace
+#logging:
+#  level:
+#    root: info
+#    org.springframework.boot.security: trace
 spring:
   jpa:
     hibernate:
@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

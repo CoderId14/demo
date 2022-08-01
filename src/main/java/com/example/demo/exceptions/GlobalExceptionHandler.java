@@ -2,6 +2,7 @@ package com.example.demo.exceptions;
 
 
 import com.example.demo.dto.response.ApiResponse;
+import com.example.demo.exceptions.user.ResourceExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resolveException(ResourceNotFoundException ex){
         ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<?> resolveException(ResourceExistsException ex){
+        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
