@@ -18,7 +18,6 @@ spring:
     username: root
     password: hieu
     url: jdbc:mysql://localhost:3306/demo
-
   mail:
     username: danghieu14th@gmail.com
     password: cckuoukwlxufnghe
