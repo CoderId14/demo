@@ -10,17 +10,17 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: ${SPRING_JPA_HIBERNATE_DIALECT}
     defer-datasource-initialization: true
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: hieu
-    url: jdbc:mysql://localhost:3306/demo
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+    url: ${JDBC_DATABASE_URL}
   mail:
-    username: danghieu14th@gmail.com
-    password: cckuoukwlxufnghe
+    username: ${MAIL_UESRNAME}
+    password: ${MAIL_PASSWORD}
     host: smtp.gmail.com
     properties:
       mail:
@@ -33,8 +33,8 @@ spring:
       client:
         registration:
           google:
-            clientId: 526186141332-u50rj397qb1gcarsd5avc8qreckpatrr.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
+            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
