@@ -14,35 +14,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(AuthController.class)
+@AutoConfigureMockMvc
+@SpringBootTest
 class AuthControllerTest {
 
     @MockBean
     UserService userService;
-    @MockBean
-    PasswordEncoder passwordEncoder;
-    @MockBean
-    UserRepo userRepo;
-    @MockBean
-    JwtSecurityFilter jwtSecurityFilter;
     @Autowired
     MockMvc mockMvc;
 
@@ -76,14 +77,11 @@ class AuthControllerTest {
 
     @Test
     void signUp() throws Exception {
-        UserDto user = UserDto.builder()
-                .username(USER_1_SIGNUP.getUsername())
-                .email(USER_1_SIGNUP.getEmail())
-                .isActive(true)
-                .build();
-//        when(userService.signUp(USER_1_SIGNUP)).thenReturn(user);
-//        mockMvc.perform(post("/api/auth/register", USER_1_SIGNUP))
-//                .andExpect(status().isCreated());
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -92,8 +90,9 @@ class AuthControllerTest {
 //                .accessToken("test")
 //                        .username("user1")
 //                .build());
-        when(userRepo.findByUsername("user1")).thenReturn(Optional.ofNullable(user));
-        when(passwordEncoder.matches(USER_1_LOGIN.getPassword(),"user1")).thenReturn(true);
+//        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+//        param.add("username", USER_1_LOGIN.getUsername());
+//        param.add("password", USER_1_LOGIN.getPassword());
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                         .content(asJsonString(USER_1_LOGIN))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,6 +110,10 @@ class AuthControllerTest {
     }
 
     @Test
-    void confirm() {
+    void confirm() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/signUp/confirm")
+                        .param("token", "testtoken")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

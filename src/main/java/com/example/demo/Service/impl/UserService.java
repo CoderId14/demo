@@ -147,7 +147,7 @@ public class UserService implements IUserService {
         String link = LINK_FORGOT_PASSWORD + token;
         emailService.send(user.getEmail(),
                 mailBuilder.buildEmailForgotPassword(user.getUsername(),link));
-        return new ForgotPasswordResponse("Check your email: " + user.getEmail(), token);
+        return new ForgotPasswordResponse(user.getEmail(), token);
     }
 
 

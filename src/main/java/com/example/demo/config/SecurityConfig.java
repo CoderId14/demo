@@ -61,7 +61,7 @@ public class SecurityConfig {
                         "/api/auth/register/**",
                         "/api/user/**",
                 "/oauth2/**",
-                "/auth/**"
+                "api/auth/**"
                         ).permitAll()
                 .anyRequest().authenticated()
                 .and()

@@ -32,9 +32,9 @@ public class AuthController {
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpDto signUpRequest) {
         log.info("Signup controller");
         UserDto user = userService.signUp(signUpRequest);
-        URI uri = URI.create("{baseUrl} + /api/auth/register");
+        URI uri = URI.create("/api/auth/register");
         return ResponseEntity.created(uri).body(new ObjectResponse(HttpStatus.CREATED,
-                "Register user: " + user.getName(),
+                "Register user: ",
                 user));
     }
     @PostMapping("/login")
@@ -45,7 +45,7 @@ public class AuthController {
 
     }
 
-    @GetMapping("/signUp/confirm")
+    @GetMapping("/register/confirm")
     public String confirm(@RequestParam("token") String token){
         return userService.confirmToken(token);
     }
