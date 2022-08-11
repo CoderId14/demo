@@ -1,6 +1,7 @@
 package com.example.demo.auth;
 
 import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.Utils.CookieUtils;
 import com.example.demo.auth.user.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -42,8 +45,10 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-            final String requestTokenHeader = request.getHeader("Authorization");
-
+            String requestTokenHeader = request.getHeader("Authorization");
+            if( requestTokenHeader == null && CookieUtils.getCookie(request, "token").isPresent()){
+                requestTokenHeader ="Bearer " + CookieUtils.getCookie(request, "token").get().getValue();
+            }
             String email = null;
             String jwtToken = null;
 

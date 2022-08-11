@@ -10,10 +10,7 @@ import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.Mapper;
 import com.example.demo.dto.entity.UserDto;
-import com.example.demo.dto.request.ChangePasswordDto;
-import com.example.demo.dto.request.ForgotPasswordDto;
-import com.example.demo.dto.request.LoginDto;
-import com.example.demo.dto.request.SignUpDto;
+import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.ChangePasswordResponse;
 import com.example.demo.dto.response.ForgotPasswordResponse;
 import com.example.demo.dto.response.JwtAuthenticationResponse;
@@ -46,8 +43,8 @@ import static com.example.demo.Utils.Vadilate.isEmail;
 @Slf4j
 public class UserService implements IUserService {
 
-    private final String LINK_VERIFY = "http://localhost:8080/api/auth/signUp/confirm?token=";
-    private final String LINK_FORGOT_PASSWORD = "http://localhost:8080/api/user/forgot-password?token=";
+    private final String LINK_VERIFY = "http://localhost:3000/register/callback?token=";
+    private final String LINK_FORGOT_PASSWORD = "http://localhost:3000/change-password?token=";
 
     private final JwtManager jwtManager;
 
@@ -66,10 +63,19 @@ public class UserService implements IUserService {
     private final CustomUserDetailsService customUserDetailsService;
 
 
-    public User getUser(String username){
-        return userRepo.findByUsername(username).orElseThrow(
-        () -> new ResourceNotFoundException("User", "Username", username)
-        );
+    public String getEmailbyUsername(String usernameOrEmail){
+        User user;
+        if(isEmail(usernameOrEmail)){
+            user = userRepo.findByEmail(usernameOrEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Email", usernameOrEmail)
+            );
+        }
+        else{
+            user = userRepo.findByUsername(usernameOrEmail).orElseThrow(
+                    ()-> new ResourceNotFoundException("User", "Username", usernameOrEmail)
+            );
+        }
+        return user.getEmail();
     }
 //    Test
     public UserDto addUser(SignUpDto signUpDto){
@@ -101,7 +107,7 @@ public class UserService implements IUserService {
         log.info("Service: updatePassword");
         User user;
         ConfirmationToken token = confirmationTokenService.getToken(changePasswordDto.getToken()).orElseThrow(
-                () -> new IllegalStateException("Token not found")
+                () -> new ResourceNotFoundException("Confirmation Token", "token", changePasswordDto.getToken())
         );
 
         String usernameOrEmail = changePasswordDto.getUsernameOrEmail();
@@ -202,7 +208,7 @@ public class UserService implements IUserService {
         log.info("Login service");
         CustomUserDetails userDetails;
         try {
-            userDetails = new CustomUserDetails(userRepo.findByUsername(loginDto.getUsername()).get());
+            userDetails = customUserDetailsService.loadUserByUsername(loginDto.getUsername());
 
         } catch (UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
@@ -240,7 +246,7 @@ public class UserService implements IUserService {
     public UserTokenResponse getUserFromToken(String token){
         log.info("Service: Get user from token: " + token);
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
-                () -> new IllegalStateException("Token not found")
+                () -> new ResourceNotFoundException("Confirmation Token", "token", token)
         );
         return UserTokenResponse.builder()
                 .username(confirmationToken.getUser().getUsername())
@@ -252,7 +258,7 @@ public class UserService implements IUserService {
     public String confirmToken(String token){
         log.info("Confirm token");
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(
-                () -> new IllegalStateException("Token not found")
+                () -> new ResourceNotFoundException("Confirmation Token", "token", token)
         );
         if(!confirmationTokenService.isTokenValid(token)){
             confirmationTokenService.setConfirmDate(token);
@@ -260,7 +266,8 @@ public class UserService implements IUserService {
             this.activeUser(confirmationToken.getUser().getUsername());
             return "confirmed";
         }
-        throw new IllegalStateException("Token expired");
+        throw new ResourceNotFoundException("Confirmation Token", "token", token);
+
     }
 
     public void activeUser(String username){

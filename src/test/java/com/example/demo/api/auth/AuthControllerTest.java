@@ -1,119 +1,224 @@
 package com.example.demo.api.auth;
 
-import com.example.demo.Repository.UserRepo;
+import com.example.demo.CommonOperations;
 import com.example.demo.Service.impl.UserService;
-import com.example.demo.auth.JwtSecurityFilter;
-import com.example.demo.dto.entity.UserDto;
+import com.example.demo.dto.request.ConfirmationDto;
 import com.example.demo.dto.request.LoginDto;
 import com.example.demo.dto.request.SignUpDto;
-import com.example.demo.dto.response.JwtAuthenticationResponse;
-import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.DbSetupTracker;
+import com.ninja_squad.dbsetup.destination.DataSourceDestination;
+import com.ninja_squad.dbsetup.destination.Destination;
+import com.ninja_squad.dbsetup.operation.Operation;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import static com.example.demo.CommonOperations.asJsonString;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import javax.sql.DataSource;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
+import static com.ninja_squad.dbsetup.Operations.insertInto;
+import static com.ninja_squad.dbsetup.Operations.sequenceOf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 class AuthControllerTest {
-
-    @MockBean
-    UserService userService;
+    private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
     @Autowired
     MockMvc mockMvc;
-
-    LoginDto USER_1_LOGIN;
-    SignUpDto USER_1_SIGNUP;
-
-    User user;
+    @Autowired
+    DataSource dataSource;
     @BeforeEach
-    void init(){
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.builder()
-                .roleName("ROLE_USER")
-                .build());
-        user =User.builder()
-                .roles(roles)
-                .username("user1")
-                .password("user1")
-                .isActive(true)
-                .email("user1@gmail.com")
-                .build();
-        USER_1_LOGIN = LoginDto.builder()
-                .username("user1")
-                .password("user1")
-                .build();
-        USER_1_SIGNUP = SignUpDto.builder()
-                .username("user1")
-                .password("user1")
-                .email("user1@gmail.com")
-                .build();
+    void prepare(){
+        final Operation insertRole =
+                insertInto("tbl_role")
+                        .row()
+                        .column("id", 1)
+                        .column("role_name", "ROLE_USER")
+                        .end()
+
+
+                        .build();
+
+        final Operation insertUser =
+                insertInto("tbl_user")
+                        .row()
+                        .column("id", 1)
+                        .column("avatar", "")
+                        .column("email", "test1@gmail.com")
+                        .column("is_active", 1)
+                        .column("name", "test1")
+                        .column("password", "$2a$10$g2LNKcrRhx6aKDp1OELyVeITVsfYe5msrBT1jiVtDPaiAOhanDEuq")
+                        .column("username", "test1")
+                        .end()
+
+                        .build();
+
+        final Operation insertUserRole =
+                insertInto("tbl_user_role")
+                        .row()
+                        .column("user_id", 1)
+                        .column("role_id", 1)
+                        .end().build();
+        final Operation insertConfirmationToken =
+                insertInto("tbl_confirmation_token")
+                        .row()
+                        .column("id", 1)
+                        .column("user_id", 1)
+                        .column("created_date", LocalDateTime.now())
+                        .column("expire_date", LocalDateTime.now().plusMinutes(15))
+                        .column("token", "testtoken")
+                        .end().build();
+        Operation operation = sequenceOf(
+                CommonOperations.DELETE_ALL,
+                insertRole,
+                insertUser,
+                insertUserRole,
+                insertConfirmationToken
+        );
+        Destination dest = new DataSourceDestination(dataSource);
+        DbSetup dbSetup = new DbSetup(dest, operation);
+        dbSetupTracker.launchIfNecessary(dbSetup);
     }
 
     @Test
-    void signUp() throws Exception {
+    @DisplayName("REGISTER: CASE 1: Username Password Email validated")
+    void signUpCase1() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("test2")
+                .password("test2")
+                .email("test2@gmail.com")
+                .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
                         .content(asJsonString(USER_1_SIGNUP))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.responseData.username", is("test2")));
     }
-
     @Test
-    void login() throws Exception {
-//        when(userService.login(USER_1_LOGIN)).thenReturn(JwtAuthenticationResponse.builder()
-//                .accessToken("test")
-//                        .username("user1")
-//                .build());
-//        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-//        param.add("username", USER_1_LOGIN.getUsername());
-//        param.add("password", USER_1_LOGIN.getPassword());
+    @DisplayName("REGISTER: CASE 2: Username Password Email empty")
+    void signUpCase2() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("")
+                .password("")
+                .email("")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
+                .andExpect(jsonPath("$.messages[1]", containsString("Field: email")))
+                .andExpect(jsonPath("$.messages[2]", containsString("Field: username")));
+    }
+    @Test
+    @DisplayName("REGISTER: CASE 3: Username Password Email invalid")
+    void signUpCase3() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("!#@$%^")
+                .password("!@#$%")
+                .email("!@#$%^%@gmail.com")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
+                .andExpect(jsonPath("$.messages[1]", containsString("Field: email")))
+                .andExpect(jsonPath("$.messages[2]", containsString("Field: username")));
+    }
+    @Test
+    @DisplayName("LOGIN: CASE 1: Username, Password valid and user exist in database")
+    void loginCase1() throws Exception {
+
+        LoginDto USER_1_LOGIN = LoginDto.builder()
+                .username("test1")
+                .password("test1")
+                .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                         .content(asJsonString(USER_1_LOGIN))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.responseData.username", is("test1")));
     }
+    @Test
+    @DisplayName("LOGIN: CASE 2: Username, Password empty")
+    void loginCase2() throws Exception {
 
-    public static String asJsonString(final Object obj){
-        try{
-            return new ObjectMapper().writeValueAsString(obj);
-        }
-        catch (Exception e){
-            throw new RuntimeException(e);
-        }
+        LoginDto USER_1_LOGIN = LoginDto.builder()
+                .username("")
+                .password("")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .content(asJsonString(USER_1_LOGIN))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
+                .andExpect(jsonPath("$.messages[1]", containsString("Field: username")));
+    }
+    @Test
+    @DisplayName("LOGIN: CASE 3: Username, Password invalid with sensitive character")
+    void loginCase3() throws Exception {
+
+        LoginDto USER_1_LOGIN = LoginDto.builder()
+                .username("*%*&^*&_")
+                .password("*%*&^*&_")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .content(asJsonString(USER_1_LOGIN))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
+                .andExpect(jsonPath("$.messages[1]", containsString("Field: username")));
     }
 
     @Test
-    void confirm() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/signUp/confirm")
-                        .param("token", "testtoken")
+    @DisplayName("CONFIRM: CASE 1: Token valid")
+    void confirmCase1() throws Exception {
+        ConfirmationDto token = ConfirmationDto.builder()
+                .token("testtoken")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register/confirm")
+                        .content(asJsonString(token))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+    @Test
+    @DisplayName("CONFIRM: CASE 2: Token invalid")
+    void confirmCase2() throws Exception {
+        ConfirmationDto token = ConfirmationDto.builder()
+                .token("invalidTestToken")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register/confirm")
+                        .content(asJsonString(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
 }

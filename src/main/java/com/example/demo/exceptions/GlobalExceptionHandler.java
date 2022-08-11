@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.naming.AuthenticationException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -29,7 +31,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resolveException(ResourceNotFoundException ex){
         ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ResourceExistsException.class)
     public ResponseEntity<?> resolveException(ResourceExistsException ex){
@@ -46,14 +48,18 @@ public class GlobalExceptionHandler {
             ex.getBindingResult().getFieldErrors().forEach(
                     error -> errors.put(error.getField(),error.getDefaultMessage())
             );
-            String errorMessage = "";
+            List<String> errorMessage = new ArrayList<>();
             for (String key :
                     errors.keySet()) {
-                errorMessage+= "Field: " + key + ", " + errors.get(key) + "\n";
+                errorMessage.add("Field: " + key + ", " + errors.get(key));
             }
-            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+            ApiResponse apiResponse = new ApiResponse(false, errorMessage);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+
         }
         log.info("Field valid");
+
+
         return new ResponseEntity<>("Field valid", HttpStatus.ACCEPTED);
     }
 }

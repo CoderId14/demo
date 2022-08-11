@@ -4,6 +4,7 @@ import com.example.demo.Repository.ConfirmationTokenRepo;
 import com.example.demo.Service.IConfirmationTokenService;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.User;
+import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class ConfirmationTokenService implements IConfirmationTokenService {
     }
     public Boolean isTokenValid(String token){
         ConfirmationToken confirmationToken = this.getToken(token).orElseThrow(
-                () -> new IllegalStateException("Token not found")
+                () -> new ResourceNotFoundException("Confirmation Token", "token", token)
         );
 
         if(confirmationToken.getConfirmedDate() != null){

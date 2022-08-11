@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,8 @@ public class User extends BaseEntity {
     @Column(name = "Name", columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
     private String name;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<ConfirmationToken> confirmationToken;
     @Lob
     @Column(name = "Avatar")
     private String avatar;

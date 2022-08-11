@@ -34,7 +34,7 @@ public class ConfirmationToken {
     private String token;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(nullable = false,
-            name = "UserId")
+            name = "user_id")
     private User user;
 
     @Column

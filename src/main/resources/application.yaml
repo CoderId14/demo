@@ -10,14 +10,14 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: ${SPRING_JPA_HIBERNATE_DIALECT}
+        dialect: org.hibernate.dialect.MySQL8Dialect
     defer-datasource-initialization: true
 
   datasource:
-    driver-class-name: org.postgresql.Driver
-    username: ${JDBC_DATABASE_USERNAME}
-    password: ${JDBC_DATABASE_PASSWORD}
-    url: ${JDBC_DATABASE_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: hieu
+    url: jdbc:mysql://localhost:3306/demo
   mail:
     username: ${MAIL_UESRNAME}
     password: ${MAIL_PASSWORD}

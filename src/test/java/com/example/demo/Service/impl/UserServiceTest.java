@@ -102,7 +102,7 @@ class UserServiceTest {
     @Test
     @DisplayName("LOGIN SUCCESS WITH USERNAME")
     void login() {
-        when(userRepo.findByUsername(USER_1_LOGIN.getUsername())).thenReturn(Optional.ofNullable(user));
+        when(customUserDetailsService.loadUserByUsername(USER_1_LOGIN.getUsername())).thenReturn(new CustomUserDetails(user));
         when(passwordEncoder.matches(USER_1_LOGIN.getPassword(),"user1")).thenReturn(true);
         String test = userService.login(USER_1_LOGIN).getUsername();
         Assertions.assertEquals("user1", test);

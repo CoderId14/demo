@@ -6,10 +6,7 @@ import com.example.demo.Service.CustomUserDetailsService;
 import com.example.demo.Service.impl.UserService;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.entity.UserDto;
-import com.example.demo.dto.request.ChangePasswordDto;
-import com.example.demo.dto.request.ForgotPasswordDto;
-import com.example.demo.dto.request.LoginDto;
-import com.example.demo.dto.request.SignUpDto;
+import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.ChangePasswordResponse;
 import com.example.demo.dto.response.ForgotPasswordResponse;
 
@@ -36,11 +33,17 @@ public class UserController {
 
     private final UserService userService;
 
-
     @GetMapping
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user){
-        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "", user.getUser().getUsername()));
+    public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail){
+        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "get email", userService.getEmailbyUsername(usernameOrEmail)));
     }
+
+    @GetMapping("/current-user")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user){
+        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "get email", user.getUser().getEmail()));
+    }
+
+
     @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto){
         UserDto userDto = userService.addUser(signUpDto);
@@ -56,6 +59,7 @@ public class UserController {
 //    3
     @PostMapping("/change-password")
     public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordDto changePasswordDto){
+        log.info("Controller :change-password");
         ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordDto);
         return ResponseEntity.ok(changePasswordResponse);
     }
