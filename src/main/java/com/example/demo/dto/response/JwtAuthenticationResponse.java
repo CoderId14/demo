@@ -10,4 +10,6 @@ public class JwtAuthenticationResponse {
 
     private String username;
 
+    private String role;
+
 }

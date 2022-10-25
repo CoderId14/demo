@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class ResourceNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 

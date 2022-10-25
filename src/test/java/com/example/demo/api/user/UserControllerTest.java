@@ -161,6 +161,20 @@ public class UserControllerTest {
         ChangePasswordDto changePasswordDto = ChangePasswordDto.builder()
                 .usernameOrEmail("invalidtest1")
                 .password("newTest1")
+                .token("invalidtesttoken")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/change-password")
+                        .content(asJsonString(changePasswordDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("Change password (Forgot Password): CASE 3: Username invalid, Password Token valid")
+    void changePasswordCase3() throws Exception {
+        ChangePasswordDto changePasswordDto = ChangePasswordDto.builder()
+                .usernameOrEmail("invalidtest1")
+                .password("newTest1")
                 .token("testtoken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/user/change-password")

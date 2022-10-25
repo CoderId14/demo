@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/v1/api/user")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin
@@ -34,49 +34,68 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail){
-        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "get email", userService.getEmailbyUsername(usernameOrEmail)));
+    public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
+        return ResponseEntity.ok(
+                new ObjectResponse(HttpStatus.OK,
+                        "get email",
+                        userService.getEmailbyUsername(usernameOrEmail)));
     }
 
+
     @GetMapping("/current-user")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user){
-        return ResponseEntity.ok(new ObjectResponse(HttpStatus.OK, "get email", user.getUser().getEmail()));
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.ok(
+                new ObjectResponse(HttpStatus.OK,
+                        "get email",
+                        user.getUser().getEmail()));
     }
 
 
     @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto){
+    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto) {
         UserDto userDto = userService.addUser(signUpDto);
         return ResponseEntity.ok(userDto);
     }
-//    2
+
+    //    2
     @GetMapping("/forgot-password")
-    public UserTokenResponse formForgotPassword(@RequestParam("token") String token){
+    public ResponseEntity<?> formForgotPassword(@RequestParam("token") String token) {
         log.info("Controller: get user from token");
         UserTokenResponse userTokenResponse = userService.getUserFromToken(token);
-        return userTokenResponse;
+        return ResponseEntity.ok(
+                new ObjectResponse(HttpStatus.OK,
+                        "Get user successfully",
+                        userTokenResponse));
     }
-//    3
+
+    //    3
     @PostMapping("/change-password")
-    public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordDto changePasswordDto){
+    public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordDto changePasswordDto) {
         log.info("Controller :change-password");
         ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordDto);
-        return ResponseEntity.ok(changePasswordResponse);
+        return ResponseEntity.ok(new ObjectResponse(HttpStatus.CREATED,
+                "Change password successfully",
+                        changePasswordResponse)
+                );
     }
-//    1
+
+    //    1
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDto request){
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDto request) {
         log.info("forgot password controller");
 
-        return ResponseEntity.ok(userService.forgotPassword(request));
+        return ResponseEntity.ok(new ObjectResponse(HttpStatus.CREATED,
+                "Send email successfully",
+                userService.forgotPassword(request))
+        );
 
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> deleteUser(@RequestParam("id") Long id){
-        log.info("Delete user id= "+id);
+    public ResponseEntity<?> deleteUser(@RequestParam("id") Long id) {
+        log.info("Delete user id= " + id);
         userService.delete(id);
-        return ResponseEntity.ok("Delete user id = " +id);
+        return ResponseEntity.ok("Delete user id = " + id);
     }
 
 

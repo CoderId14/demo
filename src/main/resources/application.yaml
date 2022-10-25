@@ -1,9 +1,16 @@
 server:
   port: 8080
-#logging:
-#  level:
-#    root: info
-#    org.springframework.boot.security: trace
+app:
+  jwt:
+    expire: 3600
+    secret: secret
+  authorizedRedirectUris: http://localhost:3000
+  apiUrl: http://localhost:8080
+
+logging:
+  level:
+    root: info
+    org.springframework.boot.security: debug
 spring:
   jpa:
     hibernate:
@@ -19,8 +26,8 @@ spring:
     password: hieu
     url: jdbc:mysql://localhost:3306/demo
   mail:
-    username: ${MAIL_UESRNAME}
-    password: ${MAIL_PASSWORD}
+    username: danghieu14th@gmail.com
+    password: cckuoukwlxufnghe
     host: smtp.gmail.com
     properties:
       mail:
@@ -33,8 +40,8 @@ spring:
       client:
         registration:
           google:
-            clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
-            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+            clientId: "526186141332-u50rj397qb1gcarsd5avc8qreckpatrr.apps.googleusercontent.com"
+            clientSecret: "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"
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -43,8 +50,5 @@ spring:
 cors:
   allowedOrigins: "*"
 
-app:
-  jwt:
-    expire: 3600
-    secret: secret
-  authorizedRedirectUris: http://localhost:3000
+
+

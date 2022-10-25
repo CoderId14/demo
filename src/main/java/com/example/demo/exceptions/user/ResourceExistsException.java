@@ -13,7 +13,7 @@ public class ResourceExistsException extends RuntimeException {
     private Object fieldValue;
 
     public ResourceExistsException(String resourceName, String fieldName, Object fieldValue) {
-        super(String.format("%s already Exist with %s : '%s'", resourceName, fieldName, fieldValue));
+        super(String.format("%s already exist with %s : '%s'", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;

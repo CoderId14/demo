@@ -124,10 +124,7 @@ class AuthControllerTest {
                         .content(asJsonString(USER_1_SIGNUP))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
-                .andExpect(jsonPath("$.messages[1]", containsString("Field: email")))
-                .andExpect(jsonPath("$.messages[2]", containsString("Field: username")));
+                .andExpect(status().isBadRequest());
     }
     @Test
     @DisplayName("REGISTER: CASE 3: Username Password Email invalid")
@@ -141,10 +138,50 @@ class AuthControllerTest {
                         .content(asJsonString(USER_1_SIGNUP))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
-                .andExpect(jsonPath("$.messages[1]", containsString("Field: email")))
-                .andExpect(jsonPath("$.messages[2]", containsString("Field: username")));
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("REGISTER: CASE 4: Username invalid, Password Email valid")
+    void signUpCase4() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("!#@$%^")
+                .password("test1")
+                .email("test1@gmail.com")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("REGISTER: CASE 5: Password invalid, Username Email valid")
+    void signUpCase5() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("test1")
+                .password("#@@#%")
+                .email("test1@gmail.com")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("REGISTER: CASE 6: Email invalid, Username Password valid")
+    void signUpCase6() throws Exception {
+        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+                .username("test1")
+                .password("test1")
+                .email("!@#$#@gmail.com")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                        .content(asJsonString(USER_1_SIGNUP))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
     }
     @Test
     @DisplayName("LOGIN: CASE 1: Username, Password valid and user exist in database")
@@ -158,8 +195,8 @@ class AuthControllerTest {
                         .content(asJsonString(USER_1_LOGIN))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.responseData.username", is("test1")));
+                .andExpect(status().isOk());
+
     }
     @Test
     @DisplayName("LOGIN: CASE 2: Username, Password empty")
@@ -173,9 +210,7 @@ class AuthControllerTest {
                         .content(asJsonString(USER_1_LOGIN))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
-                .andExpect(jsonPath("$.messages[1]", containsString("Field: username")));
+                .andExpect(status().isBadRequest());
     }
     @Test
     @DisplayName("LOGIN: CASE 3: Username, Password invalid with sensitive character")
@@ -189,11 +224,36 @@ class AuthControllerTest {
                         .content(asJsonString(USER_1_LOGIN))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.messages[0]", containsString("Field: password")))
-                .andExpect(jsonPath("$.messages[1]", containsString("Field: username")));
+                .andExpect(status().isBadRequest());
     }
+    @Test
+    @DisplayName("LOGIN: CASE 4: Username invalid")
+    void loginCase4() throws Exception {
 
+        LoginDto USER_1_LOGIN = LoginDto.builder()
+                .username("*%*&^*&_")
+                .password("test1")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .content(asJsonString(USER_1_LOGIN))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("LOGIN: CASE 5: Password invalid with sensitive character")
+    void loginCase5() throws Exception {
+
+        LoginDto USER_1_LOGIN = LoginDto.builder()
+                .username("test1")
+                .password("*%*&^*&_")
+                .build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .content(asJsonString(USER_1_LOGIN))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
     @Test
     @DisplayName("CONFIRM: CASE 1: Token valid")
     void confirmCase1() throws Exception {

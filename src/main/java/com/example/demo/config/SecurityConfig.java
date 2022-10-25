@@ -51,47 +51,49 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and()
                 .csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers("/",
-                        "/api/auth/login/**",
-                        "/api/auth/register/**",
-                        "/api/auth/register/confirm",
-
-                        "/api/user/**",
-                "/oauth2/**",
-                "api/auth/**"
-                        ).permitAll()
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/register/confirm",
+                        "/api/v1/auth/register/username",
+                        "/api/v1/auth/register/email",
+                        "/api/v1/user/**",
+                        "/oauth2/**",
+                        "actuator/**",
+                        "/**"
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
-                    .baseUri("/oauth2/authorize")
-                    .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
                 .and()
-                        .redirectionEndpoint()
-                        .baseUri("/oauth2/callback/*")
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
                 .and()
                 .userInfoEndpoint()
                 .userService(oAuth2UserService)
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler)
-                ;
+        ;
         http.addFilterBefore(jwtSecurityFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling().
                 authenticationEntryPoint(authenticationEntryPoint);
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    similar with AuthenticationManagerBuilder
+    //    similar with AuthenticationManagerBuilder
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
