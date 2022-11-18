@@ -5,4 +5,5 @@ import com.example.demo.entity.f1.RaceTeam;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IRaceCourseRepo extends JpaRepository<RaceCourse, Long> {
+    RaceCourse findByName(String raceCourse);
 }

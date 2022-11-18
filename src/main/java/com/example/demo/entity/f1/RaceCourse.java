@@ -18,7 +18,7 @@ public class RaceCourse extends BaseEntity {
     @Column(name = "name", columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
     private String name;
 
-    @ManyToOne( cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(nullable = false,
             name = "city_id")
     private City city;

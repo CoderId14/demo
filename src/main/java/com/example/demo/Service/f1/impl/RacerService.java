@@ -33,7 +33,12 @@ public class RacerService implements IRacerService {
 
         return racerDtoList;
     }
-
+    public RacerDto getRacer(Long id){
+        Racer racer = racerRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Racer", "Racer id", "Racer id")
+        );
+        return Mapper.toRacerDto(racer);
+    }
     public boolean addRacer(RacerDto racerDto){
 
         Nation nation = nationRepo.findByName(racerDto.getNational());

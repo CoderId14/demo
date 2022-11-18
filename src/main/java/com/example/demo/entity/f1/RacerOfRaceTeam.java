@@ -24,6 +24,8 @@ public class RacerOfRaceTeam extends BaseEntity {
     @JoinColumn(name = "race_team_id")
     RaceTeam raceTeam;
 
+    private boolean status;
+
     @OneToMany(mappedBy = "racerOfRaceTeam", cascade = CascadeType.ALL)
     List<Result> results;
 }

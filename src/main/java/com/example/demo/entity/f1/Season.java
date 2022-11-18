@@ -31,5 +31,5 @@ public class Season extends BaseEntity {
             @JoinColumn(name = "seasonId")},
             inverseJoinColumns = {
                     @JoinColumn(name = "raceTeamId")})
-    private Set<Racer> raceTeams;
+    private Set<RaceTeam> raceTeams;
 }

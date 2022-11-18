@@ -27,7 +27,7 @@ public class GrandPrix extends BaseEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "raceCourse")
+    @JoinColumn(name = "race_course_id")
     private RaceCourse raceCourse;
 
 //    @ManyToMany(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class GrandPrix extends BaseEntity {
     Set<Result> results;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(nullable = false,
-            name = "season")
+            name = "season_id")
     private Season season;
 //    @ManyToMany(mappedBy = "grandPrixes", cascade = CascadeType.ALL)
 //    @EqualsAndHashCode.Exclude

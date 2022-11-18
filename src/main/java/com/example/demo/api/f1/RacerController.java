@@ -24,6 +24,12 @@ public class RacerController {
                 racerService.getAllRacers()
         );
     }
+    @GetMapping("/{id}")
+    ResponseEntity<?> getAllRacers(@PathVariable Long id){
+        return ResponseEntity.ok().body(
+                racerService.getRacer(id)
+        );
+    }
     @PostMapping
     ResponseEntity<?> addRacer(@RequestBody RacerDto racerDto){
         return ResponseEntity.ok().body(

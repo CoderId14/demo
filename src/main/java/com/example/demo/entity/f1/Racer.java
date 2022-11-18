@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,7 +25,7 @@ public class Racer extends BaseEntity {
 
     private Date dateOfBirth;
 
-    @Column(name = "bio", columnDefinition = "VARCHAR(255) CHARACTER SET utf8")
+    @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
 
 //    @ManyToMany(fetch = FetchType.LAZY)
@@ -42,6 +43,8 @@ public class Racer extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "national")
     private Nation national;
+    @OneToMany(mappedBy = "racer", cascade = CascadeType.ALL)
+    List<RacerOfRaceTeam> racerOfRaceTeams;
 //    @ManyToMany(mappedBy = "raceTeams", cascade = CascadeType.ALL)
 //    @EqualsAndHashCode.Exclude
 //    @ToString.Exclude

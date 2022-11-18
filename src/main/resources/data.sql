@@ -1,0 +1,1 @@
+insert into nation (name) values ("test");

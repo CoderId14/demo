@@ -22,15 +22,17 @@ public class Result extends BaseEntity {
     @Column
     private int status;
     @Column
+    private LocalDateTime startTime;
+    @Column
     private LocalDateTime finishTime;
 
-    @ManyToOne( cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false,
-            name = "racerOfTeam")
+            name = "racer_of_team_id")
     private RacerOfRaceTeam racerOfRaceTeam;
-    @ManyToOne( cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false,
-            name = "grandPrix")
+            name = "grand_prix_id")
     private GrandPrix grandPrix;
 //    @ManyToMany(fetch = FetchType.LAZY)
 //    @EqualsAndHashCode.Exclude
