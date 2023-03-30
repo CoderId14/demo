@@ -1,1 +1,1 @@
-insert into nation (name) values ("test");
+insert into tbl_tags (title) values ("Khoa hoc");

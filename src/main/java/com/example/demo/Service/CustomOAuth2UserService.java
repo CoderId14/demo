@@ -9,9 +9,9 @@ import com.example.demo.auth.user.OAuth2UserInfoFactory;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.supports.AuthProvider;
+import com.example.demo.entity.supports.ERole;
 import com.example.demo.exceptions.OAuth2AuthenticationProcessingException;
 import com.example.demo.exceptions.ResourceNotFoundException;
-import com.sun.security.auth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.example.demo.Utils.Constant.ROLE_USER;
+import static com.example.demo.Utils.AppConstants.ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +76,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService implements
     private User signUpNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo){
         Set<Role> roles = new HashSet<>();
         roles.add(
-                roleRepo.findRoleByRoleName(ROLE_USER).orElseThrow(
+                roleRepo.findRoleByRoleName(ERole.ROLE_USER).orElseThrow(
                         () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
                 ));
         User user = User.builder()

@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -14,4 +13,12 @@ import java.util.List;
 @Configuration
 public class AppConfig {
     private List<String> authorizedRedirectUris = new ArrayList<>();
+
+//    @Autowired
+//    private EntityManager em;
+//
+//    @Bean
+//    public JPAQueryFactory jpaQueryFactory() {
+//        return new JPAQueryFactory(em);
+//    }
 }

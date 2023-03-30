@@ -18,41 +18,39 @@ import java.util.Set;
 public class User extends BaseEntity {
 
 
-    @Column(name = "username", length = 30, unique = true)
+    @Column(length = 30, unique = true)
     private String username;
 
-    @Column(name = "password", length = 100, nullable = true)
+    @Column(length = 100, nullable = true)
     private String password;
 
-    @Column(name = "email", length = 40, nullable = false, unique = true)
+    @Column(length = 40, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "Name", columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
+    @Column(columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
     private String name;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<ConfirmationToken> confirmationToken;
     @Lob
-    @Column(name = "Avatar")
+    @Column
     private String avatar;
 
-    @Column(name = "isActive", nullable = false)
+    @Column(columnDefinition="tinyint(1)", nullable = false)
     private Boolean isActive;
 
-    @Column(name ="provider")
+    @Column
     private AuthProvider provider;
-    @Column(name = "providerId")
+    @Column
     private String providerId;
-
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
     @JoinTable(name = "tbl_user_role", joinColumns = {
-            @JoinColumn(name = "UserId")},
+            @JoinColumn(name = "user_id")},
             inverseJoinColumns = {
-                    @JoinColumn(name = "RoleId")})
+                    @JoinColumn(name = "role_id")})
     private Set<Role> roles;
 }

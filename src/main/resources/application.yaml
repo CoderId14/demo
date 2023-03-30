@@ -2,23 +2,44 @@ server:
   port: 8080
 app:
   jwt:
-    expire: 3600
+    expire: 3600000
     secret: secret
   authorizedRedirectUris: http://localhost:3000
   apiUrl: http://localhost:8080
+  front-ui: http://localhost:3000
 
 logging:
   level:
     root: info
-    org.springframework.boot.security: debug
+    org:
+      springframework:
+        boot:
+          security: info
+      hibernate:
+        SQL: info
+        type:
+          descriptor:
+            sql:
+              BasicBinder: info
+hibernate:
+  query:
+    interceptor:
+      error-level: EXCEPTION
 spring:
   jpa:
+#    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-    defer-datasource-initialization: true
+        format_sql: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: '1KB'
+      max-file-size: '10MB'
+      max-request-size: '10MB'
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

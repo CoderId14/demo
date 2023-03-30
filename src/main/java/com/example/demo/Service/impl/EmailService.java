@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import static com.example.demo.Utils.Constant.EMAIL_SEND_FROM;
+import static com.example.demo.Utils.AppConstants.EMAIL_SEND_FROM;
 
 @Service
 @RequiredArgsConstructor

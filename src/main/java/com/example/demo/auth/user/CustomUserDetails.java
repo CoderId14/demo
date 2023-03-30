@@ -2,7 +2,7 @@ package com.example.demo.auth.user;
 
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
-import lombok.Builder;
+import com.example.demo.entity.supports.ERole;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,12 +42,12 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        List<String> authorityList = user.getRoles().stream().map(
+        List<ERole> authorityList = user.getRoles().stream().map(
                 Role::getRoleName
         ).collect(Collectors.toList());
-        for (String authority :
+        for (ERole authority :
                 authorityList) {
-            authorities.add(new SimpleGrantedAuthority(authority));
+            authorities.add(new SimpleGrantedAuthority(authority.toString()));
         }
         return authorities;
     }

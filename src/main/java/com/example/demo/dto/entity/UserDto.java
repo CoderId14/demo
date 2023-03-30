@@ -1,12 +1,13 @@
 package com.example.demo.dto.entity;
 
-import com.example.demo.entity.Role;
+
+import com.example.demo.entity.supports.ERole;
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -22,8 +23,8 @@ public class UserDto {
     private String name;
     private Boolean isActive;
     private String avatar;
-    private Set<Role> roles;
+    private Set<ERole> roles;
 
-    private Date createDate;
-    private Date modifyDate;
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
 }

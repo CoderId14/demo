@@ -1,11 +1,9 @@
 package com.example.demo.api.auth;
 
 import com.example.demo.CommonOperations;
-import com.example.demo.Service.impl.UserService;
-import com.example.demo.dto.request.ConfirmationDto;
-import com.example.demo.dto.request.LoginDto;
-import com.example.demo.dto.request.SignUpDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.demo.api.auth.request.ConfirmationRequest;
+import com.example.demo.api.auth.request.LoginRequest;
+import com.example.demo.api.auth.request.SignUpRequest;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -17,19 +15,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static com.example.demo.CommonOperations.asJsonString;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
 import javax.sql.DataSource;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -100,7 +95,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 1: Username Password Email validated")
     void signUpCase1() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("test2")
                 .password("test2")
                 .email("test2@gmail.com")
@@ -115,7 +110,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 2: Username Password Email empty")
     void signUpCase2() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("")
                 .password("")
                 .email("")
@@ -129,7 +124,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 3: Username Password Email invalid")
     void signUpCase3() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("!#@$%^")
                 .password("!@#$%")
                 .email("!@#$%^%@gmail.com")
@@ -143,7 +138,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 4: Username invalid, Password Email valid")
     void signUpCase4() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("!#@$%^")
                 .password("test1")
                 .email("test1@gmail.com")
@@ -157,7 +152,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 5: Password invalid, Username Email valid")
     void signUpCase5() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("test1")
                 .password("#@@#%")
                 .email("test1@gmail.com")
@@ -171,7 +166,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("REGISTER: CASE 6: Email invalid, Username Password valid")
     void signUpCase6() throws Exception {
-        SignUpDto USER_1_SIGNUP = SignUpDto.builder()
+        SignUpRequest USER_1_SIGNUP = SignUpRequest.builder()
                 .username("test1")
                 .password("test1")
                 .email("!@#$#@gmail.com")
@@ -187,7 +182,7 @@ class AuthControllerTest {
     @DisplayName("LOGIN: CASE 1: Username, Password valid and user exist in database")
     void loginCase1() throws Exception {
 
-        LoginDto USER_1_LOGIN = LoginDto.builder()
+        LoginRequest USER_1_LOGIN = LoginRequest.builder()
                 .username("test1")
                 .password("test1")
                 .build();
@@ -202,7 +197,7 @@ class AuthControllerTest {
     @DisplayName("LOGIN: CASE 2: Username, Password empty")
     void loginCase2() throws Exception {
 
-        LoginDto USER_1_LOGIN = LoginDto.builder()
+        LoginRequest USER_1_LOGIN = LoginRequest.builder()
                 .username("")
                 .password("")
                 .build();
@@ -216,7 +211,7 @@ class AuthControllerTest {
     @DisplayName("LOGIN: CASE 3: Username, Password invalid with sensitive character")
     void loginCase3() throws Exception {
 
-        LoginDto USER_1_LOGIN = LoginDto.builder()
+        LoginRequest USER_1_LOGIN = LoginRequest.builder()
                 .username("*%*&^*&_")
                 .password("*%*&^*&_")
                 .build();
@@ -230,7 +225,7 @@ class AuthControllerTest {
     @DisplayName("LOGIN: CASE 4: Username invalid")
     void loginCase4() throws Exception {
 
-        LoginDto USER_1_LOGIN = LoginDto.builder()
+        LoginRequest USER_1_LOGIN = LoginRequest.builder()
                 .username("*%*&^*&_")
                 .password("test1")
                 .build();
@@ -244,7 +239,7 @@ class AuthControllerTest {
     @DisplayName("LOGIN: CASE 5: Password invalid with sensitive character")
     void loginCase5() throws Exception {
 
-        LoginDto USER_1_LOGIN = LoginDto.builder()
+        LoginRequest USER_1_LOGIN = LoginRequest.builder()
                 .username("test1")
                 .password("*%*&^*&_")
                 .build();
@@ -257,7 +252,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("CONFIRM: CASE 1: Token valid")
     void confirmCase1() throws Exception {
-        ConfirmationDto token = ConfirmationDto.builder()
+        ConfirmationRequest token = ConfirmationRequest.builder()
                 .token("testtoken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register/confirm")
@@ -269,7 +264,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("CONFIRM: CASE 2: Token invalid")
     void confirmCase2() throws Exception {
-        ConfirmationDto token = ConfirmationDto.builder()
+        ConfirmationRequest token = ConfirmationRequest.builder()
                 .token("invalidTestToken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register/confirm")

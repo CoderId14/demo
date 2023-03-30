@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 
 
+import com.example.demo.entity.supports.ERole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -18,10 +19,9 @@ import java.util.Set;
 @Builder
 @PersistenceContext
 public class Role extends BaseEntity {
-
-    @Column(name = "RoleName", unique = true, nullable = false)
-    private String roleName;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_name", unique = true, nullable = false)
+    private ERole roleName;
 
     @ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

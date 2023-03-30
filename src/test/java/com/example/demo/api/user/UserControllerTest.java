@@ -2,8 +2,8 @@ package com.example.demo.api.user;
 
 
 import com.example.demo.CommonOperations;
-import com.example.demo.dto.request.ChangePasswordDto;
-import com.example.demo.dto.request.ForgotPasswordDto;
+import com.example.demo.api.user.request.ChangePasswordRequest;
+import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -144,13 +144,13 @@ public class UserControllerTest {
     @Test
     @DisplayName("Change password (Forgot Password): CASE 1: Username Password Token valid")
     void changePasswordCase1() throws Exception {
-        ChangePasswordDto changePasswordDto = ChangePasswordDto.builder()
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .usernameOrEmail("test1")
                 .password("newTest1")
                 .token("testtoken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/user/change-password")
-                        .content(asJsonString(changePasswordDto))
+                        .content(asJsonString(changePasswordRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -158,13 +158,13 @@ public class UserControllerTest {
     @Test
     @DisplayName("Change password (Forgot Password): CASE 2: Username Password Token invalid")
     void changePasswordCase2() throws Exception {
-        ChangePasswordDto changePasswordDto = ChangePasswordDto.builder()
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .usernameOrEmail("invalidtest1")
                 .password("newTest1")
                 .token("invalidtesttoken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/user/change-password")
-                        .content(asJsonString(changePasswordDto))
+                        .content(asJsonString(changePasswordRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -172,13 +172,13 @@ public class UserControllerTest {
     @Test
     @DisplayName("Change password (Forgot Password): CASE 3: Username invalid, Password Token valid")
     void changePasswordCase3() throws Exception {
-        ChangePasswordDto changePasswordDto = ChangePasswordDto.builder()
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .usernameOrEmail("invalidtest1")
                 .password("newTest1")
                 .token("testtoken")
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/api/user/change-password")
-                        .content(asJsonString(changePasswordDto))
+                        .content(asJsonString(changePasswordRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

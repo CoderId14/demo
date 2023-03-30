@@ -1,14 +1,13 @@
 package com.example.demo.api.user;
 
 
-import com.example.demo.Service.CustomUserDetailsService;
-
-import com.example.demo.Service.impl.UserService;
+import com.example.demo.Service.user.UserService;
+import com.example.demo.api.user.request.ChangePasswordRequest;
+import com.example.demo.api.user.request.ForgotPasswordDto;
+import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.entity.UserDto;
-import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.ChangePasswordResponse;
-import com.example.demo.dto.response.ForgotPasswordResponse;
 
 import com.example.demo.dto.response.ObjectResponse;
 import com.example.demo.dto.response.UserTokenResponse;
@@ -17,15 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/v1/api/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin
@@ -51,9 +48,9 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpDto signUpDto) {
-        UserDto userDto = userService.addUser(signUpDto);
+    @PostMapping(value = "/v1/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpRequest signUpRequest) {
+        UserDto userDto = userService.addUser(signUpRequest);
         return ResponseEntity.ok(userDto);
     }
 
@@ -70,9 +67,9 @@ public class UserController {
 
     //    3
     @PostMapping("/change-password")
-    public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         log.info("Controller :change-password");
-        ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordDto);
+        ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordRequest);
         return ResponseEntity.ok(new ObjectResponse(HttpStatus.CREATED,
                 "Change password successfully",
                         changePasswordResponse)
