@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -18,6 +19,7 @@ import java.util.List;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Builder
 public class Chapter extends BaseEntity{
+    private String title;
     @Column(columnDefinition = "TEXT")
     private String content;
     @Column(columnDefinition = "TEXT")
@@ -27,6 +29,7 @@ public class Chapter extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "book_id")
+    @NotNull
     private Book book;
 
     @JsonIgnore

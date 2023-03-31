@@ -1,10 +1,9 @@
 package com.example.demo.api.auth;
 
-import com.example.demo.Service.auth.RefreshTokenService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.api.auth.request.*;
 import com.example.demo.api.auth.request.SignUpRequest;
-import com.example.demo.dto.entity.UserDto;
+import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.dto.response.ObjectResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class AuthController {
     @PostMapping("/v1/register")
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         log.info("Signup controller");
-        UserDto user = userService.signUp(signUpRequest);
+        UserResponse user = userService.signUp(signUpRequest);
         URI uri = URI.create("/api/auth/register");
         return ResponseEntity.created(uri).body(new ObjectResponse(HttpStatus.CREATED,
                 "Register successfully",

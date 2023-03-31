@@ -12,7 +12,7 @@ public class UpdateBookRequest {
 
     private  String shortDescription;
 
-    private Set<String> categories;
+    private Set<Long> categories;
 
-    private Set<String> tags;
+    private Set<Long> tags;
 }

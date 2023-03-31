@@ -1,6 +1,6 @@
 package com.example.demo.Service.auth;
 
-import com.example.demo.Repository.UserRepo;
+import com.example.demo.Repository.user.UserRepo;
 import com.example.demo.Repository.auth.RefreshTokenRepo;
 import com.example.demo.entity.User;
 import com.example.demo.entity.auth.RefreshToken;

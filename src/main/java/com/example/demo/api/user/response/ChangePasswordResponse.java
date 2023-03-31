@@ -1,4 +1,5 @@
-package com.example.demo.dto.response;
+package com.example.demo.api.user.response;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class UserTokenResponse {
+public class ChangePasswordResponse {
     private String username;
-    private String token;
+    private String password;
 }

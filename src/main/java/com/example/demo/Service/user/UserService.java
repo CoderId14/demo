@@ -1,10 +1,9 @@
 package com.example.demo.Service.user;
 
-import com.example.demo.Repository.RoleRepo;
-import com.example.demo.Repository.UserRepo;
-import com.example.demo.Service.CustomUserDetailsService;
-import com.example.demo.Service.IEmailSender;
-import com.example.demo.Service.impl.ConfirmationTokenService;
+import com.example.demo.Repository.role.RoleRepo;
+import com.example.demo.Repository.user.UserRepo;
+import com.example.demo.Service.email.IEmailSender;
+import com.example.demo.Service.confirmation.ConfirmationTokenService;
 import com.example.demo.Service.auth.RefreshTokenService;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.Utils.MailBuilder;
@@ -14,12 +13,14 @@ import com.example.demo.api.auth.request.LoginRequest;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.example.demo.api.auth.request.SignUpRequest;
+import com.example.demo.api.user.response.ChangePasswordResponse;
+import com.example.demo.api.user.response.ForgotPasswordResponse;
+import com.example.demo.api.user.response.UserTokenResponse;
 import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.Mapper;
-import com.example.demo.dto.entity.UserDto;
+import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.auth.request.TokenRefreshRequest;
-import com.example.demo.dto.response.*;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.auth.response.TokenRefreshResponse;
 import com.example.demo.entity.ConfirmationToken;
@@ -103,7 +104,7 @@ public class UserService implements IUserService {
     }
 
     //    Test
-    public UserDto addUser(SignUpRequest signUpRequest) {
+    public UserResponse addUser(SignUpRequest signUpRequest) {
 
         if (userRepo.existsByUsername(signUpRequest.getUsername())) {
             throw new ResourceExistsException("User", "Username", signUpRequest.getUsername());
@@ -198,7 +199,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDto signUp(SignUpRequest signUpRequest) {
+    public UserResponse signUp(SignUpRequest signUpRequest) {
         log.info("Sign up Service");
         if (userRepo.existsByUsername(signUpRequest.getUsername())) {
             throw new ResourceExistsException("User", "username", signUpRequest.getUsername());
@@ -236,7 +237,6 @@ public class UserService implements IUserService {
         CustomUserDetails userDetails;
         try {
             userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUsername());
-
         } catch (UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }

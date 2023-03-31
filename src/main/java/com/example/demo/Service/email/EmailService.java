@@ -1,6 +1,5 @@
-package com.example.demo.Service.impl;
+package com.example.demo.Service.email;
 
-import com.example.demo.Service.IEmailSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;

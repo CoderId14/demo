@@ -1,4 +1,4 @@
-package com.example.demo.Repository;
+package com.example.demo.Repository.role;
 
 import com.example.demo.entity.Role;
 import com.example.demo.entity.supports.ERole;

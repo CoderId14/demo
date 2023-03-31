@@ -60,6 +60,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ParameterException.class)
+    public ResponseEntity<?> resolveException(ParameterException ex) {
+        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> resolveException(BindException ex) {

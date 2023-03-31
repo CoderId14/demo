@@ -21,4 +21,6 @@ public class AppConstants {
     public static final int MAX_PAGE_SIZE = 30;
 
     public static final String CREATED_DATE = "createdDate";
+
+    public static final String CHAPTER_NUMBER = "chapterNumber";
 }

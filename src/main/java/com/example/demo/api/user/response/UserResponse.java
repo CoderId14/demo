@@ -1,4 +1,4 @@
-package com.example.demo.dto.entity;
+package com.example.demo.api.user.response;
 
 
 import com.example.demo.entity.supports.ERole;
@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class UserDto {
+public class UserResponse {
     private Long userId;
 
     @Email(message = "Email invalid")

@@ -6,11 +6,11 @@ import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.dto.entity.UserDto;
-import com.example.demo.dto.response.ChangePasswordResponse;
+import com.example.demo.api.user.response.UserResponse;
+import com.example.demo.api.user.response.ChangePasswordResponse;
 
 import com.example.demo.dto.response.ObjectResponse;
-import com.example.demo.dto.response.UserTokenResponse;
+import com.example.demo.api.user.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
         return ResponseEntity.ok(
                 new ObjectResponse(HttpStatus.OK,
@@ -39,7 +39,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/current-user")
+    @GetMapping("/v1/current-user")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity.ok(
                 new ObjectResponse(HttpStatus.OK,
@@ -50,12 +50,12 @@ public class UserController {
 
     @PostMapping(value = "/v1/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addUser(@RequestBody @Valid SignUpRequest signUpRequest) {
-        UserDto userDto = userService.addUser(signUpRequest);
-        return ResponseEntity.ok(userDto);
+        UserResponse userResponse = userService.addUser(signUpRequest);
+        return ResponseEntity.ok(userResponse);
     }
 
     //    2
-    @GetMapping("/forgot-password")
+    @GetMapping("/v1/forgot-password")
     public ResponseEntity<?> formForgotPassword(@RequestParam("token") String token) {
         log.info("Controller: get user from token");
         UserTokenResponse userTokenResponse = userService.getUserFromToken(token);
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     //    3
-    @PostMapping("/change-password")
+    @PostMapping("/v1/change-password")
     public ResponseEntity<?> updatePasswordByToken(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         log.info("Controller :change-password");
         ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordRequest);
@@ -77,7 +77,7 @@ public class UserController {
     }
 
     //    1
-    @PostMapping("/forgot-password")
+    @PostMapping("/v1/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordDto request) {
         log.info("forgot password controller");
 
@@ -88,7 +88,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/v1")
     public ResponseEntity<?> deleteUser(@RequestParam("id") Long id) {
         log.info("Delete user id= " + id);
         userService.delete(id);

@@ -1,8 +1,9 @@
 package com.example.demo.Service.book;
 
 
-import com.example.demo.Repository.*;
 import com.example.demo.Repository.book.BookRepo;
+import com.example.demo.Repository.category.CategoryRepo;
+import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.tag.TagRepo;
 import com.example.demo.Service.attachment.AttachmentService;
 import com.example.demo.Utils.AppUtils;
@@ -59,19 +60,19 @@ public class BookService implements IBookService {
 
         Set<Category> categoryEntity = new HashSet<>();
 
-        for (String name: request.getCategories()
+        for (Long id: request.getCategories()
              ) {
-            categoryEntity.add(categoryRepo.findByName(name).orElseThrow(
-                    () -> new ResourceNotFoundException("CATEGORY", "Name", name)
+            categoryEntity.add(categoryRepo.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("category", "id", id)
             ));
         }
 
 
         Set<Tag> tags = new HashSet<>();
-        for (String title: request.getTags()
+        for (Long id: request.getTags()
         ) {
-            tags.add(tagRepo.findByTitle(title).orElseThrow(
-                    () -> new ResourceNotFoundException("tag", "Title", title)
+            tags.add(tagRepo.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("tag", "id", id)
             ));
         }
 
@@ -95,7 +96,7 @@ public class BookService implements IBookService {
                     .title(book.getTitle())
                     .content(book.getContent())
                     .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
-                    .tags(book.getTags().stream().map(Tag::getTitle).collect(Collectors.toSet()))
+                    .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
                     .shortDescription(book.getShortDescription())
                     .thumbnail(book.getThumbnail().getId())
                     .username(book.getUser().getName())
@@ -105,7 +106,7 @@ public class BookService implements IBookService {
                         .title(book.getTitle())
                         .content(book.getContent())
                         .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
-                        .tags(book.getTags().stream().map(Tag::getTitle).collect(Collectors.toSet()))
+                        .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
                         .shortDescription(book.getShortDescription())
                         .username(book.getUser().getName())
                         .build();
@@ -114,23 +115,23 @@ public class BookService implements IBookService {
 
     @Override
     public BookResponse update(long id, UpdateBookRequest request, CustomUserDetails currentUser) {
-        log.info("Update New");
+        log.info("Update Book");
 
         Set<Category> categories = new HashSet<>();
 
-        for (String name: request.getCategories()
+        for (Long categoryId: request.getCategories()
         ) {
-            categories.add(categoryRepo.findByName(name).orElseThrow(
-                    () -> new ResourceNotFoundException("CATEGORY", "Name", name)
+            categories.add(categoryRepo.findById(categoryId).orElseThrow(
+                    () -> new ResourceNotFoundException("category", "id", categoryId)
             ));
         }
 
 
         Set<Tag> tags = new HashSet<>();
-        for (String title: request.getTags()
+        for (Long tagId: request.getTags()
         ) {
-            tags.add(tagRepo.findByTitle(title).orElseThrow(
-                    () -> new ResourceNotFoundException("tag", "Title", title)
+            tags.add(tagRepo.findById(tagId).orElseThrow(
+                    () -> new ResourceNotFoundException("tag", "id", tagId)
             ));
         }
 

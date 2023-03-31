@@ -4,7 +4,7 @@ package com.example.demo.dto;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.dto.entity.UserDto;
+import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class Mapper {
-    public static UserDto toUserDto(User user) {
-        return UserDto.builder()
+    public static UserResponse toUserDto(User user) {
+        return UserResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
@@ -34,4 +34,5 @@ public class Mapper {
                 .role(user.getUser().getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet()))
                 .build();
     }
+
 }

@@ -1,4 +1,4 @@
-package com.example.demo.Service;
+package com.example.demo.Service.confirmation;
 
 import com.example.demo.entity.User;
 

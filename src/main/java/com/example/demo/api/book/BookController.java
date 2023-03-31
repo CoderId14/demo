@@ -47,7 +47,7 @@ public class BookController {
     private BookRepo bookRepo;
 
 
-    @GetMapping
+    @GetMapping("/v1")
     public ResponseEntity<?> getAllBooks(
             @RequestParam(value = "page", required = false,defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
             @RequestParam(value = "size", required = false,defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
@@ -65,7 +65,7 @@ public class BookController {
         return ResponseEntity.ok().body(response);
     }
     @GetMapping("/tags/{id}")
-    public ResponseEntity<?> getNewsByTags(
+    public ResponseEntity<?> getBookByTags(
             @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
             @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
             @PathVariable(name = "id") Long id) {
@@ -111,7 +111,7 @@ public class BookController {
         Page<Book> result = bookRepo.findAll(builder.build(), pageable);
         return ResponseEntity.ok().body(result);
     }
-    @PostMapping(
+    @PostMapping(path = "/v1",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
                     MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE}
@@ -120,14 +120,14 @@ public class BookController {
     public ResponseEntity<?> addBook(
             @ModelAttribute @RequestBody CreateBookRequest model,
             @CurrentUser CustomUserDetails currentUser) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/new").toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/book/v1").toUriString());
         BookResponse response = bookService.save(model,currentUser);
         return ResponseEntity.created(uri).body(response) ;
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/v1/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateNew(
+    public ResponseEntity<?> updateBook(
             @RequestBody UpdateBookRequest model,
             @PathVariable("id") long id,
             @CurrentUser CustomUserDetails currentUser) {
@@ -136,9 +136,9 @@ public class BookController {
                 bookService.update(id,model,currentUser));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/v1/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteNew(
+    public ResponseEntity<?> deleteBook(
             @PathVariable(name = "id") long id,
             @CurrentUser CustomUserDetails currentUser) {
         ApiResponse apiResponse = bookService.delete(id,currentUser);

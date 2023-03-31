@@ -16,18 +16,18 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name="tbl_tags",
+@Table(name="tbl_tag",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = "title")
+        @UniqueConstraint(columnNames = "name")
 }
 )
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Tag extends BaseEntity{
 
     @Column
-    private String title;
+    private String name;
     @Column
-    private String content;
+    private String description;
 
     //thêm JsonIgnore vì This is an issue with bidirectional relationships,
     // as they hold references to each other, at deserialization, Jackson runs in an infinite loop

@@ -1,7 +1,7 @@
 package com.example.demo.Repository;
 
 import com.example.demo.CommonOperations;
-import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.Repository.user.UserRepo;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;

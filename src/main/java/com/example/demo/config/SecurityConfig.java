@@ -1,7 +1,6 @@
 package com.example.demo.config;
 
-import com.example.demo.Service.CustomOAuth2UserService;
-import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.Service.user.CustomOAuth2UserService;
 
 import com.example.demo.auth.JwtSecurityFilter;
 import com.example.demo.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
@@ -12,14 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;

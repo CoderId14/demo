@@ -1,19 +1,22 @@
 package com.example.demo.Service.tag;
 
+import com.example.demo.api.tag.request.CreateTagRequest;
+import com.example.demo.api.tag.request.UpdateTagRequest;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
-import com.example.demo.dto.TagDTO;
+import com.example.demo.api.tag.response.TagResponse;
 import com.example.demo.dto.response.ApiResponse;
+import com.querydsl.core.types.Predicate;
 
 public interface ITagService {
 
-    PagedResponse<TagDTO> getAllTags(int page, int size);
+    PagedResponse<TagResponse> searchTag(Predicate predicate, int page, int size);
 
-    TagDTO getTag(Long id);
+    TagResponse getTag(Long id);
 
-    TagDTO addTag(TagDTO Tag, CustomUserDetails currentUser);
+    TagResponse addTag(CreateTagRequest Tag, CustomUserDetails currentUser);
 
-    TagDTO updateTag(Long id, TagDTO newTag, CustomUserDetails currentUser);
+    TagResponse updateTag(Long id, UpdateTagRequest request, CustomUserDetails currentUser);
 
     ApiResponse deleteTag(Long id, CustomUserDetails currentUser);
 }

@@ -1,6 +1,6 @@
-package com.example.demo.Service;
+package com.example.demo.Service.user;
 
-import com.example.demo.Repository.UserRepo;
+import com.example.demo.Repository.user.UserRepo;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.entity.User;
 import com.example.demo.exceptions.ResourceNotFoundException;

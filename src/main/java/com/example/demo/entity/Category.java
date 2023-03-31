@@ -10,7 +10,10 @@ import java.util.Set;
 
 
 @Entity
-@Table(name ="tbl_category")
+@Table(name ="tbl_category",
+        uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")
+})
 @Getter
 @Setter
 @Builder

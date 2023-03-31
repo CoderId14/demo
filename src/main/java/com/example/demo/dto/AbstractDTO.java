@@ -1,16 +1,20 @@
 package com.example.demo.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AbstractDTO {
-    public long id;
-    public String createdBy;
-    public LocalDateTime createdDate;
-    public String modifiedBy;
-    public LocalDateTime modifiedDate;
+    private long id;
+    private String createdBy;
+    private LocalDateTime createdDate;
+    private String modifiedBy;
+    private LocalDateTime modifiedDate;
 }

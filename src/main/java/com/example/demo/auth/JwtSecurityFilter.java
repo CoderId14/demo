@@ -1,6 +1,6 @@
 package com.example.demo.auth;
 
-import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.Service.user.CustomUserDetailsService;
 import com.example.demo.Utils.CookieUtils;
 import com.example.demo.auth.user.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,9 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

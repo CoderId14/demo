@@ -1,4 +1,4 @@
-package com.example.demo.Service;
+package com.example.demo.Service.email;
 
 public interface IEmailSender {
     void send(String to, String email);

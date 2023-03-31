@@ -13,6 +13,6 @@ public class CreateBookRequest {
     private String title;
     private String shortDescription;
     private String content;
-    private Set<String> categories;
-    private Set<String> tags;
+    private Set<Long> categories;
+    private Set<Long> tags;
 }

@@ -46,4 +46,7 @@ public interface BookRepo extends JpaRepository<Book, Long>,
     Page<Book> findByTagsIn(
             List<Tag> tags,
             Pageable pageable);
+
+    Optional<Book> findByChapters_Id(long id);
+
 }
