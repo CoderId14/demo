@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 
+import com.example.demo.entity.user.User;
 import lombok.*;
 import org.hibernate.Hibernate;
 

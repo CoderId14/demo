@@ -2,7 +2,7 @@ package com.example.demo.Service.confirmation;
 
 import com.example.demo.Repository.ConfirmationTokenRepo;
 import com.example.demo.entity.ConfirmationToken;
-import com.example.demo.entity.User;
+import com.example.demo.entity.user.User;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

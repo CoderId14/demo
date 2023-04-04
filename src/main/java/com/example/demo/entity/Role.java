@@ -3,6 +3,7 @@ package com.example.demo.entity;
 
 
 import com.example.demo.entity.supports.ERole;
+import com.example.demo.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 

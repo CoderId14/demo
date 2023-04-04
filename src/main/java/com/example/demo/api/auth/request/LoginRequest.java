@@ -14,10 +14,10 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class LoginRequest {
-    @NotEmpty(message = "Username not empty")
+    @NotEmpty(message = "Username must not empty")
     @Pattern(regexp = "^(?=.{4,30}$)(?![_.])[a-zA-Z0-9._@]+(?<![_.])$", message = "Username invalid")
     private String username;
-    @NotEmpty(message = "Password not empty")
+    @NotEmpty(message = "Password must not empty")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{4,}$", message = "Password invalid")
     private String password;
 }

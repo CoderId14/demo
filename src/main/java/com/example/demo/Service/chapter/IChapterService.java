@@ -11,7 +11,7 @@ import com.querydsl.core.types.Predicate;
 public interface IChapterService {
     PagedResponse<ChapterResponse> searchChapter(Predicate predicate, int page, int size);
 
-    ChapterResponse getChapter(Long id);
+    ChapterResponse getChapter(Long id, CustomUserDetails currentUser);
 
     ChapterResponse addChapter(CreateChapterRequest request, CustomUserDetails currentUser);
 

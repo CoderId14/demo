@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.entity.user.UserBookHistory;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -36,5 +37,7 @@ public class Chapter extends BaseEntity{
     @OneToMany(fetch = FetchType.LAZY)
     private List<ChapterComment> chapterComment;
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<UserBookHistory> userBookHistories;
 
 }

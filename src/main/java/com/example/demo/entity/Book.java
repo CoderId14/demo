@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.example.demo.entity.user.User;
+import com.example.demo.entity.user.UserBookHistory;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -87,4 +89,7 @@ public class Book extends BaseEntity{
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "thumbnail", referencedColumnName = "id")
     private Attachment thumbnail;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<UserBookHistory> userBookHistories;
 }

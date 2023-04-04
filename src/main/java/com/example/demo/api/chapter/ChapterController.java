@@ -27,6 +27,7 @@ import java.net.URI;
 public class ChapterController {
     private final ChapterService chapterService;
 
+
     @GetMapping("/v1/search")
     public ResponseEntity<PagedResponse<ChapterResponse>> searchChapter(
             @QuerydslPredicate(root = Chapter.class) Predicate predicate,
@@ -48,8 +49,9 @@ public class ChapterController {
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<?> getChapter(@PathVariable(name = "id") Long id) {
-        ChapterResponse response = chapterService.getChapter(id);
+    public ResponseEntity<?> getChapter(@PathVariable(name = "id") Long id,
+                                        @CurrentUser CustomUserDetails currentUser) {
+        ChapterResponse response = chapterService.getChapter(id, currentUser);
 
         return ResponseEntity.ok().body(response);
     }

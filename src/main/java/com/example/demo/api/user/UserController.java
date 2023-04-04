@@ -1,10 +1,14 @@
 package com.example.demo.api.user;
 
 
+import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
+import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.example.demo.api.auth.request.SignUpRequest;
+import com.example.demo.api.user.request.UserBookHistoryRequest;
+import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.user.response.ChangePasswordResponse;
@@ -30,6 +34,8 @@ public class UserController {
 
     private final UserService userService;
 
+    private final UserHistoryService userHistoryService;
+
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
         return ResponseEntity.ok(
@@ -38,6 +44,20 @@ public class UserController {
                         userService.getEmailbyUsername(usernameOrEmail)));
     }
 
+    @GetMapping("/v1/reading-history")
+    public ResponseEntity<?> getReadingHistory(
+            @RequestParam(value = "userId") Long userId,
+            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
+            @CurrentUser CustomUserDetails user) {
+
+        UserBookHistoryRequest request = UserBookHistoryRequest.builder()
+                .userId(userId)
+                .page(page)
+                .size(size)
+                .build();
+        return ResponseEntity.ok(userHistoryService.getHistory(request, user));
+    }
 
     @GetMapping("/v1/current-user")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user) {
@@ -72,8 +92,8 @@ public class UserController {
         ChangePasswordResponse changePasswordResponse = userService.updatePasswordByToken(changePasswordRequest);
         return ResponseEntity.ok(new ObjectResponse(HttpStatus.CREATED,
                 "Change password successfully",
-                        changePasswordResponse)
-                );
+                changePasswordResponse)
+        );
     }
 
     //    1

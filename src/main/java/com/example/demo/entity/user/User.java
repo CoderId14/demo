@@ -1,5 +1,8 @@
-package com.example.demo.entity;
+package com.example.demo.entity.user;
 
+import com.example.demo.entity.BaseEntity;
+import com.example.demo.entity.ConfirmationToken;
+import com.example.demo.entity.Role;
 import com.example.demo.entity.supports.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -21,7 +24,7 @@ public class User extends BaseEntity {
     @Column(length = 30, unique = true)
     private String username;
 
-    @Column(length = 100, nullable = true)
+    @Column(length = 100)
     private String password;
 
     @Column(length = 40, nullable = false, unique = true)

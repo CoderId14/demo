@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=hieu
+      - MYSQL_DATABASE=demo
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  app:
+    image: springboot-reading:latest
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:

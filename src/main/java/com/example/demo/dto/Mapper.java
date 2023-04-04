@@ -2,7 +2,7 @@ package com.example.demo.dto;
 
 
 import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
+import com.example.demo.entity.user.User;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;

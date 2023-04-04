@@ -25,7 +25,7 @@ import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.auth.response.TokenRefreshResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
+import com.example.demo.entity.user.User;
 import com.example.demo.entity.auth.RefreshToken;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
@@ -77,16 +77,10 @@ public class UserService implements IUserService {
     private final RefreshTokenService refreshTokenService;
 
     public boolean isUsernameExist(CheckUsernameRequest checkUsernameRequest){
-        if(userRepo.findByUsername(checkUsernameRequest.getUsername()).isPresent()){
-            return true;
-        }
-        return false;
+        return userRepo.findByUsername(checkUsernameRequest.getUsername()).isPresent();
     }
     public boolean isEmailExist(CheckEmailRequest checkEmailRequest){
-        if(userRepo.findByEmail(checkEmailRequest.getEmail()).isPresent()){
-            return true;
-        }
-        return false;
+        return userRepo.findByEmail(checkEmailRequest.getEmail()).isPresent();
     }
 
     public String getEmailbyUsername(String usernameOrEmail) {

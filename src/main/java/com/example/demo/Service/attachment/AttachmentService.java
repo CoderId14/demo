@@ -5,6 +5,7 @@ import com.example.demo.Repository.AttachmentRepo;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.attachment.response.AttachmentResponse;
 import com.example.demo.entity.Attachment;
+import com.example.demo.exceptions.BadRequestException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -82,7 +83,7 @@ public class AttachmentService implements IAttachmentService {
     }
 
     public Attachment saveImg(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         try {
             if(isImageFile(file)){
                 Attachment attachment =
@@ -95,7 +96,7 @@ public class AttachmentService implements IAttachmentService {
 
         }
         catch (Exception e){
-            throw new RuntimeException("Could not save file");
+            throw new BadRequestException("Could not save file");
         }
     }
 
@@ -120,7 +121,7 @@ public class AttachmentService implements IAttachmentService {
                 attachmentRepository.findById(fileId).orElseThrow(
                         () -> new ResourceNotFoundException("file attachment",fileId,fileId)
                 );
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         try{
             attachment.setFileName(fileName);
             attachment.setData(file.getBytes());

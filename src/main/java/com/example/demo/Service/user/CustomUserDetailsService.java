@@ -2,7 +2,7 @@ package com.example.demo.Service.user;
 
 import com.example.demo.Repository.user.UserRepo;
 import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.entity.User;
+import com.example.demo.entity.user.User;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

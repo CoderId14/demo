@@ -1,25 +1,27 @@
 package com.example.demo.exceptions;
 
 
-import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.dto.response.ApiResponseError;
-import com.example.demo.dto.response.ErrorMessage;
 import com.example.demo.dto.response.ErrorResponse;
 import com.example.demo.exceptions.auth.TokenRefreshException;
+import com.example.demo.exceptions.auth.UnauthorizedException;
 import com.example.demo.exceptions.user.AccountActiveException;
 import com.example.demo.exceptions.user.ResourceExistsException;
 import com.example.demo.exceptions.user.TokenInvalidException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.naming.AuthenticationException;
 import java.util.*;
+
+import static org.springframework.http.HttpStatus.*;
 
 
 @ControllerAdvice
@@ -27,43 +29,47 @@ import java.util.*;
 public class GlobalExceptionHandler {
     @ExceptionHandler(TokenInvalidException.class)
     public ResponseEntity<?> resolveException(TokenInvalidException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
 
     @ExceptionHandler(AccountActiveException.class)
     public ResponseEntity<?> resolveException(AccountActiveException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> resolveException(UnauthorizedException ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> resolveException(AuthenticationException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
 
-    //    @ExceptionHandler(BadRequestException.class)
-//    @ResponseBody
-//    public ResponseEntity<?> handleMethodArgumentNotValidException(BadRequestException ex) {
-//        ApiResponseError apiResponseError = new ApiResponseError(ex.getMessage())
-//    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(BadRequestException ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resolveException(ResourceNotFoundException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceExistsException.class)
     public ResponseEntity<?> resolveException(ResourceExistsException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
 
     @ExceptionHandler(ParameterException.class)
     public ResponseEntity<?> resolveException(ParameterException ex) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> resolveException (MissingServletRequestParameterException ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -75,7 +81,6 @@ public class GlobalExceptionHandler {
             ex.getBindingResult().getFieldErrors().forEach(
                     error -> errors.put(error.getField(), error.getDefaultMessage())
             );
-            List<String> errorMessage = new ArrayList<>();
             ApiResponseError errorMessages = new ApiResponseError(new ArrayList<>());
             for (String key :
                     errors.keySet()) {
@@ -84,9 +89,7 @@ public class GlobalExceptionHandler {
                         .message(errors.get(key))
                         .build();
                 errorMessages.getErrors().add(errorResponse);
-//                errorMessage.add("Field: " + key + ", " + errors.get(key));
             }
-//            ApiResponse apiResponse = new ApiResponse(false, errorMessage);
             return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
 
         }
@@ -98,13 +101,29 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenRefreshException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<?> handleTokenRefreshException(TokenRefreshException ex, WebRequest request) {
-        return new ResponseEntity<>(
-                new ErrorMessage(
-                        HttpStatus.FORBIDDEN.value(),
-                        new Date(),
-                        ex.getMessage(),
-                        request.getDescription(false)),
-                HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> handleTokenRefreshException(TokenRefreshException ex) {
+        return new ResponseEntity<>(getBody(FORBIDDEN, ex, ex.getMessage()), new HttpHeaders(), FORBIDDEN);
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> exception(Exception ex) {
+        return new ResponseEntity<>(getBody(INTERNAL_SERVER_ERROR, ex, "Something Went Wrong"), new HttpHeaders(), INTERNAL_SERVER_ERROR);
+    }
+
+    public Map<String, Object> getBody(HttpStatus status, Exception ex, String message) {
+
+        log.error(message, ex);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("message", message);
+        body.put("timestamp", new Date());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("exception", ex.toString());
+
+        Throwable cause = ex.getCause();
+        if (cause != null) {
+            body.put("exceptionCause", ex.getCause().toString());
+        }
+        return body;
     }
 }

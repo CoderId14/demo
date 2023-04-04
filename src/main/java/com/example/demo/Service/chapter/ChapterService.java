@@ -3,10 +3,12 @@ package com.example.demo.Service.chapter;
 import com.example.demo.Repository.book.BookRepo;
 import com.example.demo.Repository.chapter.ChapterRepo;
 import com.example.demo.Repository.role.RoleRepo;
+import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Utils.AppUtils;
 import com.example.demo.api.chapter.request.CreateChapterRequest;
 import com.example.demo.api.chapter.request.UpdateChapterRequest;
 import com.example.demo.api.chapter.response.ChapterResponse;
+import com.example.demo.api.user.request.CreateUserBookHistoryRequest;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
@@ -40,6 +42,8 @@ public class ChapterService implements IChapterService {
     private final ChapterRepo chapterRepo;
     private BookRepo bookRepo;
     private final RoleRepo roleRepo;
+
+    private final UserHistoryService userHistoryService;
 
     @Override
     public PagedResponse<ChapterResponse> searchChapter(Predicate predicate, int page, int size) {
@@ -76,11 +80,19 @@ public class ChapterService implements IChapterService {
     }
 
     @Override
-    public ChapterResponse getChapter(Long id) {
-        Chapter category = chapterRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("category", "id", id)
+    public ChapterResponse getChapter(Long id, CustomUserDetails currentUser) {
+        Chapter chapter = chapterRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("chapter", "id", id)
         );
-        return getDtoFromEntity(category);
+        if (currentUser != null){
+            userHistoryService.addUserBookHistory(CreateUserBookHistoryRequest.builder()
+                    .userId(currentUser.getId())
+                    .chapterId(id)
+                    .bookId(chapter.getBook().getId())
+                    .build(), currentUser);
+        }
+
+        return getDtoFromEntity(chapter);
     }
 
     @Override

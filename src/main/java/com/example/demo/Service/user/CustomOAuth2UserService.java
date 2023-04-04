@@ -7,7 +7,7 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.auth.user.OAuth2UserInfo;
 import com.example.demo.auth.user.OAuth2UserInfoFactory;
 import com.example.demo.entity.Role;
-import com.example.demo.entity.User;
+import com.example.demo.entity.user.User;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
 import com.example.demo.exceptions.OAuth2AuthenticationProcessingException;
