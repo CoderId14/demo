@@ -1,8 +1,8 @@
 package com.example.demo.entity.user;
 
 import com.example.demo.entity.BaseEntity;
-import com.example.demo.entity.Book;
-import com.example.demo.entity.Chapter;
+import com.example.demo.entity.book.Book;
+import com.example.demo.entity.chapter.Chapter;
 import lombok.*;
 
 import javax.persistence.*;

@@ -12,11 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.naming.AuthenticationException;
 import java.util.*;
@@ -66,10 +68,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resolveException(ParameterException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
-
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> resolveException(AccessDeniedException ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<?> resolveException (MissingServletRequestParameterException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> resolveException (MethodArgumentTypeMismatchException ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getName() + " invalid"), new HttpHeaders(), BAD_REQUEST);
     }
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

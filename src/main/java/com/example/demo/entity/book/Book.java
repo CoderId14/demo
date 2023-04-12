@@ -1,5 +1,7 @@
-package com.example.demo.entity;
+package com.example.demo.entity.book;
 
+import com.example.demo.entity.*;
+import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.user.User;
 import com.example.demo.entity.user.UserBookHistory;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -45,7 +47,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Book extends BaseEntity{
+public class Book extends BaseEntity {
 
     @Column
     private String title;
@@ -80,11 +82,6 @@ public class Book extends BaseEntity{
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     private List<Chapter> chapters = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    private List<BookComment> bookComments;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "thumbnail", referencedColumnName = "id")

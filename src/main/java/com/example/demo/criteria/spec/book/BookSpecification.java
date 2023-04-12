@@ -2,7 +2,7 @@ package com.example.demo.criteria.spec.book;
 
 import com.example.demo.criteria.SearchCriteria;
 import com.example.demo.criteria.SearchOperation;
-import com.example.demo.entity.Book;
+import com.example.demo.entity.book.Book;
 import com.example.demo.entity.Tag;
 import lombok.Data;
 import org.springframework.data.jpa.domain.Specification;

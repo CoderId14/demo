@@ -1,7 +1,7 @@
 package com.example.demo.Repository.book;
 
-import com.example.demo.entity.Book;
-import com.example.demo.entity.QBook;
+import com.example.demo.entity.book.Book;
+import com.example.demo.entity.book.QBook;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;

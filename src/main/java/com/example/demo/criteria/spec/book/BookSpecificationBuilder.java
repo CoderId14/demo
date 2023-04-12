@@ -2,7 +2,7 @@ package com.example.demo.criteria.spec.book;
 
 import com.example.demo.criteria.SearchCriteria;
 import com.example.demo.criteria.SearchOperation;
-import com.example.demo.entity.Book;
+import com.example.demo.entity.book.Book;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

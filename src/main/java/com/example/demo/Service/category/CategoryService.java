@@ -2,6 +2,7 @@ package com.example.demo.Service.category;
 
 import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.category.CategoryRepo;
+import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppUtils;
 import com.example.demo.api.category.request.CreateCategoryRequest;
 import com.example.demo.api.category.request.UpdateCategoryRequest;
@@ -33,10 +34,10 @@ import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 @AllArgsConstructor
 @Transactional
 @Service
-public class CategoryService implements ICategoryService{
+public class CategoryService implements ICategoryService {
     private final CategoryRepo categoryRepo;
 
-    private final RoleRepo roleRepo;
+    private final RoleUtils roleUtils;
 
     @Override
     public PagedResponse<CategoryResponse> searchCategory(Predicate predicate, int page, int size) {
@@ -44,7 +45,7 @@ public class CategoryService implements ICategoryService{
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
 
-        Page<Category> categoryPage = categoryRepo.findAll(predicate,pageable);
+        Page<Category> categoryPage = categoryRepo.findAll(predicate, pageable);
 
         List<Category> content = categoryPage.getNumberOfElements() == 0 ? Collections.emptyList() : categoryPage.getContent();
 
@@ -88,29 +89,19 @@ public class CategoryService implements ICategoryService{
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request, CustomUserDetails currentUser) {
         Category category = categoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("category", "id", id));
-        if (category.getCreatedBy().equals(currentUser.getUsername())
-                || currentUser.getAuthorities().contains(
-                new SimpleGrantedAuthority(roleRepo.findRoleByRoleName(ROLE_ADMIN).toString()))) {
-
-            category.setName(request.getName());
-            category.setDescription(request.getDescription());
-            categoryRepo.save(category);
-            return getDtoFromEntity(category);
-        }
-        throw new UnauthorizedException("You don't have permission to edit this category");
+        roleUtils.checkAuthorization(category.getCreatedBy(), currentUser);
+        category.setName(request.getName());
+        category.setDescription(request.getDescription());
+        categoryRepo.save(category);
+        return getDtoFromEntity(category);
     }
 
     @Override
     public ApiResponse deleteCategory(Long id, CustomUserDetails currentUser) {
         Category category = categoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("category", "id", id));
-        if (category.getCreatedBy().equals(currentUser.getUsername())
-                || currentUser.getAuthorities().contains(
-                new SimpleGrantedAuthority(roleRepo.findRoleByRoleName(ROLE_ADMIN).toString()))) {
-            categoryRepo.delete(category);
+        roleUtils.checkAuthorization(category.getCreatedBy(), currentUser);
+        return new ApiResponse(Boolean.TRUE, "You successfully deleted category", HttpStatus.CREATED);
 
-            return new ApiResponse(Boolean.TRUE, "You successfully deleted category", HttpStatus.CREATED);
-        }
-        throw new UnauthorizedException("You don't have permission to edit this category");
     }
 }

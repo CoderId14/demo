@@ -6,6 +6,7 @@ import com.example.demo.Repository.category.CategoryRepo;
 import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.tag.TagRepo;
 import com.example.demo.Service.attachment.AttachmentService;
+import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppUtils;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
@@ -14,6 +15,7 @@ import com.example.demo.api.book.request.UpdateBookRequest;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.entity.*;
+import com.example.demo.entity.book.Book;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.exceptions.auth.UnauthorizedException;
 import com.querydsl.core.types.Predicate;
@@ -45,36 +47,24 @@ public class BookService implements IBookService {
 
     private final TagRepo tagRepo;
 
-    private final RoleRepo roleRepository;
-
     private final AttachmentService attachmentService;
 
-    
+    private final BookUtils bookUtils;
+
+    private final RoleUtils roleUtils;
+
+
     @Override
     public BookResponse save(CreateBookRequest request, CustomUserDetails currentUser) {
 
         Attachment attachment = null;
 
-        if(request.getThumbnail() != null)
+        if (request.getThumbnail() != null)
             attachment = attachmentService.saveImg(request.getThumbnail());
 
-        Set<Category> categoryEntity = new HashSet<>();
+        Set<Category> categoryEntity = bookUtils.findSetCategory(request.getCategories());
 
-        for (Long id: request.getCategories()
-             ) {
-            categoryEntity.add(categoryRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("category", "id", id)
-            ));
-        }
-
-
-        Set<Tag> tags = new HashSet<>();
-        for (Long id: request.getTags()
-        ) {
-            tags.add(tagRepo.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException("tag", "id", id)
-            ));
-        }
+        Set<Tag> tags = bookUtils.findSetTag(request.getTags());
 
         Book book = Book.builder()
                 .title(request.getTitle())
@@ -91,7 +81,7 @@ public class BookService implements IBookService {
 
     private static BookResponse getBookResponse(Book book) {
         Attachment thumbnail = book.getThumbnail();
-        if (thumbnail != null){
+        if (thumbnail != null) {
             return BookResponse.builder()
                     .title(book.getTitle())
                     .content(book.getContent())
@@ -99,17 +89,17 @@ public class BookService implements IBookService {
                     .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
                     .shortDescription(book.getShortDescription())
                     .thumbnail(book.getThumbnail().getId())
-                    .username(book.getUser().getName())
+                    .name(book.getUser().getName())
                     .build();
         }
         return BookResponse.builder()
-                        .title(book.getTitle())
-                        .content(book.getContent())
-                        .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
-                        .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
-                        .shortDescription(book.getShortDescription())
-                        .username(book.getUser().getName())
-                        .build();
+                .title(book.getTitle())
+                .content(book.getContent())
+                .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
+                .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
+                .shortDescription(book.getShortDescription())
+                .name(book.getUser().getName())
+                .build();
 
     }
 
@@ -117,66 +107,35 @@ public class BookService implements IBookService {
     public BookResponse update(long id, UpdateBookRequest request, CustomUserDetails currentUser) {
         log.info("Update Book");
 
-        Set<Category> categories = new HashSet<>();
+        Set<Category> categories = bookUtils.findSetCategory(request.getCategories());
 
-        for (Long categoryId: request.getCategories()
-        ) {
-            categories.add(categoryRepo.findById(categoryId).orElseThrow(
-                    () -> new ResourceNotFoundException("category", "id", categoryId)
-            ));
-        }
+        Set<Tag> tags = bookUtils.findSetTag(request.getTags());
 
+        Book book = bookUtils.findBookById(id);
 
-        Set<Tag> tags = new HashSet<>();
-        for (Long tagId: request.getTags()
-        ) {
-            tags.add(tagRepo.findById(tagId).orElseThrow(
-                    () -> new ResourceNotFoundException("tag", "id", tagId)
-            ));
-        }
+        roleUtils.checkAuthorization(book.getCreatedBy(), currentUser);
 
+        book.setTitle(request.getTitle());
+        book.setContent(request.getContent());
 
-        Book book = bookRepo.findById(id).
-                orElseThrow(() -> new ResourceNotFoundException("book", "id", id));
+        if (!categories.isEmpty()) book.setCategories(categories);
+        if (!tags.isEmpty()) book.setTags(tags);
 
-        if(book.getCreatedBy().equals(currentUser.getUsername())
-        || currentUser.getAuthorities().contains(
-                new SimpleGrantedAuthority(roleRepository.findRoleByRoleName(ROLE_ADMIN).toString()))){
+        book = bookRepo.save(book);
 
+        return getBookResponse(book);
 
-            book.setTitle(request.getTitle());
-            book.setContent(request.getContent());
-
-            if(!categories.isEmpty()) book.setCategories(categories);
-            if(!tags.isEmpty()) book.setTags(tags);
-
-            book = bookRepo.save(book);
-
-            return getBookResponse(book);
-        }
-        ApiResponse apiResponse = new ApiResponse(
-                Boolean.FALSE,
-                "You don't have permission to edit this news");
-
-        throw new UnauthorizedException(apiResponse);
     }
 
     @Override
     public ApiResponse delete(long id, CustomUserDetails currentUser) {
 
-        Book book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("book", "id", id));
-        if(book.getCreatedBy().equals(currentUser.getUsername())
-                || currentUser.getAuthorities().contains(
-                new SimpleGrantedAuthority(roleRepository.findRoleByRoleName(ROLE_ADMIN).toString()))){
+        Book book = bookUtils.findBookById(id);
+        roleUtils.checkAuthorization(book.getCreatedBy(), currentUser);
+        bookRepo.deleteById(id);
 
-            bookRepo.deleteById(id);
+        return new ApiResponse(Boolean.TRUE, "You successfully deleted post");
 
-            return new ApiResponse(Boolean.TRUE, "You successfully deleted post");
-
-        }
-        ApiResponse apiResponse = new ApiResponse(Boolean.FALSE, "You don't have permission to delete this post");
-
-        throw new UnauthorizedException(apiResponse);
     }
 
     @Override
@@ -186,10 +145,14 @@ public class BookService implements IBookService {
 //        CategoryEntity category = categoryRepository.findById(id)
 //                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, ID, id));
 
-        Pageable pageable = PageRequest.of(page,size, Sort.Direction.DESC,CREATED_DATE);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
 
         Page<Book> books = bookRepo.findAll(pageable);
 
+        return getBookResponsePagedResponse(books);
+    }
+
+    private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books) {
         List<Book> contents = books.getNumberOfElements() == 0 ?
                 Collections.emptyList()
                 :
@@ -215,14 +178,7 @@ public class BookService implements IBookService {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
         Page<Book> news = bookRepo.findByCategoriesIn(Collections.singleton(category), pageable);
 
-        List<Book> contents = news.getNumberOfElements() == 0 ?
-                Collections.emptyList()
-                :
-                news.getContent();
-        List<BookResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookResponse(temp)));
-        return new PagedResponse<>(result, news.getNumber(), news.getSize(), news.getTotalElements(),
-                news.getTotalPages(), news.isLast());
+        return getBookResponsePagedResponse(news);
     }
 
     @Override
@@ -236,32 +192,14 @@ public class BookService implements IBookService {
 
         Page<Book> books = bookRepo.findByTagsIn(Collections.singletonList(tag), pageable);
 
-        List<Book> contents = books.getNumberOfElements() == 0 ? Collections.emptyList() : books.getContent();
-
-        List<BookResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookResponse(temp)));
-        return new PagedResponse<>(result,books.getNumber(), books.getSize(), books.getTotalElements(),
-                books.getTotalPages(), books.isLast());
+        return getBookResponsePagedResponse(books);
     }
 
     public PagedResponse<BookResponse> searchBook(Predicate predicate, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
         Page<Book> books = bookRepo.findAll(predicate, pageable);
 
-        List<Book> contents = books.getNumberOfElements() == 0 ?
-                Collections.emptyList()
-                :
-                books.getContent();
-
-        List<BookResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookResponse(temp)));
-
-        return new PagedResponse<>(result,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isLast());
+        return getBookResponsePagedResponse(books);
 
     }
 

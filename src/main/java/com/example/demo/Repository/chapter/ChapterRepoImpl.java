@@ -1,8 +1,8 @@
 package com.example.demo.Repository.chapter;
 
-import com.example.demo.entity.Chapter;
-import com.example.demo.entity.QBook;
+import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.QChapter;
+import com.example.demo.entity.book.QBook;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Service;
 

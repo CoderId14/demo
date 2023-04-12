@@ -3,6 +3,8 @@ package com.example.demo.Repository.book;
 import com.example.demo.criteria.BookPredicateBuilder;
 import com.example.demo.entity.*;
 
+import com.example.demo.entity.book.Book;
+import com.example.demo.entity.book.QBook;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +39,6 @@ public interface BookRepo extends JpaRepository<Book, Long>,
                     Iterator<? extends LocalDateTime> it = value.iterator();
                     return Optional.ofNullable(path.between(it.next(), it.next()));
                 });
-        bindings.excluding(root.bookComments);
         bindings.excluding(root.createdBy);
         bindings.excluding(root.modifiedBy);
     }

@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.example.demo.criteria;
 
-import com.example.demo.entity.QBook;
 import com.example.demo.entity.Tag;
+import com.example.demo.entity.book.QBook;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import lombok.Data;

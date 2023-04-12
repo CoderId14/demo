@@ -1,6 +1,6 @@
 package com.example.demo.Repository.user;
 
-import com.example.demo.entity.QBook;
+import com.example.demo.entity.book.QBook;
 import com.example.demo.entity.user.QUserBookHistory;
 import com.example.demo.entity.user.UserBookHistory;
 import com.querydsl.jpa.impl.JPAQuery;

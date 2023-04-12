@@ -15,7 +15,7 @@ import com.example.demo.api.book.request.CreateBookRequest;
 import com.example.demo.api.book.request.UpdateBookRequest;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.book.response.BookResponse;
-import com.example.demo.entity.Book;
+import com.example.demo.entity.book.Book;
 import com.querydsl.core.types.Predicate;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -37,7 +37,6 @@ import java.util.List;
 
 import static com.example.demo.Utils.AppConstants.CREATED_DATE;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/book")
 public class BookController {

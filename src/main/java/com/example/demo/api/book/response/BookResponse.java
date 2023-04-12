@@ -20,5 +20,5 @@ public class BookResponse {
 
     private String thumbnail;
 
-    private String username;
+    private String name;
 }

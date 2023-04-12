@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 
+import com.example.demo.entity.book.Book;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;

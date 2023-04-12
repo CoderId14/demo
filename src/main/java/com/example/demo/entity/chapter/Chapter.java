@@ -1,5 +1,8 @@
-package com.example.demo.entity;
+package com.example.demo.entity.chapter;
 
+import com.example.demo.entity.BaseEntity;
+import com.example.demo.entity.ChapterComment;
+import com.example.demo.entity.book.Book;
 import com.example.demo.entity.user.UserBookHistory;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +22,7 @@ import java.util.List;
 @Table(name="tbl_chapter")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Builder
-public class Chapter extends BaseEntity{
+public class Chapter extends BaseEntity {
     private String title;
     @Column(columnDefinition = "TEXT")
     private String content;

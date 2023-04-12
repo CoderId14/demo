@@ -8,7 +8,7 @@ import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
-import com.example.demo.entity.Chapter;
+import com.example.demo.entity.chapter.Chapter;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
