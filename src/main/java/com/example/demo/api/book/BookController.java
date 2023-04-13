@@ -144,4 +144,13 @@ public class BookController {
         return ResponseEntity.ok().body(apiResponse);
 
     }
+    @GetMapping("/v1/hot-books")
+    public ResponseEntity<?> hotBooks(
+        @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
+        @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
+    ) {
+        PagedResponse<BookResponse> response = bookService.hotBooks(page,size);
+
+        return ResponseEntity.ok().body(response);
+    }
 }
