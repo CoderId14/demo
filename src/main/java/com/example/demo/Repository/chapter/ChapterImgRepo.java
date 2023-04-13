@@ -1,6 +1,6 @@
 package com.example.demo.Repository.chapter;
 
-import com.example.demo.entity.QChapter;
+import com.example.demo.entity.chapter.QChapter;
 import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.chapter.ChapterImg;
 import com.example.demo.entity.chapter.QChapterImg;

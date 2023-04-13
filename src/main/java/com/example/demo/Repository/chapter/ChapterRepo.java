@@ -1,7 +1,7 @@
 package com.example.demo.Repository.chapter;
 
 import com.example.demo.entity.chapter.Chapter;
-import com.example.demo.entity.QChapter;
+import com.example.demo.entity.chapter.QChapter;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

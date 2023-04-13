@@ -1,6 +1,8 @@
 package com.example.demo.api.user;
 
 
+import com.example.demo.Service.book.BookLikeService;
+import com.example.demo.Service.book.BookService;
 import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.Utils.AppConstants;
@@ -17,6 +19,8 @@ import com.example.demo.dto.response.ObjectResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +39,7 @@ public class UserController {
     private final UserService userService;
 
     private final UserHistoryService userHistoryService;
+    private final BookService bookService;
 
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
@@ -115,5 +120,15 @@ public class UserController {
         return ResponseEntity.ok("Delete user id = " + id);
     }
 
+    @GetMapping("/v1/get-books-liked")
+    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @RequestParam long userid){
+        log.info("get book liked by  user id= " + userid);
+        return ResponseEntity.ok(bookService.findBookLikeByUserId(userid,PageRequest.of(page,size,Sort.by("createdBy"))));
+    }
+    @PostMapping("/v1/like-book")
+    public ResponseEntity<?> likeBook(@RequestParam long userid, @RequestParam long bookid){
+         bookService.liked(userid,bookid);
+         return ResponseEntity.ok("Liked success book = " + bookid);
+    }
 
 }

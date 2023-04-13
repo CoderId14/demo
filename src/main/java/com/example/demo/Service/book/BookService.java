@@ -1,6 +1,7 @@
 package com.example.demo.Service.book;
 
 
+import com.example.demo.Repository.BookLikeRepo;
 import com.example.demo.Repository.book.BookRepo;
 import com.example.demo.Repository.category.CategoryRepo;
 import com.example.demo.Repository.role.RoleRepo;
@@ -22,6 +23,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -52,6 +54,7 @@ public class BookService implements IBookService {
     private final BookUtils bookUtils;
 
     private final RoleUtils roleUtils;
+    private final BookLikeRepo bookLikeRepo;
 
 
     @Override
@@ -202,5 +205,28 @@ public class BookService implements IBookService {
         return getBookResponsePagedResponse(books);
 
     }
+    public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable){
+        Page<BookLike> bookPage = bookLikeRepo.findByUserId(id,pageable);
+        return getBookResponsePagedResponse(
+            new PageImpl<>(bookPage
+                .stream()
+                .map(Book::new)
+                .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()));
+    }
 
+    public void liked(long userid, long bookid) {
+        BookLike bookLike = bookLikeRepo.findByUserIdAndAndBookId(userid,bookid).isPresent()?
+        bookLikeRepo.findByUserIdAndAndBookId(userid,bookid).get(): null;
+        if(bookLike != null){
+            bookLikeRepo.save(bookLike);
+        }else {
+            log.info("invalid book or user!");
+        }
+    }
+    public PagedResponse<BookResponse> hotBooks(int page, int size){
+        // thống kê danh sách
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Book> bookPage = bookRepo.findTop100ByLikes(pageable);
+        return getBookResponsePagedResponse(bookPage);
+    }
 }
