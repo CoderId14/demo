@@ -10,6 +10,7 @@ import java.util.Set;
 @Builder
 public class CreateBookRequest {
     private MultipartFile thumbnail;
+    private String thumbnailUrl;
     private String title;
     private String shortDescription;
     private String content;

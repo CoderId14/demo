@@ -64,18 +64,18 @@ public class ChaperImgController {
 
     @PutMapping("/v1/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> update(@PathVariable(name = "id") Long id,
+    public ResponseEntity<?> update(@PathVariable(name = "id") String id,
                                     @Validated @RequestBody UpdateChapterImgRequest request,
                                     @CurrentUser CustomUserDetails currentUser) {
         UpdateChapterImgResponse response = chapterImgService.updateChapterImg(id, request, currentUser);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/categories/" + id).toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/chapterImg/" + id).toUriString());
         return ResponseEntity.created(uri).body(response);
 
     }
 
     @DeleteMapping("/v1/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteChapter(@PathVariable(name = "id") Long id,
+    public ResponseEntity<?> deleteChapterImg(@PathVariable(name = "id") String id,
                                            @CurrentUser CustomUserDetails currentUser) {
 
         return new ResponseEntity<>(chapterImgService.deleteChapterImg(id, currentUser), HttpStatus.CREATED);

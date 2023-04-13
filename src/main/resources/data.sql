@@ -1,1 +1,0 @@
-insert into tbl_tags (title) values ("Khoa hoc");

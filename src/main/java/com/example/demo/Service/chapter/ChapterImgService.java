@@ -79,7 +79,7 @@ public class ChapterImgService {
                 .build();
     }
 
-    public UpdateChapterImgResponse updateChapterImg(Long id, UpdateChapterImgRequest request, CustomUserDetails currentUser) {
+    public UpdateChapterImgResponse updateChapterImg(String id, UpdateChapterImgRequest request, CustomUserDetails currentUser) {
         ChapterImg chapterImg = chapterImgRepo.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("chapter", "id", id));
         long chapterId = chapterImg.getChapter().getId();
@@ -95,7 +95,7 @@ public class ChapterImgService {
 
     }
 
-    public ApiResponse deleteChapterImg(Long id, CustomUserDetails currentUser) {
+    public ApiResponse deleteChapterImg(String id, CustomUserDetails currentUser) {
         ChapterImg chapterImg = chapterImgRepo.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("chapter", "id", id));
         long chapterId = chapterImg.getChapter().getId();
@@ -103,12 +103,13 @@ public class ChapterImgService {
                 orElseThrow(() -> new ResourceNotFoundException("chapter", "id", chapterId));
         roleUtils.checkAuthorization(chapter.getCreatedBy(), currentUser);
         chapterImgRepo.delete(chapterImg);
-        return new ApiResponse(Boolean.TRUE, "You successfully deleted chapter", HttpStatus.CREATED);
+        return new ApiResponse(Boolean.TRUE, "You successfully deleted chapterImg", HttpStatus.CREATED);
 
     }
 
     private ImgChapter getImgChapter(ChapterImg root) {
         return ImgChapter.builder()
+                .id(root.getId())
                 .fileUrl(root.getFileUrl())
                 .imgNumber(root.getImgNumber())
                 .build();

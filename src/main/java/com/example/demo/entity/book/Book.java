@@ -86,6 +86,8 @@ public class Book extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "thumbnail", referencedColumnName = "id")
     private Attachment thumbnail;
+    @Column(columnDefinition = "TEXT")
+    private String thumbnailUrl;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<UserBookHistory> userBookHistories;

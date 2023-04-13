@@ -10,7 +10,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
-public interface ChapterImgRepo extends JpaRepository<ChapterImg, Long>,
+public interface ChapterImgRepo extends JpaRepository<ChapterImg, String>,
         ChapterImgRepoCustom,
         QuerydslPredicateExecutor<ChapterImg>, QuerydslBinderCustomizer<QChapterImg> {
     @Override

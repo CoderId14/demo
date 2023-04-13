@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ImgChapter {
+    private String id;
     private String fileUrl;
     private int imgNumber;
 }
