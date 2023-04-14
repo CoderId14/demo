@@ -43,9 +43,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${{MySQL.MYSQLUSER}}
-    password: ${{MySQL.MYSQLPASSWORD}}
-    url: jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}
+    username: ${MYSQLUSER}
+    password: ${MYSQLPASSWORD}
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
   mail:
     username: danghieu14th@gmail.com
     password: cckuoukwlxufnghe
