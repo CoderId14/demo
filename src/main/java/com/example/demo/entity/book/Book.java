@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.modelmapper.ModelMapper;
 
 
 @Entity
@@ -91,4 +92,10 @@ public class Book extends BaseEntity {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<UserBookHistory> userBookHistories;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<BookLike> bookLikes;
+    public Book(BookLike bookLike) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.map(bookLike.getBook(), this);
+    }
 }
