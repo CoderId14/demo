@@ -27,7 +27,7 @@ hibernate:
       error-level: EXCEPTION
 spring:
   jpa:
-#    show-sql: true
+    #    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
@@ -70,6 +70,3 @@ spring:
 
 cors:
   allowedOrigins: "*"
-
-
-

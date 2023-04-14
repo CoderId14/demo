@@ -6,9 +6,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/demo
+      SPRING_DATASOURCE_URL: jdbc:mysql://root:p4dqVY9LW6i6gDJYEEzb@containers-us-west-1.railway.app:5516/railway
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: hieu
+      SPRING_DATASOURCE_PASSWORD: p4dqVY9LW6i6gDJYEEzb
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
     depends_on:
