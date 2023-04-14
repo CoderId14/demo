@@ -15,6 +15,7 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.Attachment;
+import com.example.demo.entity.BookLike;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
