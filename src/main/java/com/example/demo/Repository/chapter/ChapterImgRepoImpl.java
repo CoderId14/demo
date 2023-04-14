@@ -7,7 +7,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 @Service
 public class ChapterImgRepoImpl implements ChapterImgRepoCustom {
@@ -24,18 +23,14 @@ public class ChapterImgRepoImpl implements ChapterImgRepoCustom {
         JPAQuery<Chapter> queryFactory = new JPAQuery<>(em);
         QChapter chapter = QChapter.chapter;
         QChapterImg chapterImg = QChapterImg.chapterImg;
-        List<Integer> list = queryFactory
+        Integer lastImgNumber = queryFactory
                 .select(chapterImg.imgNumber)
                 .from(chapterImg)
                 .innerJoin(chapterImg.chapter, chapter)
                 .where(chapter.id.eq(chapterId))
                 .orderBy(chapterImg.imgNumber.desc())
                 .limit(1)
-                .fetch();
-        int lastChapterImgNumber = 0;
-        if (list.size() > 0) {
-            lastChapterImgNumber = list.get(0);
-        }
-        return lastChapterImgNumber;
+                .fetchOne();
+        return lastImgNumber != null ? lastImgNumber : 0;
     }
 }

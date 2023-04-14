@@ -20,5 +20,7 @@ public class BookResponse {
 
     private String thumbnail;
 
+    private String thumbnailUrl;
+
     private String name;
 }

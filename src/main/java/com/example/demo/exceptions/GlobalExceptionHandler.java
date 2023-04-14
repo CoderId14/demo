@@ -85,27 +85,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resolveException(BindException ex) {
         log.info("BindException");
         Map<String, String> errors = new HashMap<>();
-        if (ex.getBindingResult().hasErrors()) {
+        ex.getFieldErrors().forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
+        ex.getGlobalErrors().forEach(e -> errors.put(e.getObjectName(), e.getDefaultMessage()));
 
-            ex.getBindingResult().getFieldErrors().forEach(
-                    error -> errors.put(error.getField(), error.getDefaultMessage())
-            );
-            ApiResponseError errorMessages = new ApiResponseError(new ArrayList<>());
-            for (String key :
-                    errors.keySet()) {
+        if (errors.containsKey("createBookRequest")) {
+            ApiResponseError responseError = new ApiResponseError();
+            List<ErrorResponse> errorResponses = new ArrayList<>();
+            errors.forEach((k, v) -> {
                 ErrorResponse errorResponse = ErrorResponse.builder()
-                        .error(key)
-                        .message(errors.get(key))
+                        .error(k)
+                        .message(v)
                         .build();
-                errorMessages.getErrors().add(errorResponse);
-            }
-            return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
-
+                errorResponses.add(errorResponse);
+            });
+            responseError.setErrors(errorResponses);
+            return ResponseEntity.badRequest().body(responseError);
+        } else {
+            return ResponseEntity.badRequest().body(errors);
         }
-        log.info("Field valid");
-
-
-        return new ResponseEntity<>("Field valid", HttpStatus.ACCEPTED);
     }
 
     @ExceptionHandler(TokenRefreshException.class)

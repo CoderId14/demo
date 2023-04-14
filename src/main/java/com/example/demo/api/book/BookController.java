@@ -29,6 +29,7 @@ import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -54,24 +55,7 @@ public class BookController {
         PagedResponse<BookResponse> response = bookService.getAllBooks(page, size);
         return ResponseEntity.ok().body(response);
     }
-    @GetMapping("/category/{id}")
-    public ResponseEntity<?> getBooksByCategory(
-            @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
-            @PathVariable(name = "id") Long id) {
-        PagedResponse<BookResponse> response = bookService.getBooksByCategory(id, page, size);
 
-        return ResponseEntity.ok().body(response);
-    }
-    @GetMapping("/tags/{id}")
-    public ResponseEntity<?> getBookByTags(
-            @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
-            @PathVariable(name = "id") Long id) {
-        PagedResponse<BookResponse> response = bookService.getBooksByTags(id, page, size);
-
-        return ResponseEntity.ok().body(response);
-    }
 
     @GetMapping("/v1/search")
     public ResponseEntity<?> searchBook(
@@ -79,6 +63,9 @@ public class BookController {
             @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
             @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
     ) {
+        if (page < 0 || size <= 0) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "page and size must >=0"));
+        }
         PagedResponse<BookResponse> response = bookService.searchBook(predicate, page, size);
 
         return ResponseEntity.ok().body(response);
@@ -117,7 +104,7 @@ public class BookController {
     )
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(
-            @ModelAttribute @RequestBody CreateBookRequest model,
+            @ModelAttribute @RequestBody @Validated CreateBookRequest model,
             @CurrentUser CustomUserDetails currentUser) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/book/v1").toUriString());
         BookResponse response = bookService.save(model,currentUser);

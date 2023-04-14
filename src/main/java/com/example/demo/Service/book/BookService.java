@@ -28,10 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.AppConstants.CREATED_DATE;
@@ -55,18 +52,9 @@ public class BookService implements IBookService {
     private final RoleUtils roleUtils;
 
     private static BookResponse getBookResponse(Book book) {
-        Attachment thumbnail = book.getThumbnail();
-        if (thumbnail != null) {
-            return BookResponse.builder()
-                    .title(book.getTitle())
-                    .content(book.getContent())
-                    .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
-                    .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
-                    .shortDescription(book.getShortDescription())
-                    .thumbnail(book.getThumbnail().getId())
-                    .name(book.getUser().getName())
-                    .build();
-        }
+        Optional<Attachment> thumbnail = Optional.ofNullable(book.getThumbnail());
+        String thumbnailId = thumbnail.map(Attachment::getId).orElse(null);
+        String thumbnailUrl = book.getThumbnailUrl();
         return BookResponse.builder()
                 .title(book.getTitle())
                 .content(book.getContent())
@@ -74,29 +62,30 @@ public class BookService implements IBookService {
                 .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
                 .shortDescription(book.getShortDescription())
                 .name(book.getUser().getName())
-                .thumbnail(book.getThumbnailUrl())
+                .thumbnail(thumbnailId)
+                .thumbnailUrl(thumbnailUrl)
                 .build();
 
     }
 
     @Override
     public BookResponse save(CreateBookRequest request, CustomUserDetails currentUser) {
+        Optional<Attachment> attachment = Optional.ofNullable(request.getThumbnail()).map(attachmentService::saveImg);
 
-        Attachment attachment = null;
+        Set<Category> categories = Optional.ofNullable(request.getCategories())
+                .map(bookUtils::findSetCategory)
+                .orElse(Collections.emptySet());
 
-        if (request.getThumbnail() != null)
-            attachment = attachmentService.saveImg(request.getThumbnail());
-
-        Set<Category> categoryEntity = bookUtils.findSetCategory(request.getCategories());
-
-        Set<Tag> tags = bookUtils.findSetTag(request.getTags());
+        Set<Tag> tags = Optional.ofNullable(request.getTags())
+                .map(bookUtils::findSetTag)
+                .orElse(Collections.emptySet());
 
         Book book = Book.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
-                .categories(categoryEntity)
+                .categories(categories)
                 .shortDescription(request.getShortDescription())
-                .thumbnail(attachment)
+                .thumbnail(attachment.orElse(null))
                 .thumbnailUrl(request.getThumbnailUrl())
                 .tags(tags)
                 .user(currentUser.getUser())
