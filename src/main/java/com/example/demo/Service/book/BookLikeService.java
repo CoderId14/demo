@@ -14,7 +14,14 @@ public class BookLikeService {
     private final BookLikeRepo bookLikeRepo;
 
     public List<BookResponse> findBookLikeByUserId(long id, Pageable pageable) {
-        return bookLikeRepo.findByUserId(id, pageable).map(booklike -> new BookResponse(booklike.getBook().getTitle(), booklike.getBook().getContent(), booklike.getBook().getShortDescription())).stream().toList();
+        return bookLikeRepo.findByUserId(id, pageable)
+                .map(booklike ->
+                         BookResponse.builder()
+                                 .title(booklike.getBook().getTitle())
+                                 .content(booklike.getBook().getContent())
+                                 .shortDescription(booklike.getBook().getShortDescription())
+                                 .build()
+                ).stream().toList();
     }
 
 }

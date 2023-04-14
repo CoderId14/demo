@@ -1,12 +1,16 @@
 package com.example.demo.api.book.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookResponse {
     private String title;
 
@@ -23,23 +27,4 @@ public class BookResponse {
     private String thumbnailUrl;
 
     private String name;
-
-    public BookResponse(String title, String content, String shortDescription) {
-        this.title = title;
-        this.content = content;
-        this.shortDescription = shortDescription;
-    }
-
-    public BookResponse(String title, String content, String shortDescription,
-        Set<String> categories,
-        Set<String> tags, String thumbnail, String name) {
-        this.title = title;
-        this.content = content;
-        this.shortDescription = shortDescription;
-        this.categories = categories;
-        this.tags = tags;
-        this.thumbnail = thumbnail;
-        this.name = name;
-    }
-
 }
