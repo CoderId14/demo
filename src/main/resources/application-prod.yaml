@@ -8,19 +8,7 @@ app:
   apiUrl: http://localhost:8080
   front-ui: http://localhost:3000
 
-logging:
-  level:
-    root: info
-    org:
-      springframework:
-        boot:
-          security: info
-      hibernate:
-        SQL: info
-        type:
-          descriptor:
-            sql:
-              BasicBinder: info
+
 hibernate:
   query:
     interceptor:
@@ -43,9 +31,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: p4dqVY9LW6i6gDJYEEzb
-    url: jdbc:mysql://root:p4dqVY9LW6i6gDJYEEzb@containers-us-west-1.railway.app:5516/railway
+    username: ${MYSQLUSER}
+    password: ${MYSQLPASSWORD}
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
   mail:
     username: danghieu14th@gmail.com
     password: cckuoukwlxufnghe
