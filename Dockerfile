@@ -18,4 +18,4 @@ FROM openjdk:17-oracle
 COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/demo.jar"]
-ENV SPRING_PROFILES_ACTIVE=prod
+ENV SPRING_PROFILES_ACTIVE=prod,common
