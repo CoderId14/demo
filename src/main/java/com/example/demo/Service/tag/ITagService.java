@@ -7,10 +7,12 @@ import com.example.demo.dto.PagedResponse;
 import com.example.demo.api.tag.response.TagResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.querydsl.core.types.Predicate;
+import org.springframework.data.domain.Pageable;
 
 public interface ITagService {
 
-    PagedResponse<TagResponse> searchTag(Predicate predicate, int page, int size);
+
+    PagedResponse<TagResponse> searchTag(Predicate predicate, Pageable pageable);
 
     TagResponse getTag(Long id);
 

@@ -6,6 +6,7 @@ import com.example.demo.api.book.request.CreateBookRequest;
 import com.example.demo.api.book.request.UpdateBookRequest;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.book.response.BookResponse;
+import org.springframework.data.domain.Pageable;
 
 public interface IBookService {
     BookResponse save(CreateBookRequest request, CustomUserDetails currentUser);
@@ -14,9 +15,5 @@ public interface IBookService {
 
     ApiResponse delete(long id, CustomUserDetails currentUser);
 
-    PagedResponse<BookResponse> getAllBooks(int page, int size);
-
-    PagedResponse<BookResponse> getBooksByCategory(Long id, int page, int size);
-
-    PagedResponse<BookResponse> getBooksByTags(Long id, int page, int size);
+    PagedResponse<BookResponse> getAllBooks(Pageable pageable);
 }

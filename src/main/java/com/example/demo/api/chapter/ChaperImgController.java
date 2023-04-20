@@ -13,10 +13,10 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.entity.chapter.ChapterImg;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,9 +37,9 @@ public class ChaperImgController {
     @GetMapping("/v1/search/{chapterId}")
     public ResponseEntity<ChapterImgResponse> searchChapterImg(
             @PathVariable(name = "chapterId") Long chapterId,
-            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "imgNumber");
+            @PageableDefault(sort = "imgNumber",
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable) {
         ChapterImgResponse response = chapterImgService.searchChapterImg(chapterId, pageable);
         return ResponseEntity.ok().body(response);
     }
@@ -76,7 +76,7 @@ public class ChaperImgController {
     @DeleteMapping("/v1/{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteChapterImg(@PathVariable(name = "id") String id,
-                                           @CurrentUser CustomUserDetails currentUser) {
+                                              @CurrentUser CustomUserDetails currentUser) {
 
         return new ResponseEntity<>(chapterImgService.deleteChapterImg(id, currentUser), HttpStatus.CREATED);
     }

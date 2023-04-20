@@ -1,8 +1,8 @@
 package com.example.demo.Repository.book;
 
-import com.example.demo.entity.book.BookRating;
-import com.example.demo.entity.book.QBookRating;
-import com.example.demo.exceptions.ParameterException;
+import com.example.demo.entity.book.Book;
+import com.example.demo.entity.book.BookViewCount;
+import com.example.demo.entity.book.QBookViewCount;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -11,16 +11,17 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
-         QuerydslPredicateExecutor<BookRating>, QuerydslBinderCustomizer<QBookRating> , JpaSpecificationExecutor<BookRating> {
+public interface BookViewCountRepo extends JpaRepository<BookViewCount, Long>,
+         QuerydslPredicateExecutor<BookViewCount>, QuerydslBinderCustomizer<QBookViewCount> , JpaSpecificationExecutor<BookViewCount> {
     @Override
-    default void customize(QuerydslBindings bindings, QBookRating root) {
-        if(root.book == null){
-            throw new ParameterException("bookId");
-        }
+    default void customize(QuerydslBindings bindings, QBookViewCount root) {
         bindings.bind(String.class).first(
                 (StringPath path, String value) -> path.containsIgnoreCase(value));
     }
+
+    Optional<BookViewCount> findByBook(Book book);
 
 }

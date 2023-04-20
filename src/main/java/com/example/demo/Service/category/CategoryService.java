@@ -1,6 +1,5 @@
 package com.example.demo.Service.category;
 
-import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.category.CategoryRepo;
 import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppUtils;
@@ -12,15 +11,11 @@ import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.Category;
 import com.example.demo.exceptions.ResourceNotFoundException;
-import com.example.demo.exceptions.auth.UnauthorizedException;
 import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -28,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.demo.Utils.AppConstants.CREATED_DATE;
-import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
+import static com.example.demo.dto.Mapper.getCategoryResponseFromEntity;
 
 @AllArgsConstructor
 @Transactional
@@ -40,40 +34,28 @@ public class CategoryService implements ICategoryService {
     private final RoleUtils roleUtils;
 
     @Override
-    public PagedResponse<CategoryResponse> searchCategory(Predicate predicate, int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
+    public PagedResponse<CategoryResponse> searchCategory(Predicate predicate, Pageable pageable) {
+        AppUtils.validatePageNumberAndSize(pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Category> categoryPage = categoryRepo.findAll(predicate, pageable);
 
         List<Category> content = categoryPage.getNumberOfElements() == 0 ? Collections.emptyList() : categoryPage.getContent();
 
         List<CategoryResponse> categoryResponse = new ArrayList<>();
-        content.forEach(category -> categoryResponse.add(getDtoFromEntity(category)));
+        content.forEach(category -> categoryResponse.add(getCategoryResponseFromEntity(category)));
 
         return new PagedResponse<>(categoryResponse, categoryPage.getNumber(), categoryPage.getSize(),
                 categoryPage.getTotalElements(), categoryPage.getTotalPages(), categoryPage.isLast());
     }
 
-    private CategoryResponse getDtoFromEntity(Category root) {
-        return CategoryResponse.builder()
-                .id(root.getId())
-                .name(root.getName())
-                .description(root.getDescription())
-                .createdDate(root.getCreatedDate())
-                .createdBy(root.getCreatedBy())
-                .modifiedDate(root.getModifiedDate())
-                .modifiedBy(root.getModifiedBy())
-                .build();
-    }
+
 
     @Override
     public CategoryResponse getCategory(Long id) {
         Category category = categoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("category", "id", id)
         );
-        return getDtoFromEntity(category);
+        return getCategoryResponseFromEntity(category);
     }
 
     @Override
@@ -82,7 +64,7 @@ public class CategoryService implements ICategoryService {
         category.setName(request.getCategoryName());
         category.setDescription(request.getDescription());
         categoryRepo.save(category);
-        return getDtoFromEntity(category);
+        return getCategoryResponseFromEntity(category);
     }
 
     @Override
@@ -93,7 +75,7 @@ public class CategoryService implements ICategoryService {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         categoryRepo.save(category);
-        return getDtoFromEntity(category);
+        return getCategoryResponseFromEntity(category);
     }
 
     @Override

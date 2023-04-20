@@ -7,14 +7,13 @@ app:
   authorizedRedirectUris: http://localhost:3000
   apiUrl: http://localhost:8080
   front-ui: http://localhost:3000
+spring-hibernate-query-utils:
+  n-plus-one-queries-detection:
+    error-level: error
 
-hibernate:
-  query:
-    interceptor:
-      error-level: EXCEPTION
 spring:
   jpa:
-    #    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:

@@ -17,9 +17,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.demo.Utils.AppConstants.CREATED_DATE;
+import static com.example.demo.dto.Mapper.getTagResponseFromEntity;
 import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 
 @Service
@@ -42,32 +40,18 @@ public class TagService implements ITagService {
     private final RoleRepo roleRepository;
 
     @Override
-    public PagedResponse<TagResponse> searchTag(Predicate predicate, int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
+    public PagedResponse<TagResponse> searchTag(Predicate predicate, Pageable pageable) {
+        AppUtils.validatePageNumberAndSize(pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Tag> tagEntities = tagRepository.findAll(predicate, pageable);
 
         List<Tag> content = tagEntities.getNumberOfElements() == 0 ? Collections.emptyList() : tagEntities.getContent();
 
         List<TagResponse> categoryRespons = new ArrayList<>();
-        content.forEach(tag -> categoryRespons.add(getDtoFromEntity(tag)));
+        content.forEach(tag -> categoryRespons.add(getTagResponseFromEntity(tag)));
 
         return new PagedResponse<>(categoryRespons, tagEntities.getNumber(), tagEntities.getSize(),
                 tagEntities.getTotalElements(), tagEntities.getTotalPages(), tagEntities.isLast());
-    }
-
-    private TagResponse getDtoFromEntity(Tag root) {
-        return TagResponse.builder()
-                .id(root.getId())
-                .name(root.getName())
-                .description(root.getDescription())
-                .createdBy(root.getCreatedBy())
-                .createdDate(root.getCreatedDate())
-                .modifiedBy(root.getModifiedBy())
-                .modifiedDate(root.getModifiedDate())
-                .build();
     }
 
     @Override
@@ -75,7 +59,7 @@ public class TagService implements ITagService {
         Tag tag = tagRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("tag", "id", id)
         );
-        return getDtoFromEntity(tag);
+        return getTagResponseFromEntity(tag);
     }
 
     @Override
@@ -88,7 +72,7 @@ public class TagService implements ITagService {
         tag.setName(request.getTagName());
         tag.setDescription(request.getDescription());
         tagRepository.save(tag);
-        return getDtoFromEntity(tag);
+        return getTagResponseFromEntity(tag);
     }
 
     @Override
@@ -105,7 +89,7 @@ public class TagService implements ITagService {
             tag.setDescription(request.getDescription());
             tagRepository.save(tag);
 
-            return getDtoFromEntity(tag);
+            return getTagResponseFromEntity(tag);
         }
         throw new UnauthorizedException("You don't have permission to edit this tag");
     }

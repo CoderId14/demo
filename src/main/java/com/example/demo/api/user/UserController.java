@@ -18,7 +18,9 @@ import com.example.demo.dto.response.ObjectResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,14 +52,15 @@ public class UserController {
     @GetMapping("/v1/reading-history")
     public ResponseEntity<?> getReadingHistory(
             @RequestParam(value = "userId") Long userId,
-            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
+            @PageableDefault(sort = "createdDate",
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
             @CurrentUser CustomUserDetails user) {
 
         UserBookHistoryRequest request = UserBookHistoryRequest.builder()
                 .userId(userId)
-                .page(page)
-                .size(size)
+                .page(pageable.getPageNumber())
+                .size(pageable.getPageSize())
                 .build();
         return ResponseEntity.ok(userHistoryService.getHistory(request, user));
     }

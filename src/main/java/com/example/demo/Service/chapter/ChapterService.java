@@ -7,6 +7,7 @@ import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Utils.AppUtils;
 import com.example.demo.api.chapter.request.CreateChapterRequest;
 import com.example.demo.api.chapter.request.UpdateChapterRequest;
+import com.example.demo.api.chapter.response.ChapterContentResponse;
 import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.api.user.request.CreateUserBookHistoryRequest;
 import com.example.demo.auth.user.CustomUserDetails;
@@ -14,14 +15,11 @@ import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.book.Book;
-import com.example.demo.exceptions.ParameterException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.demo.Utils.AppConstants.CHAPTER_NUMBER;
+import static com.example.demo.dto.Mapper.getChapterContentResponseFromEntity;
+import static com.example.demo.dto.Mapper.getChapterResponseFromEntity;
 
 @AllArgsConstructor
 @Transactional
@@ -42,41 +41,23 @@ public class ChapterService implements IChapterService {
     private BookRepo bookRepo;
 
     @Override
-    public PagedResponse<ChapterResponse> searchChapter(Predicate predicate, int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, CHAPTER_NUMBER);
+    public PagedResponse<ChapterResponse> searchChapter(Predicate predicate, Pageable pageable) {
+        AppUtils.validatePageNumberAndSize(pageable.getPageNumber(), pageable.getPageSize());
 
         Page<Chapter> chapterPage = chapterRepo.findAll(predicate, pageable);
 
         List<Chapter> content = chapterPage.getNumberOfElements() == 0 ? Collections.emptyList() : chapterPage.getContent();
 
         List<ChapterResponse> chapterResponses = new ArrayList<>();
-        content.forEach(category -> chapterResponses.add(getDtoFromEntity(category)));
+        content.forEach(category -> chapterResponses.add(getChapterResponseFromEntity(category)));
 
         return new PagedResponse<>(chapterResponses, chapterPage.getNumber(), chapterPage.getSize(),
                 chapterPage.getTotalElements(), chapterPage.getTotalPages(), chapterPage.isLast());
     }
 
-    private ChapterResponse getDtoFromEntity(Chapter root) {
-        if (root.getBook() == null) {
-            throw new ParameterException("book");
-        }
-
-        return ChapterResponse.builder()
-                .id(root.getId())
-                .title(root.getTitle())
-                .chapterNumber(root.getChapterNumber())
-                .bookId(root.getBook().getId())
-                .createdBy(root.getCreatedBy())
-                .createdDate(root.getCreatedDate())
-                .modifiedBy(root.getModifiedBy())
-                .modifiedDate(root.getModifiedDate())
-                .build();
-    }
 
     @Override
-    public ChapterResponse getChapter(Long id, CustomUserDetails currentUser) {
+    public ChapterContentResponse getChapter(Long id, CustomUserDetails currentUser) {
         Chapter chapter = chapterRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("chapter", "id", id)
         );
@@ -88,7 +69,7 @@ public class ChapterService implements IChapterService {
                     .build(), currentUser);
         }
 
-        return getDtoFromEntity(chapter);
+        return getChapterContentResponseFromEntity(chapter);
     }
 
     @Override
@@ -106,7 +87,7 @@ public class ChapterService implements IChapterService {
                 .book(book)
                 .build();
         chapter = chapterRepo.save(chapter);
-        return getDtoFromEntity(chapter);
+        return getChapterResponseFromEntity(chapter);
 
     }
 
@@ -124,7 +105,7 @@ public class ChapterService implements IChapterService {
         chapter.setContent(request.getContent());
         chapter.setDescription(request.getDescription());
         chapterRepo.save(chapter);
-        return getDtoFromEntity(chapter);
+        return getChapterResponseFromEntity(chapter);
 
     }
 

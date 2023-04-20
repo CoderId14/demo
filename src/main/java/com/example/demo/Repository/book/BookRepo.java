@@ -1,8 +1,8 @@
 package com.example.demo.Repository.book;
 
 import com.example.demo.criteria.BookPredicateBuilder;
-import com.example.demo.entity.*;
-
+import com.example.demo.entity.Category;
+import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.QBook;
 import com.querydsl.core.types.dsl.StringPath;
@@ -14,20 +14,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface BookRepo extends JpaRepository<Book, Long>,
-        BookRepoCustom, QuerydslPredicateExecutor<Book>, QuerydslBinderCustomizer<QBook> , JpaSpecificationExecutor<Book> {
+        BookRepoCustom, QuerydslPredicateExecutor<Book>, QuerydslBinderCustomizer<QBook>, JpaSpecificationExecutor<Book> {
     @Override
     default void customize(QuerydslBindings bindings, QBook root) {
         BookPredicateBuilder predicate = new BookPredicateBuilder();
         bindings.bind(root.tags).first(
-                (path,  values) -> {
+                (path, values) -> {
                     predicate.withTags(values);
                     return predicate.build();
                 });
@@ -35,7 +38,7 @@ public interface BookRepo extends JpaRepository<Book, Long>,
                 (StringPath path, String value) -> path.containsIgnoreCase(value));
         bindings.bind(root.createdDate).all(
                 (path, value) -> {
-                    if(value.size() == 1 )
+                    if (value.size() == 1)
                         return Optional.ofNullable(path.goe(value.iterator().next()));
                     Iterator<? extends LocalDateTime> it = value.iterator();
                     return Optional.ofNullable(path.between(it.next(), it.next()));
@@ -43,13 +46,15 @@ public interface BookRepo extends JpaRepository<Book, Long>,
         bindings.excluding(root.createdBy);
         bindings.excluding(root.modifiedBy);
     }
-    Page<Book> findByCategoriesIn(Set<Category> categories, Pageable pageable);
-
-    Page<Book> findByTagsIn(
-            List<Tag> tags,
-            Pageable pageable);
 
     Optional<Book> findByChapters_Id(long id);
-  @Query("SELECT b FROM Book b JOIN b.bookLikes bl GROUP BY b.id ORDER BY COUNT(bl) DESC")
+
+    @Query("SELECT b FROM Book b JOIN b.bookLikes bl GROUP BY b.id ORDER BY COUNT(bl) DESC")
     Page<Book> findTop100ByLikes(Pageable pageable);
+
+    @Query("SELECT COUNT(ur) FROM UserBookHistory ur WHERE ur.book.id = :bookId")
+    Long getViewCountForBook(@Param("bookId") Long bookId);
+
+    @Query("SELECT COUNT(bl) FROM BookLike bl WHERE bl.book.id = :bookId")
+    Long getLikeCountForBook(@Param("bookId") Long bookId);
 }

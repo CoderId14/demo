@@ -19,7 +19,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="tbl_chapter")
+@Table(name="tbl_chapter", indexes = @Index(name = "mdate_index", columnList = "modifiedDate"))
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Builder
 public class Chapter extends BaseEntity {

@@ -1,30 +1,38 @@
 package com.example.demo.api.book.response;
 
+import com.example.demo.api.category.response.CategoryResponse;
+import com.example.demo.api.chapter.response.ChapterResponse;
+import com.example.demo.api.tag.response.TagResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookResponse {
+    private long bookId;
     private String title;
 
     private String content;
 
     private String shortDescription;
 
-    private Set<String> categories;
+    private List<CategoryResponse> categories;
 
-    private Set<String> tags;
+    private List<TagResponse> tags;
 
     private String thumbnail;
 
     private String thumbnailUrl;
 
-    private String name;
+    private String author;
+
+    List<ChapterResponse> latestChapters;
+    private long viewCount;
+    private long likeCount;
 }

@@ -3,14 +3,13 @@ package com.example.demo.Service.book;
 
 import com.example.demo.Repository.BookLikeRepo;
 import com.example.demo.Repository.book.BookRepo;
-import com.example.demo.Repository.category.CategoryRepo;
-import com.example.demo.Repository.tag.TagRepo;
 import com.example.demo.Service.attachment.AttachmentService;
 import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppUtils;
 import com.example.demo.api.book.request.CreateBookRequest;
 import com.example.demo.api.book.request.UpdateBookRequest;
 import com.example.demo.api.book.response.BookResponse;
+import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
@@ -19,13 +18,11 @@ import com.example.demo.entity.BookLike;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
-import com.example.demo.exceptions.ResourceNotFoundException;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -34,7 +31,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.demo.Utils.AppConstants.CREATED_DATE;
+import static com.example.demo.dto.Mapper.getBookResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -44,10 +41,6 @@ public class BookService implements IBookService {
 
     private final BookRepo bookRepo;
 
-    private final CategoryRepo categoryRepo;
-
-    private final TagRepo tagRepo;
-
     private final AttachmentService attachmentService;
 
     private final BookUtils bookUtils;
@@ -55,22 +48,6 @@ public class BookService implements IBookService {
     private final RoleUtils roleUtils;
     private final BookLikeRepo bookLikeRepo;
 
-    private static BookResponse getBookResponse(Book book) {
-        Optional<Attachment> thumbnail = Optional.ofNullable(book.getThumbnail());
-        String thumbnailId = thumbnail.map(Attachment::getId).orElse(null);
-        String thumbnailUrl = book.getThumbnailUrl();
-        return BookResponse.builder()
-                .title(book.getTitle())
-                .content(book.getContent())
-                .categories(book.getCategories().stream().map(Category::getName).collect(Collectors.toSet()))
-                .tags(book.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
-                .shortDescription(book.getShortDescription())
-                .name(book.getUser().getName())
-                .thumbnail(thumbnailId)
-                .thumbnailUrl(thumbnailUrl)
-                .build();
-
-    }
 
     @Override
     public BookResponse save(CreateBookRequest request, CustomUserDetails currentUser) {
@@ -95,12 +72,11 @@ public class BookService implements IBookService {
                 .user(currentUser.getUser())
                 .build();
         book = bookRepo.save(book);
-        return getBookResponse(book);
+        return getBookResponse(book, false);
     }
 
     @Override
     public BookResponse update(long id, UpdateBookRequest request, CustomUserDetails currentUser) {
-        log.info("Update Book");
 
         Set<Category> categories = bookUtils.findSetCategory(request.getCategories());
 
@@ -118,7 +94,7 @@ public class BookService implements IBookService {
 
         book = bookRepo.save(book);
 
-        return getBookResponse(book);
+        return getBookResponse(book, false);
 
     }
 
@@ -134,27 +110,34 @@ public class BookService implements IBookService {
     }
 
     @Override
-    public PagedResponse<BookResponse> getAllBooks(int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
+    public PagedResponse<BookResponse> getAllBooks(Pageable pageable) {
+        AppUtils.validatePageNumberAndSize(pageable.getPageNumber(), pageable.getPageSize());
 
 //        CategoryEntity category = categoryRepository.findById(id)
 //                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, ID, id));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
-
         Page<Book> books = bookRepo.findAll(pageable);
 
-        return getBookResponsePagedResponse(books);
+        return getBookResponsePagedResponse(books, pageable,false);
     }
 
-    private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books) {
+    private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books,Pageable pageable, boolean isDetail) {
         List<Book> contents = books.getNumberOfElements() == 0 ?
                 Collections.emptyList()
                 :
                 books.getContent();
 
         List<BookResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookResponse(temp)));
+        contents.forEach(temp -> result.add(getBookResponse(temp, isDetail)));
+        if(isDetail){
+            for (Sort.Order order : pageable.getSort()) {
+                if(order.getProperty().equals("chapterModifiedDate")){
+                    Comparator<BookResponse> chapterModifiedDateComparator = getChapterModifiedDateComparator(order.getDirection());
+                    result.sort(Comparator.comparing((BookResponse book) -> book.getLatestChapters().isEmpty())
+                            .thenComparing(chapterModifiedDateComparator));
+                }
+            }
+        }
 
         return new PagedResponse<>(result,
                 books.getNumber(),
@@ -163,62 +146,47 @@ public class BookService implements IBookService {
                 books.getTotalPages(),
                 books.isLast());
     }
+    private Comparator<BookResponse> getChapterModifiedDateComparator(Sort.Direction direction) {
+        Comparator<BookResponse> comparator = Comparator.comparing(book ->
+                        book.getLatestChapters().stream()
+                                .map(ChapterResponse::getModifiedDate)
+                                .max(Comparator.naturalOrder())
+                                .orElse(null),
+                Comparator.nullsLast(Comparator.naturalOrder()));
+        if (direction == Sort.Direction.DESC) {
+            comparator = comparator.reversed();
+        }
+        return comparator;
+    }
+    public PagedResponse<BookResponse> searchBook(Predicate predicate, Pageable pageable, boolean isDetail) {
+        Page<Book> books;
+        books = bookRepo.searchBook(predicate, pageable);
+        return getBookResponsePagedResponse(books, pageable, isDetail);
 
-    @Override
-    public PagedResponse<BookResponse> getBooksByCategory(Long id, int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
-        Category category = categoryRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("category", "id", id));
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
-        Page<Book> news = bookRepo.findByCategoriesIn(Collections.singleton(category), pageable);
-
-        return getBookResponsePagedResponse(news);
     }
 
-    @Override
-    public PagedResponse<BookResponse> getBooksByTags(Long id, int page, int size) {
-        AppUtils.validatePageNumberAndSize(page, size);
-
-        Tag tag = tagRepo.findById(id).
-                orElseThrow(() -> new ResourceNotFoundException("tag", "id", id));
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
-
-        Page<Book> books = bookRepo.findByTagsIn(Collections.singletonList(tag), pageable);
-
-        return getBookResponsePagedResponse(books);
-    }
-
-    public PagedResponse<BookResponse> searchBook(Predicate predicate, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_DATE);
-        Page<Book> books = bookRepo.findAll(predicate, pageable);
-
-        return getBookResponsePagedResponse(books);
-
-    }
-    public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable){
-        Page<BookLike> bookPage = bookLikeRepo.findByUserId(id,pageable);
+    public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable) {
+        Page<BookLike> bookPage = bookLikeRepo.findByUserId(id, pageable);
         return getBookResponsePagedResponse(
-            new PageImpl<>(bookPage
-                .stream()
-                .map(Book::new)
-                .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()));
+                new PageImpl<>(bookPage
+                        .stream()
+                        .map(Book::new)
+                        .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()), pageable,false);
     }
 
     public void liked(long userid, long bookid) {
-        BookLike bookLike = bookLikeRepo.findByUserIdAndAndBookId(userid,bookid).isPresent()?
-        bookLikeRepo.findByUserIdAndAndBookId(userid,bookid).get(): null;
-        if(bookLike != null){
+        BookLike bookLike = bookLikeRepo.findByUserIdAndAndBookId(userid, bookid).isPresent() ?
+                bookLikeRepo.findByUserIdAndAndBookId(userid, bookid).get() : null;
+        if (bookLike != null) {
             bookLikeRepo.save(bookLike);
-        }else {
+        } else {
             log.info("invalid book or user!");
         }
     }
-    public PagedResponse<BookResponse> hotBooks(int page, int size){
+
+    public PagedResponse<BookResponse> hotBooks(Pageable pageable) {
         // thống kê danh sách
-        Pageable pageable = PageRequest.of(page, size);
         Page<Book> bookPage = bookRepo.findTop100ByLikes(pageable);
-        return getBookResponsePagedResponse(bookPage);
+        return getBookResponsePagedResponse(bookPage, pageable, false);
     }
 }

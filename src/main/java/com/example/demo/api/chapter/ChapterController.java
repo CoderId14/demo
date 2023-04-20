@@ -4,6 +4,7 @@ import com.example.demo.Service.chapter.ChapterService;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.chapter.request.CreateChapterRequest;
 import com.example.demo.api.chapter.request.UpdateChapterRequest;
+import com.example.demo.api.chapter.response.ChapterContentResponse;
 import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
@@ -11,7 +12,10 @@ import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.chapter.Chapter;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,10 +35,11 @@ public class ChapterController {
     @GetMapping("/v1/search")
     public ResponseEntity<PagedResponse<ChapterResponse>> searchChapter(
             @QuerydslPredicate(root = Chapter.class) Predicate predicate,
-            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size) {
+            @PageableDefault(sort = AppConstants.CHAPTER_NUMBER,
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        PagedResponse<ChapterResponse> response = chapterService.searchChapter(predicate, page, size);
+        PagedResponse<ChapterResponse> response = chapterService.searchChapter(predicate, pageable);
         return ResponseEntity.ok().body(response);
     }
 
@@ -51,7 +56,7 @@ public class ChapterController {
     @GetMapping("/v1/{id}")
     public ResponseEntity<?> getChapter(@PathVariable(name = "id") Long id,
                                         @CurrentUser CustomUserDetails currentUser) {
-        ChapterResponse response = chapterService.getChapter(id, currentUser);
+        ChapterContentResponse response = chapterService.getChapter(id, currentUser);
 
         return ResponseEntity.ok().body(response);
     }

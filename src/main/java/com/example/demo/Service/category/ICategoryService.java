@@ -8,9 +8,11 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.querydsl.core.types.Predicate;
+import org.springframework.data.domain.Pageable;
 
 public interface ICategoryService {
-    PagedResponse<CategoryResponse> searchCategory(Predicate predicate, int page, int size);
+
+    PagedResponse<CategoryResponse> searchCategory(Predicate predicate, Pageable pageable);
 
     CategoryResponse getCategory(Long id);
 
