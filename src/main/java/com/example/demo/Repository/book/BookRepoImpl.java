@@ -1,7 +1,7 @@
 package com.example.demo.Repository.book;
 
 import com.example.demo.entity.QCategory;
-import com.example.demo.entity.QChapter;
+import com.example.demo.entity.chapter.QChapter;
 import com.example.demo.entity.QTag;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.QBook;
