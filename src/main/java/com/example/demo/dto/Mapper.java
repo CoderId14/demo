@@ -104,10 +104,13 @@ public class Mapper {
         String thumbnailId = thumbnail.map(Attachment::getId).orElse(null);
         String thumbnailUrl = book.getThumbnailUrl();
         List<ChapterResponse> latestChapter;
-        BookLikeCount bookLikeCount = book.getLikeCount();
-        BookViewCount bookViewCount = book.getViewCount();
-        long likeCount = bookLikeCount.getLikeCount() != null ? bookLikeCount.getLikeCount() : 0;
-        long viewCount = bookViewCount.getViewCount() != null ? bookViewCount.getViewCount() : 0;
+        long likeCount = Optional.ofNullable(book.getLikeCount())
+                .map(BookLikeCount::getLikeCount)
+                .orElse(0L);
+
+        long viewCount = Optional.ofNullable(book.getViewCount())
+                .map(BookViewCount::getViewCount)
+                .orElse(0L);
 
         if(!isDetail){
             return BookResponse.builder()
