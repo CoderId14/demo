@@ -18,6 +18,7 @@ import com.example.demo.api.user.response.ForgotPasswordResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
 import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
+import com.example.demo.constant.PremiumConstance;
 import com.example.demo.dto.Mapper;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.auth.request.TokenRefreshRequest;
@@ -32,6 +33,7 @@ import com.example.demo.entity.supports.ERole;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.exceptions.auth.TokenRefreshException;
 import com.example.demo.exceptions.user.AccountActiveException;
+import com.example.demo.exceptions.user.InsufficientEx;
 import com.example.demo.exceptions.user.ResourceExistsException;
 import com.example.demo.exceptions.user.TokenInvalidException;
 import lombok.RequiredArgsConstructor;
@@ -321,6 +323,25 @@ public class UserService implements IUserService {
         );
         user.setIsActive(true);
     }
-
+    public void loadCoin(Long userid, Long coin) {
+        User user = userRepo.findById(userid).orElseThrow(
+            () -> new UsernameNotFoundException("Username not found")
+        );
+        Long currentCoin = user.getCoin()+coin;
+        user.setCoin(currentCoin);
+        userRepo.save(user);
+    }
+    public void openPremium(Long userid) {
+        User user = userRepo.findById(userid).orElseThrow(
+            () -> new UsernameNotFoundException("Username not found")
+        );
+        Long usercoin = user.getCoin();
+        if (usercoin < PremiumConstance.price){
+            throw new InsufficientEx("account not enough coin");
+        }
+        user.setCoin(usercoin-PremiumConstance.price);
+        //chỗ này set roles, xem hộ đoạn set role với Hiếu nhé
+        userRepo.save(user);
+    }
 
 }

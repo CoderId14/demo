@@ -15,8 +15,25 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 
+import com.example.demo.config.CacheConfig;
+import com.example.demo.config.VnpayConfig;
 import com.example.demo.dto.response.ObjectResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +57,7 @@ public class UserController {
 
     private final UserHistoryService userHistoryService;
     private final BookService bookService;
+    private final CacheConfig cacheConfig;
 
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
@@ -129,6 +147,128 @@ public class UserController {
     public ResponseEntity<?> likeBook(@RequestParam long userid, @RequestParam long bookid){
          bookService.liked(userid,bookid);
          return ResponseEntity.ok("Liked success book = " + bookid);
+    }
+
+    @GetMapping("/v1/load-coin")
+    public ResponseEntity<?> loadCoin(@RequestParam(value = "userId") Long userId, @RequestParam(value = "coin") Long coin)
+        throws Exception {
+        String vnp_Version = VnpayConfig.vnp_Version;
+        String vnp_Command = VnpayConfig.vnp_Command;
+        String orderType = VnpayConfig.orderType;
+        long amount = coin*1000*100;
+        // mã thanh toán gửi sang là duy nhất nên cần set session (UUID), lưu cái session nayf lại, nhưng lấy ra để lấy userid kiểu gì
+        String vnp_TxnRef = VnpayConfig.getRandomNumber(userId);
+        String vnp_IpAddr = VnpayConfig.vnp_IpAddr;
+        String vnp_TmnCode = VnpayConfig.vnp_TmnCode;
+        cacheConfig.put(vnp_TxnRef, userId);
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", vnp_Version);
+        vnp_Params.put("vnp_Command", vnp_Command);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", String.valueOf(amount));
+        vnp_Params.put("vnp_CurrCode", "VND");
+
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", "Thanh toán hóa đơn thuế:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderType", orderType);
+
+        String locate = "";
+        if (locate != null && !locate.isEmpty()) {
+            vnp_Params.put("vnp_Locale", locate);
+        } else {
+            vnp_Params.put("vnp_Locale", "vn");
+        }
+        vnp_Params.put("vnp_ReturnUrl", VnpayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnp_CreateDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+        cld.add(Calendar.MINUTE, 15);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+        List fieldNames = new ArrayList(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        Iterator itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                //Build hash data
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
+            }
+        }
+        String queryUrl = query.toString();
+        String vnp_SecureHash = VnpayConfig.hmacSHA512(VnpayConfig.vnp_HashSecret, hashData.toString());
+        System.out.println("hashdata is: "+ hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = VnpayConfig.vnp_PayUrl + "?" + queryUrl;
+//        System.out.println(paymentUrl);
+        return ResponseEntity.ok(paymentUrl);
+    }
+    @RequestMapping("/v1/save-coin")
+    public ResponseEntity<?> saveCoin(HttpServletRequest request) throws Exception {
+        Map<String, String[]> params = request.getParameterMap();
+        HashMap<String, String> paramMap = new HashMap<>();
+        Set<String> keySets = params.keySet();
+        for (String key : keySets) {
+            String[] values = params.get(key);
+            paramMap.put(key, values[0]);
+        }
+        String vnp_SecureHash = paramMap.get("vnp_SecureHash");
+        paramMap.remove("vnp_SecureHash");
+        List fieldNames = new ArrayList(paramMap.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        Iterator itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) paramMap.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                //Build hash data
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
+            }
+        }
+
+        if(VnpayConfig.hmacSHA512(VnpayConfig.vnp_HashSecret,hashData.toString()).equals(vnp_SecureHash)==false){
+            return ResponseEntity.ok("70");
+        }
+        Long userId = cacheConfig.get(paramMap.get("vnp_TxnRef"));
+        Long coin = Long.valueOf(paramMap.get("vnp_Amount"))/(100*1000);
+        userService.loadCoin(userId,coin);
+        cacheConfig.remove(paramMap.get("vnp_TxnRef"));
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    @GetMapping("/v1/open-premium")
+    public ResponseEntity<?> openPremium(@RequestParam long userid){
+        userService.openPremium(userid);
+        return ResponseEntity.ok("Open success premium");
     }
 
 }

@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 app:
   jwt:
     expire: 3600000
@@ -44,7 +44,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: hieu
+    password: 28022001
     url: jdbc:mysql://localhost:3306/demo
   mail:
     username: danghieu14th@gmail.com

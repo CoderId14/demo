@@ -46,6 +46,8 @@ public class User extends BaseEntity {
     private AuthProvider provider;
     @Column
     private String providerId;
+    @Column
+    private Long coin;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
