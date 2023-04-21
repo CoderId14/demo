@@ -1,8 +1,6 @@
 package com.example.demo.Repository.book;
 
 import com.example.demo.criteria.BookPredicateBuilder;
-import com.example.demo.entity.Category;
-import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.QBook;
 import com.querydsl.core.types.dsl.StringPath;
@@ -19,9 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface BookRepo extends JpaRepository<Book, Long>,
@@ -32,6 +28,11 @@ public interface BookRepo extends JpaRepository<Book, Long>,
         bindings.bind(root.tags).first(
                 (path, values) -> {
                     predicate.withTags(values);
+                    return predicate.build();
+                });
+        bindings.bind(root.categories).first(
+                (path, values) -> {
+                    predicate.withCategories(values);
                     return predicate.build();
                 });
         bindings.bind(String.class).first(

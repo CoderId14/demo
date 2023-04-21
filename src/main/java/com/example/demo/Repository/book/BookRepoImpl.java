@@ -1,11 +1,7 @@
 package com.example.demo.Repository.book;
 
-import com.example.demo.entity.QCategory;
-
-import com.example.demo.entity.QTag;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.QBook;
-import com.example.demo.entity.chapter.QChapter;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
@@ -65,9 +61,6 @@ public class BookRepoImpl implements BookRepoCustom{
         }
         List<Book> books = queryFactory
                 .from(book)
-                .leftJoin(book.tags, QTag.tag).fetchJoin()
-                .leftJoin(book.categories, QCategory.category).fetchJoin()
-                .leftJoin(book.chapters, QChapter.chapter).fetchJoin()
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .where(predicate)

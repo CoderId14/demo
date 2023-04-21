@@ -28,7 +28,7 @@ public class BookRatingController {
     @GetMapping("/v1/search")
     public ResponseEntity<?> searchBookRating(
             @QuerydslPredicate(root = BookRating.class) Predicate predicate,
-            @PageableDefault(sort = "createdDate",
+            @PageableDefault(sort = "rating",
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable
     ) {

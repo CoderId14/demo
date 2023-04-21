@@ -36,7 +36,7 @@ public class Book extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tbl_book_category",
             joinColumns = @JoinColumn(name ="book_id")
             , inverseJoinColumns = @JoinColumn(name = "category_id")
@@ -61,7 +61,7 @@ public class Book extends BaseEntity {
     @EqualsAndHashCode.Exclude
     private List<Chapter> chapters = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "thumbnail", referencedColumnName = "id")
     private Attachment thumbnail;
     @Column(columnDefinition = "TEXT")

@@ -1,8 +1,6 @@
 package com.example.demo.Repository.book;
 
-import com.example.demo.entity.book.Book;
-import com.example.demo.entity.book.BookViewCount;
-import com.example.demo.entity.book.QBookViewCount;
+import com.example.demo.entity.book.*;
 import com.example.demo.exceptions.ParameterException;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,17 +13,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface BookViewCountRepo extends JpaRepository<BookViewCount, Long>,
-         QuerydslPredicateExecutor<BookViewCount>, QuerydslBinderCustomizer<QBookViewCount> , JpaSpecificationExecutor<BookViewCount> {
+public interface BookRatingCountRepo extends JpaRepository<BookRatingCount, Long>,
+        QuerydslPredicateExecutor<BookRatingCount>, QuerydslBinderCustomizer<QBookRatingCount>, JpaSpecificationExecutor<BookRatingCount> {
     @Override
-    default void customize(QuerydslBindings bindings, QBookViewCount root) {
+    default void customize(QuerydslBindings bindings, QBookRatingCount root) {
         if(root.book.id == null){
             throw new ParameterException("bookId");
         }
         bindings.bind(String.class).first(
                 (StringPath path, String value) -> path.containsIgnoreCase(value));
     }
-
-    Optional<BookViewCount> findByBook(Book book);
+    Optional<BookRatingCount> findByBook(Book book);
 
 }

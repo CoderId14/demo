@@ -6,6 +6,7 @@ import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.BookLikeCount;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,9 @@ public class BookLikeCountService {
 
     private final BookLikeCountRepo bookLikeCountRepo;
 
-    public PagedResponse<BookResponse> getHotBookByLikeCount(Pageable pageable){
+    public PagedResponse<BookResponse> getHotBookByLikeCount(Predicate predicate, Pageable pageable){
 
-        Page<BookLikeCount> books = bookLikeCountRepo.findAll(pageable);
+        Page<BookLikeCount> books = bookLikeCountRepo.findAll(predicate, pageable);
         List<BookLikeCount> contents = books.getNumberOfElements() == 0 ?
                 Collections.emptyList()
                 :

@@ -11,6 +11,8 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
          QuerydslPredicateExecutor<BookRating>, QuerydslBinderCustomizer<QBookRating> , JpaSpecificationExecutor<BookRating> {
@@ -22,5 +24,8 @@ public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
         bindings.bind(String.class).first(
                 (StringPath path, String value) -> path.containsIgnoreCase(value));
     }
+
+    List<BookRating> findByBook_Id(long id);
+
 
 }

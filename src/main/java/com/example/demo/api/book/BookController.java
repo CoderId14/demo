@@ -4,6 +4,7 @@ package com.example.demo.api.book;
 import com.example.demo.Repository.book.BookRepo;
 import com.example.demo.Service.book.BookService;
 import com.example.demo.Service.book.likeCount.BookLikeCountService;
+import com.example.demo.Service.book.rating.BookRatingCountService;
 import com.example.demo.Service.book.viewCount.BookViewCountService;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.book.request.BookSearchRequest;
@@ -18,6 +19,9 @@ import com.example.demo.criteria.spec.book.BookSpecificationBuilder;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.book.Book;
+import com.example.demo.entity.book.BookLikeCount;
+import com.example.demo.entity.book.BookRatingCount;
+import com.example.demo.entity.book.BookViewCount;
 import com.querydsl.core.types.Predicate;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -51,6 +55,8 @@ public class BookController {
 
     private final BookLikeCountService bookLikeCountService;
 
+    private final BookRatingCountService bookRatingCountService;
+
     @GetMapping("/v1")
     public ResponseEntity<?> getAllBooks(
             @PageableDefault(sort = "createdDate",
@@ -78,6 +84,7 @@ public class BookController {
                 }
             }
         }
+
         boolean isDetail = detail.equals("true");
         PagedResponse<BookResponse> response = bookService.searchBook(predicate, pageable, isDetail);
 
@@ -150,22 +157,36 @@ public class BookController {
 
     @GetMapping("/v1/likeCount")
     public ResponseEntity<?> hotBooksByLikeCount(
+            @QuerydslPredicate(root = BookLikeCount.class) Predicate predicate,
             @PageableDefault(sort = "likeCount",
                     direction = Sort.Direction.DESC,
                     size = 10) Pageable pageable
     ) {
-        PagedResponse<BookResponse> response = bookLikeCountService.getHotBookByLikeCount(pageable);
+        PagedResponse<BookResponse> response = bookLikeCountService.getHotBookByLikeCount(predicate, pageable);
 
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/v1/viewCount")
     public ResponseEntity<?> hotBooksByViewCount(
+            @QuerydslPredicate(root = BookViewCount.class) Predicate predicate,
             @PageableDefault(sort = "viewCount",
                     direction = Sort.Direction.DESC,
                     size = 10) Pageable pageable
     ) {
-        PagedResponse<BookResponse> response = bookViewCountService.getHotBookByViewCount(pageable);
+        PagedResponse<BookResponse> response = bookViewCountService.getHotBookByViewCount(predicate, pageable);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/v1/ratingCount")
+    public ResponseEntity<?> hotBooksByRatingCount(
+            @QuerydslPredicate(root = BookRatingCount.class) Predicate predicate,
+            @PageableDefault(sort = "averageRating",
+                    direction = Sort.Direction.DESC,
+                    size = 10) Pageable pageable
+    ) {
+        PagedResponse<BookResponse> response = bookRatingCountService.searchBookByRatingCount(predicate , pageable);
 
         return ResponseEntity.ok().body(response);
     }
@@ -182,6 +203,14 @@ public class BookController {
     public ResponseEntity<?> test1(
     ) {
         bookLikeCountService.updateLikeCount();
+
+        return ResponseEntity.ok().body("test");
+    }
+
+    @GetMapping("/v1/testUpdateRatingCount")
+    public ResponseEntity<?> test2(
+    ) {
+        bookRatingCountService.updateRatingCount();
 
         return ResponseEntity.ok().body("test");
     }
