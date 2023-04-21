@@ -1,7 +1,21 @@
+FROM openjdk:17-oracle as builder
+
+WORKDIR /app
+
+COPY mvnw .
+RUN chmod +x mvnw
+COPY .mvn .mvn
+COPY pom.xml .
+
+RUN ./mvnw dependency:go-offline -B
+
+COPY src src
+
+RUN ./mvnw package -DskipTests
+
 FROM openjdk:17-oracle
 
-LABEL mentainer="danghieu14th@gmail.com"
-
-COPY target/demo-0.0.1-SNAPSHOT.jar springboot-reading.jar
-
-ENTRYPOINT ["java", "-jar", "springboot-reading.jar"]
+COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/demo.jar"]
+ENV SPRING_PROFILES_ACTIVE=prod,common

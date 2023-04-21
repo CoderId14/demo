@@ -8,4 +8,7 @@ import org.springframework.data.domain.Pageable;
 public interface BookRepoCustom {
 
     Page<Book> findAllBookAdvanced(Predicate predicate, Pageable pageable);
+
+    Page<Book> searchBook(Predicate predicate, Pageable pageable);
+
 }

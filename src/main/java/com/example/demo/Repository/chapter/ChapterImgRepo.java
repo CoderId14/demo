@@ -1,7 +1,5 @@
 package com.example.demo.Repository.chapter;
 
-import com.example.demo.entity.chapter.QChapter;
-import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.chapter.ChapterImg;
 import com.example.demo.entity.chapter.QChapterImg;
 import com.querydsl.core.types.dsl.StringPath;
@@ -12,7 +10,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
-public interface ChapterImgRepo extends JpaRepository<ChapterImg, Long>,
+public interface ChapterImgRepo extends JpaRepository<ChapterImg, String>,
+        ChapterImgRepoCustom,
         QuerydslPredicateExecutor<ChapterImg>, QuerydslBinderCustomizer<QChapterImg> {
     @Override
     default void customize(QuerydslBindings bindings, QChapterImg root) {

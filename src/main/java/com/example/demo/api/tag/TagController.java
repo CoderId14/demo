@@ -11,7 +11,10 @@ import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.Tag;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,10 +33,11 @@ public class TagController {
     @GetMapping("/v1/search")
     public ResponseEntity<PagedResponse<TagResponse>> searchTag(
             @QuerydslPredicate(root = Tag.class) Predicate predicate,
-            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size) {
+            @PageableDefault(sort = "createdDate",
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        PagedResponse<TagResponse> response = tagService.searchTag(predicate, page, size);
+        PagedResponse<TagResponse> response = tagService.searchTag(predicate, pageable);
         return ResponseEntity.ok().body(response);
     }
 

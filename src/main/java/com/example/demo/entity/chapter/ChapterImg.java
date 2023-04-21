@@ -32,10 +32,8 @@ public class ChapterImg {
 
     private String fileName;
     private String fileType;
-
-    @Lob
-    private byte[] data;
-
+    @Column(columnDefinition = "TEXT")
+    private String fileUrl;
     @Column
     @CreatedBy
     private String createdBy;

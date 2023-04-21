@@ -1,20 +1,32 @@
-version: "3"
+version: '3'
 
 services:
-  mysql:
-    image: mysql:latest
-    environment:
-      - MYSQL_ROOT_PASSWORD=hieu
-      - MYSQL_DATABASE=demo
-    volumes:
-      - mysql-data:/var/lib/mysql
-
   app:
-    image: springboot-reading:latest
+    build: .
     ports:
-      - "8081:8080"
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://root:p4dqVY9LW6i6gDJYEEzb@containers-us-west-1.railway.app:5516/railway
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: p4dqVY9LW6i6gDJYEEzb
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
     depends_on:
-      - mysql
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: hieu
+      MYSQL_DATABASE: demo
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - default
 
 volumes:
-  mysql-data:
+  db-data:
+
+networks:
+  default:
+    driver: bridge

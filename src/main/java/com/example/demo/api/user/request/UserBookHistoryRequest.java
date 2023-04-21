@@ -13,7 +13,7 @@ public class UserBookHistoryRequest {
     @NotNull
     private Long userId;
     @Builder.Default
-    private int page = Integer.parseInt(AppConstants.DEFAULT_PAGE_NUMBER);
+    private int page = AppConstants.DEFAULT_PAGE_NUMBER;
     @Builder.Default
-    private int size = Integer.parseInt(AppConstants.DEFAULT_PAGE_SIZE);
+    private int size = AppConstants.DEFAULT_PAGE_SIZE;
 }

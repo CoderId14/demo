@@ -1,5 +1,6 @@
 package com.example.demo.criteria;
 
+import com.example.demo.entity.Category;
 import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.QBook;
 import com.querydsl.core.BooleanBuilder;
@@ -18,6 +19,14 @@ public class BookPredicateBuilder {
         QBook book = QBook.book;
         BooleanBuilder builder = new BooleanBuilder();
         tags.forEach(tag -> builder.and(book.tags.contains(tag)));
+        expressions.add(builder);
+        return this;
+    }
+
+    public BookPredicateBuilder withCategories(Set<Category> categories){
+        QBook book = QBook.book;
+        BooleanBuilder builder = new BooleanBuilder();
+        categories.forEach(category -> builder.and(book.categories.contains(category)));
         expressions.add(builder);
         return this;
     }

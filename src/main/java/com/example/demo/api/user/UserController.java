@@ -1,15 +1,17 @@
 package com.example.demo.api.user;
 
 
-import com.example.demo.Service.book.BookLikeService;
 import com.example.demo.Service.book.BookService;
 import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.Utils.AppConstants;
+import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
-import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.api.user.request.UserBookHistoryRequest;
+import com.example.demo.api.user.response.ChangePasswordResponse;
+import com.example.demo.api.user.response.UserResponse;
+import com.example.demo.api.user.response.UserTokenResponse;
 import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.api.user.response.UserResponse;
@@ -37,7 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,14 +74,15 @@ public class UserController {
     @GetMapping("/v1/reading-history")
     public ResponseEntity<?> getReadingHistory(
             @RequestParam(value = "userId") Long userId,
-            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
+            @PageableDefault(sort = "createdDate",
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
             @CurrentUser CustomUserDetails user) {
 
         UserBookHistoryRequest request = UserBookHistoryRequest.builder()
                 .userId(userId)
-                .page(page)
-                .size(size)
+                .page(pageable.getPageNumber())
+                .size(pageable.getPageSize())
                 .build();
         return ResponseEntity.ok(userHistoryService.getHistory(request, user));
     }

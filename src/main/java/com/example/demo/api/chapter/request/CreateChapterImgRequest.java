@@ -2,7 +2,6 @@ package com.example.demo.api.chapter.request;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 
@@ -11,5 +10,5 @@ import javax.validation.constraints.NotNull;
 public class CreateChapterImgRequest {
     @NotNull
     private long chapterId;
-    private MultipartFile chapterImg;
+    private String fileUrl;
 }

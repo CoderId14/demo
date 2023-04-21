@@ -46,4 +46,26 @@ public class BookRepoImpl implements BookRepoCustom{
 
         return new PageImpl<>(books);
     }
+
+    @Override
+    public Page<Book> searchBook(Predicate predicate, Pageable pageable) {
+        JPAQuery<Book> queryFactory = new JPAQuery<>(em);
+        QBook book = QBook.book;
+        PathBuilder<Book> bookPath = new PathBuilder<>(Book.class, "book");
+        for (Sort.Order order : pageable.getSort()) {
+            if(order.getProperty().equals("chapterModifiedDate")){
+                continue;
+            }
+            PathBuilder<Object> bpath = bookPath.get(order.getProperty());
+            queryFactory.orderBy(new OrderSpecifier(Order.valueOf(order.getDirection().name()), bpath));
+        }
+        List<Book> books = queryFactory
+                .from(book)
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .where(predicate)
+                .fetch();
+
+        return new PageImpl<>(books);
+    }
 }

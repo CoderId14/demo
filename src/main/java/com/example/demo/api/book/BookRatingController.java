@@ -9,18 +9,15 @@ import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.book.BookRating;
-import com.example.demo.entity.supports.SortType;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import static com.example.demo.Utils.AppConstants.CREATED_DATE;
 
 @RestController
 @RequestMapping("/api/book-rating")
@@ -31,12 +28,10 @@ public class BookRatingController {
     @GetMapping("/v1/search")
     public ResponseEntity<?> searchBookRating(
             @QuerydslPredicate(root = BookRating.class) Predicate predicate,
-            @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size,
-            @RequestParam(value = "sortType", required = false, defaultValue = CREATED_DATE) SortType sortType,
-            @RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") Sort.Direction sortDirection
+            @PageableDefault(sort = "rating",
+                    direction = Sort.Direction.DESC,
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size, sortDirection, sortType.getSortType());
         PagedResponse<BookRatingResponse> response = bookRatingService.searchBookRating(predicate, pageable);
         return ResponseEntity.ok().body(response);
     }
@@ -49,6 +44,7 @@ public class BookRatingController {
         BookRatingResponse response = bookRatingService.addBookRating(request);
         return ResponseEntity.ok().body(response);
     }
+
     @PutMapping("/v1")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateBookRating(

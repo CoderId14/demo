@@ -237,6 +237,11 @@ public class UserService implements IUserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }
         if (!userDetails.getUser().getIsActive()) {
+            String token = confirmationTokenService.generateConfirmationToken(userDetails.getUser());
+
+            String link = AppConstants.LINK_VERIFY + token;
+            emailService.send(userDetails.getUser().getEmail(),
+                    mailBuilder.buildEmailSignUp(userDetails.getUser().getUsername(), link));
             throw new AccountActiveException();
         }
         if (passwordEncoder.matches(loginRequest.getPassword(), userDetails.getUser().getPassword())) {

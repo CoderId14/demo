@@ -18,29 +18,6 @@ import org.modelmapper.ModelMapper;
 
 
 @Entity
-//@NamedEntityGraph(
-//        name = "graph.book.comment",
-//        attributeNodes = {
-//                @NamedAttributeNode("user"),
-//                @NamedAttributeNode(value = "categories", subgraph = "categories.subgraph"),
-//                @NamedAttributeNode(value = "tags", subgraph = "tags.subgraph")
-//        },
-//        subgraphs = {
-//                @NamedSubgraph(
-//                        name = "categories.subgraph",
-//                        attributeNodes = {
-//                                @NamedAttributeNode("name")
-//                        }
-//                ),
-//                @NamedSubgraph(
-//                name = "tags.subgraph",
-//                attributeNodes = {
-//                        @NamedAttributeNode("title")
-//                }
-//        )
-//        }
-//
-//)
 @Table(name = "tbl_book")
 @Getter
 @Setter
@@ -59,7 +36,7 @@ public class Book extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tbl_book_category",
             joinColumns = @JoinColumn(name ="book_id")
             , inverseJoinColumns = @JoinColumn(name = "category_id")
@@ -84,14 +61,20 @@ public class Book extends BaseEntity {
     @EqualsAndHashCode.Exclude
     private List<Chapter> chapters = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "thumbnail", referencedColumnName = "id")
     private Attachment thumbnail;
+    @Column(columnDefinition = "TEXT")
+    private String thumbnailUrl;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<UserBookHistory> userBookHistories;
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookLike> bookLikes;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookViewCount viewCount;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookLikeCount likeCount;
     public Book(BookLike bookLike) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(bookLike.getBook(), this);
