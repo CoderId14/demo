@@ -53,6 +53,8 @@ public class UserController {
 
     private final RoleUtils roleUtils;
 
+    private final VnpayConfig vnpayConfig;
+
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
         return ResponseEntity.ok(
@@ -158,14 +160,15 @@ public class UserController {
     @GetMapping("/v1/load-coin")
     public ResponseEntity<?> loadCoin(@RequestParam(value = "userId") Long userId, @RequestParam(value = "coin") Long coin)
         throws Exception {
-        String vnp_Version = VnpayConfig.vnp_Version;
-        String vnp_Command = VnpayConfig.vnp_Command;
-        String orderType = VnpayConfig.orderType;
+        String test = vnpayConfig.myTestValue;
+        String vnp_Version = vnpayConfig.vnp_Version;
+        String vnp_Command = vnpayConfig.vnp_Command;
+        String orderType = vnpayConfig.orderType;
         long amount = coin*1000*100;
         // mã thanh toán gửi sang là duy nhất nên cần set session (UUID), lưu cái session nayf lại, nhưng lấy ra để lấy userid kiểu gì
         String vnp_TxnRef = VnpayConfig.getRandomNumber(userId);
-        String vnp_IpAddr = VnpayConfig.vnp_IpAddr;
-        String vnp_TmnCode = VnpayConfig.vnp_TmnCode;
+        String vnp_IpAddr = vnpayConfig.vnp_IpAddr;
+        String vnp_TmnCode = vnpayConfig.vnp_TmnCode;
         cacheConfig.put(vnp_TxnRef, userId);
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
@@ -184,7 +187,7 @@ public class UserController {
         } else {
             vnp_Params.put("vnp_Locale", "vn");
         }
-        vnp_Params.put("vnp_ReturnUrl", VnpayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_ReturnUrl", vnpayConfig.vnp_Returnurl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -220,10 +223,10 @@ public class UserController {
             }
         }
         String queryUrl = query.toString();
-        String vnp_SecureHash = VnpayConfig.hmacSHA512(VnpayConfig.vnp_HashSecret, hashData.toString());
+        String vnp_SecureHash = VnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret, hashData.toString());
         System.out.println("hashdata is: "+ hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = VnpayConfig.vnp_PayUrl + "?" + queryUrl;
+        String paymentUrl = vnpayConfig.vnp_PayUrl + "?" + queryUrl;
 //        System.out.println(paymentUrl);
         return ResponseEntity.ok(paymentUrl);
     }
@@ -262,7 +265,7 @@ public class UserController {
             }
         }
 
-        if(VnpayConfig.hmacSHA512(VnpayConfig.vnp_HashSecret,hashData.toString()).equals(vnp_SecureHash)==false){
+        if(VnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret,hashData.toString()).equals(vnp_SecureHash)==false){
             return ResponseEntity.ok("70");
         }
         Long userId = cacheConfig.get(paramMap.get("vnp_TxnRef"));
