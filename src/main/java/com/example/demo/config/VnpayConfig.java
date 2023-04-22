@@ -13,8 +13,6 @@ import java.util.UUID;
 @Configuration
 @PropertySource("classpath:application-local.yaml")
 public class VnpayConfig  {
-  @Value("${myTestValue}")
-  public String myTestValue;
   @Value("${vnp.vnp_IpAddr}")
   public String vnp_IpAddr;
   @Value("${vnp.orderType}")

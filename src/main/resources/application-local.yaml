@@ -69,5 +69,3 @@ vnp:
   orderType: ${VNP_ORDER_TYPE}
   vnp_Command: ${VNP_COMMAND}
   vnp_Version: ${VNP_VERSION}
-
-myTestValue: testValue
