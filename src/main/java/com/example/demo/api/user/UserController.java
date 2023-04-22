@@ -160,7 +160,6 @@ public class UserController {
     @GetMapping("/v1/load-coin")
     public ResponseEntity<?> loadCoin(@RequestParam(value = "userId") Long userId, @RequestParam(value = "coin") Long coin)
         throws Exception {
-        String test = vnpayConfig.myTestValue;
         String vnp_Version = vnpayConfig.vnp_Version;
         String vnp_Command = vnpayConfig.vnp_Command;
         String orderType = vnpayConfig.orderType;
