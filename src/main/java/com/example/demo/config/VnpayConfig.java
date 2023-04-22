@@ -11,13 +11,13 @@ import java.util.UUID;
 public class VnpayConfig  {
   @Value("${vnp.vnp_IpAddr}")
   public static String vnp_IpAddr;
-  @Value("${vnp.billpayment}")
+  @Value("${vnp.orderType}")
   public static String orderType;
   @Value("${vnp.vnp_Command}")
   public static String vnp_Command;
   @Value("${vnp.vnp_Version}")
   public static String vnp_Version;
-  @Value("${vnp.VNP_PAY_URL}")
+  @Value("${vnp.vnp_PayUrl}")
   public static String vnp_PayUrl;
   @Value("${vnp.vnp_Returnurl}")
   public static String vnp_Returnurl;

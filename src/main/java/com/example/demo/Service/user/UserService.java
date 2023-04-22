@@ -230,7 +230,6 @@ public class UserService implements IUserService {
                 .build();
 
         userRole.setUser(user);
-        userRoleRepo.save(userRole);
 
         userRepo.save(user);
 
