@@ -27,7 +27,7 @@ public class Tag extends BaseEntity{
 
     @Column
     private String name;
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     //thêm JsonIgnore vì This is an issue with bidirectional relationships,

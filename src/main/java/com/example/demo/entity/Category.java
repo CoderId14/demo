@@ -24,7 +24,7 @@ import java.util.Set;
 public class Category extends BaseEntity{
     @Column
     private String name;
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
     @ManyToMany(mappedBy = "categories", cascade = CascadeType.ALL)
     @JsonIgnore
