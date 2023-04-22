@@ -11,9 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Configuration
-@PropertySource("classpath:application-local.yaml")
 public class VnpayConfig  {
-
   @Value("${vnp.vnp_IpAddr}")
   public String vnp_IpAddr;
   @Value("${vnp.orderType}")
