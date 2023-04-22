@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 app:
   jwt:
     expire: 3600000
@@ -13,13 +14,14 @@ spring-hibernate-query-utils:
 
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+
   servlet:
     multipart:
       enabled: true
@@ -34,7 +36,7 @@ spring:
     url: jdbc:mysql://localhost:3306/demo
   mail:
     username: danghieu14th@gmail.com
-    password: cckuoukwlxufnghe
+    password: cvvmbqonqrzhcyrx
     host: smtp.gmail.com
     properties:
       mail:
@@ -47,8 +49,8 @@ spring:
       client:
         registration:
           google:
-            clientId: "526186141332-u50rj397qb1gcarsd5avc8qreckpatrr.apps.googleusercontent.com"
-            clientSecret: "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"
+            clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
+            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -56,3 +58,14 @@ spring:
 
 cors:
   allowedOrigins: "*"
+
+vnp:
+  vnp_IpAddr: ${VNP_IP_ADDRESS}
+  vnp_PayUrl: ${VNP_PAY_URL}
+  vnp_Returnurl: ${VNP_RETURN_URL}
+  vnp_TmnCode: ${VNP_TMN_CODE}
+  vnp_HashSecret: ${VNP_HASH_SECRET}
+  vnp_apiUrl: ${VNP_API_URL}
+  orderType: ${VNP_ORDER_TYPE}
+  vnp_Command: ${VNP_COMMAND}
+  vnp_Version: ${VNP_VERSION}

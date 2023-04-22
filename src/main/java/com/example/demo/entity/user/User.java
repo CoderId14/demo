@@ -47,15 +47,12 @@ public class User extends BaseEntity {
     @Column
     private String providerId;
     @Column
-    private Long coin;
+    @Builder.Default
+    private Long coin = 0L;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
-    @JoinTable(name = "tbl_user_role", joinColumns = {
-            @JoinColumn(name = "user_id")},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "role_id")})
-    private Set<Role> roles;
+    private Set<UserRole> userRoles;
 }

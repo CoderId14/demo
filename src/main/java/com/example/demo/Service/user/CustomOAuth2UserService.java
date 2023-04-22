@@ -7,11 +7,11 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.auth.user.OAuth2UserInfo;
 import com.example.demo.auth.user.OAuth2UserInfoFactory;
 import com.example.demo.entity.Role;
-import com.example.demo.entity.user.User;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
+import com.example.demo.entity.user.User;
+import com.example.demo.entity.user.UserRole;
 import com.example.demo.exceptions.OAuth2AuthenticationProcessingException;
-import com.example.demo.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -22,11 +22,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
-
-import static com.example.demo.Utils.AppConstants.ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -74,21 +73,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService implements
 
 //    Bổ sung DTO
     private User signUpNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo){
-        Set<Role> roles = new HashSet<>();
-        roles.add(
-                roleRepo.findRoleByRoleName(ERole.ROLE_USER).orElseThrow(
-                        () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
-                ));
+        Role role = roleRepo.findRoleByRoleName(ERole.ROLE_USER)
+                .orElseGet(() -> roleRepo.save(Role.builder().roleName(ERole.ROLE_USER).build()));
+
+        UserRole userRole = UserRole.builder()
+                .role(role)
+                .validUntil(LocalDateTime.now().plusMonths(1))
+                .build();
         User user = User.builder()
                 .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
                 .providerId(oAuth2UserInfo.getId())
                 .name(oAuth2UserInfo.getName())
                 .username(oAuth2UserInfo.getEmail())
                 .email(oAuth2UserInfo.getEmail())
-                .roles(roles)
+                .userRoles(new HashSet<>(Collections.singletonList(userRole)))
                 .avatar(oAuth2UserInfo.getImageUrl())
                 .isActive(true)
                 .build();
+        userRole.setUser(user);
         return userRepo.save(user);
     }
 

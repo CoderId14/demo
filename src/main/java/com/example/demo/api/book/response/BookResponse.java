@@ -31,8 +31,9 @@ public class BookResponse {
     private String thumbnailUrl;
 
     private String author;
-
     List<ChapterResponse> latestChapters;
     private long viewCount;
     private long likeCount;
+    private double averageRating;
+    private boolean isPremium;
 }

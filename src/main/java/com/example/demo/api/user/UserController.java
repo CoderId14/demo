@@ -2,6 +2,7 @@ package com.example.demo.api.user;
 
 
 import com.example.demo.Service.book.BookService;
+import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.Utils.AppConstants;
@@ -14,28 +15,9 @@ import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
 import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.api.user.response.UserResponse;
-import com.example.demo.api.user.response.ChangePasswordResponse;
-
 import com.example.demo.config.CacheConfig;
 import com.example.demo.config.VnpayConfig;
 import com.example.demo.dto.response.ObjectResponse;
-import com.example.demo.api.user.response.UserTokenResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -45,10 +27,16 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -63,6 +51,8 @@ public class UserController {
     private final BookService bookService;
     private final CacheConfig cacheConfig;
 
+    private final RoleUtils roleUtils;
+
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
         return ResponseEntity.ok(
@@ -72,18 +62,29 @@ public class UserController {
     }
 
     @GetMapping("/v1/reading-history")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getReadingHistory(
-            @RequestParam(value = "userId") Long userId,
+            @RequestParam(value = "userId", required = false) Long userId,
             @PageableDefault(sort = "createdDate",
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
             @CurrentUser CustomUserDetails user) {
+        roleUtils.checkAuthorization(user.getUsername(), user);
+        UserBookHistoryRequest request;
+        if(userId != null){
+             request = UserBookHistoryRequest.builder()
+                    .userId(userId)
+                    .page(pageable.getPageNumber())
+                    .size(pageable.getPageSize())
+                    .build();
+        } else{
+            request = UserBookHistoryRequest.builder()
+                    .userId(user.getId())
+                    .page(pageable.getPageNumber())
+                    .size(pageable.getPageSize())
+                    .build();
+        }
 
-        UserBookHistoryRequest request = UserBookHistoryRequest.builder()
-                .userId(userId)
-                .page(pageable.getPageNumber())
-                .size(pageable.getPageSize())
-                .build();
         return ResponseEntity.ok(userHistoryService.getHistory(request, user));
     }
 
@@ -271,8 +272,8 @@ public class UserController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
     @GetMapping("/v1/open-premium")
-    public ResponseEntity<?> openPremium(@RequestParam long userid){
-        userService.openPremium(userid);
+    public ResponseEntity<?> openPremium(@RequestParam long userId){
+        userService.openPremium(userId);
         return ResponseEntity.ok("Open success premium");
     }
 

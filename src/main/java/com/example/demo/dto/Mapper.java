@@ -1,38 +1,47 @@
 package com.example.demo.dto;
 
 
+import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.api.category.response.CategoryResponse;
 import com.example.demo.api.chapter.response.ChapterContentResponse;
 import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.api.tag.response.TagResponse;
-import com.example.demo.entity.*;
+import com.example.demo.api.user.response.UserResponse;
+import com.example.demo.auth.user.CustomUserDetails;
+import com.example.demo.entity.Attachment;
+import com.example.demo.entity.Category;
+import com.example.demo.entity.Role;
+import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.BookLikeCount;
+import com.example.demo.entity.book.BookRatingCount;
 import com.example.demo.entity.book.BookViewCount;
 import com.example.demo.entity.chapter.Chapter;
+import com.example.demo.entity.supports.ERole;
 import com.example.demo.entity.user.User;
-import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.api.user.response.UserResponse;
-import com.example.demo.api.auth.response.JwtAuthenticationResponse;
+import com.example.demo.entity.user.UserRole;
 import com.example.demo.exceptions.ParameterException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class Mapper {
     public static UserResponse toUserDto(User user) {
+        Set<ERole> roleSet = new HashSet<>();
+        Set<UserRole> userRole = user.getUserRoles();
+        userRole.stream()
+                .map(UserRole::getRole)
+                .map(Role::getRoleName)
+                .forEach(roleSet::add);
+
         return UserResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .avatar(user.getAvatar())
-                .roles(user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet()))
+                .roles(roleSet)
                 .name(user.getName())
                 .isActive(user.getIsActive())
                 .createDate(user.getCreatedDate())
@@ -41,11 +50,17 @@ public class Mapper {
     }
 
     public static JwtAuthenticationResponse toJwtAuthenticationRepsonse(String token, CustomUserDetails user, String refreshToken) {
+        Set<ERole> roleSet = new HashSet<>();
+        Set<UserRole> userRole = user.getUser().getUserRoles();
+        userRole.stream()
+                .map(UserRole::getRole)
+                .map(Role::getRoleName)
+                .forEach(roleSet::add);
         return JwtAuthenticationResponse.builder()
                 .accessToken(token)
                 .username(user.getUsername())
                 .refreshToken(refreshToken)
-                .role(user.getUser().getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet()))
+                .role(roleSet)
                 .build();
     }
     public static ChapterResponse getChapterResponseFromEntity(Chapter root) {
@@ -103,6 +118,7 @@ public class Mapper {
         Optional<Attachment> thumbnail = Optional.ofNullable(book.getThumbnail());
         String thumbnailId = thumbnail.map(Attachment::getId).orElse(null);
         String thumbnailUrl = book.getThumbnailUrl();
+
         List<ChapterResponse> latestChapter;
         long likeCount = Optional.ofNullable(book.getLikeCount())
                 .map(BookLikeCount::getLikeCount)
@@ -111,7 +127,9 @@ public class Mapper {
         long viewCount = Optional.ofNullable(book.getViewCount())
                 .map(BookViewCount::getViewCount)
                 .orElse(0L);
-
+        double averageRating = Optional.ofNullable(book.getBookRatingCount())
+                .map(BookRatingCount::getAverageRating)
+                .orElse(0d);
         if(!isDetail){
             return BookResponse.builder()
                     .bookId(book.getId())
@@ -121,6 +139,8 @@ public class Mapper {
                     .thumbnail(thumbnailId)
                     .viewCount(viewCount)
                     .likeCount(likeCount)
+                    .averageRating(averageRating)
+                    .isPremium(book.isPremium())
                     .build();
         }
         latestChapter = book.getChapters().stream()
@@ -144,6 +164,8 @@ public class Mapper {
                 .latestChapters(latestChapter)
                 .likeCount(likeCount)
                 .viewCount(viewCount)
+                .averageRating(averageRating)
+                .isPremium(book.isPremium())
                 .build();
 
     }

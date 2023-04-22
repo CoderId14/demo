@@ -61,6 +61,9 @@ public class ChapterService implements IChapterService {
         Chapter chapter = chapterRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("chapter", "id", id)
         );
+
+        roleUtils.checkPremium(chapter.getBook().isPremium(), currentUser);
+
         if (currentUser != null) {
             userHistoryService.addUserBookHistory(CreateUserBookHistoryRequest.builder()
                     .userId(currentUser.getId())

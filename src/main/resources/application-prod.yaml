@@ -4,9 +4,10 @@ app:
   jwt:
     expire: 3600000
     secret: secret
-  authorizedRedirectUris: http://localhost:3000
+  authorizedRedirectUris: ${AUTHORIZED_REDIRECT_URIS}
   apiUrl: http://localhost:8080
   front-ui: http://localhost:3000
+
 
 
 hibernate:
@@ -35,8 +36,8 @@ spring:
     password: ${MYSQLPASSWORD}
     url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
   mail:
-    username: danghieu14th@gmail.com
-    password: cckuoukwlxufnghe
+    username: ${MAIL_ACCOUNT}
+    password: ${MAIL_PASSWORD}
     host: smtp.gmail.com
     properties:
       mail:
@@ -49,8 +50,8 @@ spring:
       client:
         registration:
           google:
-            clientId: "526186141332-u50rj397qb1gcarsd5avc8qreckpatrr.apps.googleusercontent.com"
-            clientSecret: "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"
+            clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
+            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -58,3 +59,14 @@ spring:
 
 cors:
   allowedOrigins: "*"
+
+vnp:
+  vnp_IpAddr: ${VNP_IP_ADDRESS}
+  vnp_PayUrl: ${VNP_PAY_URL}
+  vnp_Returnurl: ${VNP_RETURN_URL}
+  vnp_TmnCode: ${VNP_TMN_CODE}
+  vnp_HashSecret: ${VNP_HASH_SECRET}
+  vnp_apiUrl: ${VNP_API_URL}
+  orderType: ${VNP_ORDER_TYPE}
+  vnp_Command: ${VNP_COMMAND}
+  vnp_Version: ${VNP_VERSION}

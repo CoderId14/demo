@@ -4,10 +4,13 @@ import com.example.demo.Repository.book.BookRepo;
 import com.example.demo.Repository.chapter.ChapterRepo;
 import com.example.demo.Repository.user.UserBookHistoryRepo;
 import com.example.demo.Repository.user.UserRepo;
+import com.example.demo.api.book.response.BookResponse;
+import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.api.user.request.CreateUserBookHistoryRequest;
 import com.example.demo.api.user.request.UserBookHistoryRequest;
 import com.example.demo.api.user.response.UserBookHistoryResponse;
 import com.example.demo.auth.user.CustomUserDetails;
+import com.example.demo.dto.Mapper;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.chapter.Chapter;
@@ -101,20 +104,23 @@ public class UserHistoryService {
         return getDtoResponse(userBookHistory);
     }
 
+
     public UserBookHistoryResponse getDtoResponse(UserBookHistory root) {
         User user = root.getUser();
         Book book = root.getBook();
         Chapter chapter = root.getChapter();
-        return UserBookHistoryResponse.builder()
+        ChapterResponse chapterResponse = Mapper.getChapterResponseFromEntity(chapter);
+
+        BookResponse bookResponse = Mapper.getBookResponse(book, true);
+        UserBookHistoryResponse userBookHistoryResponse = UserBookHistoryResponse.builder()
                 .userId(user.getId())
+                .book(bookResponse)
+                .recentlyChapter(chapterResponse)
                 .username(user.getUsername())
-                .bookId(book.getId())
-                .bookTitle(book.getTitle())
-                .chapterId(chapter.getId())
-                .chapterTitle(chapter.getTitle())
-                .chapterNumber(chapter.getChapterNumber())
-                .createdDate(root.getCreatedDate())
                 .modifiedDate(root.getModifiedDate())
                 .build();
+
+        return userBookHistoryResponse;
     }
+
 }

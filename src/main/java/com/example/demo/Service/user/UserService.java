@@ -1,5 +1,6 @@
 package com.example.demo.Service.user;
 
+import com.example.demo.Repository.UserRoleRepo;
 import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.user.UserRepo;
 import com.example.demo.Service.email.IEmailSender;
@@ -30,6 +31,7 @@ import com.example.demo.entity.user.User;
 import com.example.demo.entity.auth.RefreshToken;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
+import com.example.demo.entity.user.UserRole;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.exceptions.auth.TokenRefreshException;
 import com.example.demo.exceptions.user.AccountActiveException;
@@ -46,6 +48,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +82,8 @@ public class UserService implements IUserService {
 
     private final RefreshTokenService refreshTokenService;
 
+    private final UserRoleRepo userRoleRepo;
+
     public boolean isUsernameExist(CheckUsernameRequest checkUsernameRequest){
         return userRepo.findByUsername(checkUsernameRequest.getUsername()).isPresent();
     }
@@ -108,19 +114,23 @@ public class UserService implements IUserService {
         if (userRepo.existsByEmail(signUpRequest.getEmail())) {
             throw new ResourceExistsException("User", "Email", signUpRequest.getEmail());
         }
-        Set<Role> roles = new HashSet<>();
-        roles.add(
-                roleRepo.findRoleByRoleName(ERole.ROLE_USER).orElseGet(() -> roleRepo.save(
-                        Role.builder().roleName(ERole.ROLE_USER).build())));
 
+        Role defaultRole = roleRepo.findRoleByRoleName(ERole.ROLE_USER)
+                .orElseGet(() -> roleRepo.save(Role.builder().roleName(ERole.ROLE_USER).build()));
+
+        UserRole userRole = UserRole.builder()
+                .role(defaultRole)
+                .validUntil(LocalDateTime.now().plusYears(10))
+                .build();
 
         User user = User.builder()
                 .username(signUpRequest.getUsername())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .email(signUpRequest.getEmail())
-                .roles(roles)
                 .isActive(true)
+                .userRoles(new HashSet<>(Collections.singletonList(userRole)))
                 .build();
+        userRole.setUser(user);
         userRepo.save(user);
         return Mapper.toUserDto(user);
     }
@@ -203,19 +213,25 @@ public class UserService implements IUserService {
         if (userRepo.existsByEmail(signUpRequest.getEmail())) {
             throw new ResourceExistsException("User", "email", signUpRequest.getEmail());
         }
-        Set<Role> roles = new HashSet<>();
-        roles.add(
-                roleRepo.findRoleByRoleName(ERole.ROLE_USER).orElseThrow(
-                        () -> new ResourceNotFoundException("Role", "Role name", ROLE_USER)
-                ));
+        Role defaultRole = roleRepo.findRoleByRoleName(ERole.ROLE_USER)
+                .orElseGet(() -> roleRepo.save(Role.builder().roleName(ERole.ROLE_USER).build()));
+
+        UserRole userRole = UserRole.builder()
+                .role(defaultRole)
+                .validUntil(LocalDateTime.now().plusYears(10))
+                .build();
 
         User user = User.builder()
                 .username(signUpRequest.getUsername())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .email(signUpRequest.getEmail())
                 .isActive(false)
-                .roles(roles)
+                .userRoles(new HashSet<>(Collections.singletonList(userRole)))
                 .build();
+
+        userRole.setUser(user);
+        userRoleRepo.save(userRole);
+
         userRepo.save(user);
 
         String token = confirmationTokenService.generateConfirmationToken(user);
@@ -340,12 +356,22 @@ public class UserService implements IUserService {
         User user = userRepo.findById(userid).orElseThrow(
             () -> new UsernameNotFoundException("Username not found")
         );
-        Long usercoin = user.getCoin();
-        if (usercoin < PremiumConstance.price){
+        Long userCoin = user.getCoin();
+        if (userCoin < PremiumConstance.price){
             throw new InsufficientEx("account not enough coin");
         }
-        user.setCoin(usercoin-PremiumConstance.price);
+        user.setCoin(userCoin-PremiumConstance.price);
         //chỗ này set roles, xem hộ đoạn set role với Hiếu nhé
+//        Đã set nhé
+        Role userVipRole = roleRepo.findRoleByRoleName(ERole.ROLE_USER_VIP)
+                .orElseGet(() -> roleRepo.save(Role.builder().roleName(ERole.ROLE_USER_VIP).build()));
+
+        UserRole userRole = UserRole.builder()
+                .role(userVipRole)
+                .validUntil(LocalDateTime.now().plusMonths(1))
+                .build();
+        user.setUserRoles(new HashSet<>(Collections.singletonList(userRole)));
+        userRole.setUser(user);
         userRepo.save(user);
     }
 

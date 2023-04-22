@@ -1,8 +1,9 @@
 package com.example.demo.auth.user;
 
 import com.example.demo.entity.Role;
-import com.example.demo.entity.user.User;
 import com.example.demo.entity.supports.ERole;
+import com.example.demo.entity.user.User;
+import com.example.demo.entity.user.UserRole;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 public class CustomUserDetails implements UserDetails, OAuth2User {
@@ -42,9 +42,10 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        List<ERole> authorityList = user.getRoles().stream().map(
-                Role::getRoleName
-        ).toList();
+        List<ERole> authorityList = user.getUserRoles().stream()
+                .map(UserRole::getRole)
+                .map(Role::getRoleName)
+                .toList();
         for (ERole authority :
                 authorityList) {
             authorities.add(new SimpleGrantedAuthority(authority.toString()));

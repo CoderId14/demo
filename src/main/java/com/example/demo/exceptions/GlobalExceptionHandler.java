@@ -112,7 +112,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> exception(Exception ex) {
-        return new ResponseEntity<>(getBody(INTERNAL_SERVER_ERROR, ex, "Something Went Wrong"), new HttpHeaders(), INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(getBody(INTERNAL_SERVER_ERROR, ex, ex.getMessage()), new HttpHeaders(), INTERNAL_SERVER_ERROR);
     }
 
     public Map<String, Object> getBody(HttpStatus status, Exception ex, String message) {

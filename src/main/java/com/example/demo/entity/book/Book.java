@@ -75,6 +75,10 @@ public class Book extends BaseEntity {
     private BookViewCount viewCount;
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private BookLikeCount likeCount;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookRatingCount bookRatingCount;
+    @Column(name = "is_premium")
+    private boolean isPremium;
     public Book(BookLike bookLike) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(bookLike.getBook(), this);

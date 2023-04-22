@@ -1,21 +1,32 @@
 package com.example.demo.config;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class VnpayConfig  {
-  public static String vnp_IpAddr = "0.0.0.0.0.1";
-  public static String orderType = "billpayment";
-  public static String vnp_Command = "pay";
-  public static String vnp_Version = "2.1.0";
-  public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-  public static String vnp_Returnurl = "http://localhost:8081/api/user/v1/save-coin";
-  public static String vnp_TmnCode = "OKVQCIMD";
-  public static String vnp_HashSecret = "AVKGBRLEQDXSXICCGAFSBYQNVVZZGICP";
-  public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+  @Value("${vnp.vnp_IpAddr}")
+  public static String vnp_IpAddr;
+  @Value("${vnp.billpayment}")
+  public static String orderType;
+  @Value("${vnp.vnp_Command}")
+  public static String vnp_Command;
+  @Value("${vnp.vnp_Version}")
+  public static String vnp_Version;
+  @Value("${vnp.VNP_PAY_URL}")
+  public static String vnp_PayUrl;
+  @Value("${vnp.vnp_Returnurl}")
+  public static String vnp_Returnurl;
+  @Value("${vnp.vnp_TmnCode}")
+  public static String vnp_TmnCode;
+  @Value("${vnp.vnp_HashSecret}")
+  public static String vnp_HashSecret;
+  @Value("${vnp.vnp_apiUrl}")
+  public static String vnp_apiUrl;
 
   //  key = secret. amount. dateTime. sku
   public static String getRandomNumber(Long userId) throws Exception {

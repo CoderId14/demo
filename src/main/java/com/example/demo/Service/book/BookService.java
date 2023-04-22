@@ -70,6 +70,7 @@ public class BookService implements IBookService {
                 .thumbnailUrl(request.getThumbnailUrl())
                 .tags(tags)
                 .user(currentUser.getUser())
+                .isPremium(request.isPremium())
                 .build();
         book = bookRepo.save(book);
         return getBookResponse(book, false);
