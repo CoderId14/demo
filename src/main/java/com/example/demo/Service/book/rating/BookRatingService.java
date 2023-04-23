@@ -58,9 +58,14 @@ public class BookRatingService {
                 bookRatings.isLast());
     }
 
-    public BookRatingResponse addBookRating(CreateBookRatingRequest request){
-        User user =  userRepo.findById(request.getUserId()).
-                orElseThrow(() -> new ResourceNotFoundException("user", "id", request.getUserId()));
+    public BookRatingResponse addBookRating(CreateBookRatingRequest request, CustomUserDetails currentUser){
+        roleUtils.checkAuthorization(currentUser.getUsername(), currentUser);
+        User user =  currentUser.getUser();
+        if(request.getUserId() != 0L){
+            user =  userRepo.findById(request.getUserId()).
+                    orElseThrow(() -> new ResourceNotFoundException("user", "id", request.getUserId()));
+        }
+
         Book book = bookUtils.findBookById(request.getBookId());
         BookRating bookRating = BookRating.builder()
                 .user(user)

@@ -39,9 +39,10 @@ public class BookRatingController {
     @PostMapping("/v1")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBookRating(
-            @RequestBody CreateBookRatingRequest request
+            @RequestBody CreateBookRatingRequest request,
+            @CurrentUser CustomUserDetails currentUser
     ) {
-        BookRatingResponse response = bookRatingService.addBookRating(request);
+        BookRatingResponse response = bookRatingService.addBookRating(request, currentUser);
         return ResponseEntity.ok().body(response);
     }
 

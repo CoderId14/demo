@@ -3,57 +3,50 @@ package com.example.demo.Service.user;
 import com.example.demo.Repository.UserRoleRepo;
 import com.example.demo.Repository.role.RoleRepo;
 import com.example.demo.Repository.user.UserRepo;
-import com.example.demo.Service.email.IEmailSender;
-import com.example.demo.Service.confirmation.ConfirmationTokenService;
 import com.example.demo.Service.auth.RefreshTokenService;
+import com.example.demo.Service.confirmation.ConfirmationTokenService;
+import com.example.demo.Service.email.IEmailSender;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.Utils.MailBuilder;
-import com.example.demo.api.auth.request.CheckEmailRequest;
-import com.example.demo.api.auth.request.CheckUsernameRequest;
-import com.example.demo.api.auth.request.LoginRequest;
+import com.example.demo.api.auth.request.*;
+import com.example.demo.api.auth.response.JwtAuthenticationResponse;
+import com.example.demo.api.auth.response.TokenRefreshResponse;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
-import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.ForgotPasswordResponse;
+import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
 import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.constant.PremiumConstance;
 import com.example.demo.dto.Mapper;
-import com.example.demo.api.user.response.UserResponse;
-import com.example.demo.api.auth.request.TokenRefreshRequest;
-import com.example.demo.api.auth.response.JwtAuthenticationResponse;
-import com.example.demo.api.auth.response.TokenRefreshResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
-import com.example.demo.entity.user.User;
 import com.example.demo.entity.auth.RefreshToken;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
+import com.example.demo.entity.user.User;
 import com.example.demo.entity.user.UserRole;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.exceptions.auth.TokenRefreshException;
+import com.example.demo.exceptions.auth.UnauthorizedException;
 import com.example.demo.exceptions.user.AccountActiveException;
 import com.example.demo.exceptions.user.InsufficientEx;
 import com.example.demo.exceptions.user.ResourceExistsException;
 import com.example.demo.exceptions.user.TokenInvalidException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.demo.Utils.AppConstants.ROLE_USER;
 import static com.example.demo.Utils.AppUtils.isEmail;
 
 @Service
@@ -249,7 +242,7 @@ public class UserService implements IUserService {
         try {
             userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUsername());
         } catch (UsernameNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+            throw new ResourceNotFoundException("User", "username", loginRequest.getUsername());
         }
         if (!userDetails.getUser().getIsActive()) {
             String token = confirmationTokenService.generateConfirmationToken(userDetails.getUser());
@@ -267,7 +260,7 @@ public class UserService implements IUserService {
             return Mapper.toJwtAuthenticationRepsonse(jwt, userDetails, refreshToken.getToken());
         }
 
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized");
+        throw new UnauthorizedException("Password incorrect");
     }
 
     @Override
