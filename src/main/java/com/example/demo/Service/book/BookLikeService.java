@@ -70,7 +70,7 @@ public class BookLikeService {
         User user = userRepo.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("user", "id", userId)
         );
-        Book book = bookRepo.findById(userId).orElseThrow(
+        Book book = bookRepo.findById(bookId).orElseThrow(
                 () -> new ResourceNotFoundException("book", "id", bookId)
         );
         BookLike bookLike = BookLike.builder()
