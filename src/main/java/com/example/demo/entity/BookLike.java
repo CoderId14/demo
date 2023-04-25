@@ -17,10 +17,6 @@ import javax.persistence.*;
 @Builder
 @Entity
 public class BookLike extends BaseEntity{
-  @Column(name = "user_id", insertable = false, updatable = false)
-  private long userId;
-  @Column(name = "book_id", insertable = false, updatable = false)
-  private long bookId;
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(nullable = false,
       name = "user_id")
@@ -30,8 +26,4 @@ public class BookLike extends BaseEntity{
       name = "book_id")
   private Book book;
 
-  public BookLike(long userId, long bookId) {
-    this.userId = userId;
-    this.bookId = bookId;
-  }
 }

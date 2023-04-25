@@ -6,6 +6,7 @@ import com.example.demo.Service.book.BookUtils;
 import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.api.book.request.rating.CreateBookRatingRequest;
 import com.example.demo.api.book.request.rating.UpdateBookRatingRequest;
+import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.api.book.response.rating.BookRatingResponse;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.dto.PagedResponse;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.demo.dto.Mapper.getBookResponse;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,7 +42,7 @@ public class BookRatingService {
     private final RoleUtils roleUtils;
 
 
-    public PagedResponse<BookRatingResponse> searchBookRating(Predicate predicate, Pageable pageable){
+    public PagedResponse<BookResponse> searchBookRating(Predicate predicate, Pageable pageable){
 
         Page<BookRating> bookRatings = bookRatingRepo.findAll(predicate, pageable);
         List<BookRating> contents = bookRatings.getNumberOfElements() == 0 ?
@@ -47,8 +50,8 @@ public class BookRatingService {
                 :
                 bookRatings.getContent();
 
-        List<BookRatingResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookRatingResponse(temp)));
+        List<BookResponse> result = new ArrayList<>();
+        contents.forEach(temp -> result.add(getBookResponse(temp.getBook(), true)));
 
         return new PagedResponse<>(result,
                 bookRatings.getNumber(),

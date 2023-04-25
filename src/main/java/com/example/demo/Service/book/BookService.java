@@ -18,6 +18,7 @@ import com.example.demo.entity.BookLike;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
+import com.example.demo.entity.user.User;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,15 +176,6 @@ public class BookService implements IBookService {
                         .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()), pageable,false);
     }
 
-    public void liked(long userid, long bookid) {
-        BookLike bookLike = bookLikeRepo.findByUserIdAndAndBookId(userid, bookid).isPresent() ?
-                bookLikeRepo.findByUserIdAndAndBookId(userid, bookid).get() : null;
-        if (bookLike != null) {
-            bookLikeRepo.save(bookLike);
-        } else {
-            log.info("invalid book or user!");
-        }
-    }
 
     public PagedResponse<BookResponse> hotBooks(Pageable pageable) {
         // thống kê danh sách

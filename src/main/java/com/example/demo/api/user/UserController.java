@@ -1,6 +1,7 @@
 package com.example.demo.api.user;
 
 
+import com.example.demo.Service.book.BookLikeService;
 import com.example.demo.Service.book.BookService;
 import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Service.user.UserHistoryService;
@@ -9,6 +10,7 @@ import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.auth.request.SignUpRequest;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
+import com.example.demo.api.user.request.LikeBookRequest;
 import com.example.demo.api.user.request.UserBookHistoryRequest;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.UserResponse;
@@ -29,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +57,8 @@ public class UserController {
     private final RoleUtils roleUtils;
 
     private final VnpayConfig vnpayConfig;
+
+    private final BookLikeService bookLikeService;
 
     @GetMapping("/v1")
     public ResponseEntity<?> getEmailByUsername(@RequestParam("usernameOrEmail") String usernameOrEmail) {
@@ -152,9 +157,19 @@ public class UserController {
         return ResponseEntity.ok(bookService.findBookLikeByUserId(userid,PageRequest.of(page,size,Sort.by("createdBy"))));
     }
     @PostMapping("/v1/like-book")
-    public ResponseEntity<?> likeBook(@RequestParam long userid, @RequestParam long bookid){
-         bookService.liked(userid,bookid);
-         return ResponseEntity.ok("Liked success book = " + bookid);
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> likeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser){
+        long userId = currentUser.getId();
+        bookLikeService.liked(userId, request.getBookId());
+         return ResponseEntity.ok("Liked success book = " + request.getBookId());
+    }
+
+    @PostMapping("/v1/unLike-book")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> unLikeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser){
+        long userId = currentUser.getId();
+        bookLikeService.unLiked(userId, request.getBookId());
+        return ResponseEntity.ok("unLike success book = " + request.getBookId());
     }
 
     @GetMapping("/v1/load-coin")

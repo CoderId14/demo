@@ -4,6 +4,7 @@ import com.example.demo.Service.book.rating.BookRatingService;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.book.request.rating.CreateBookRatingRequest;
 import com.example.demo.api.book.request.rating.UpdateBookRatingRequest;
+import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.api.book.response.rating.BookRatingResponse;
 import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
@@ -32,7 +33,7 @@ public class BookRatingController {
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable
     ) {
-        PagedResponse<BookRatingResponse> response = bookRatingService.searchBookRating(predicate, pageable);
+        PagedResponse<BookResponse> response = bookRatingService.searchBookRating(predicate, pageable);
         return ResponseEntity.ok().body(response);
     }
 
