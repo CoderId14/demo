@@ -157,9 +157,11 @@ public class UserController {
     }
 
     @GetMapping("/v1/get-books-liked")
-    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @RequestParam long userId){
-        log.info("get book liked by  user id= " + userId);
-        return ResponseEntity.ok(bookService.findBookLikeByUserId(userId,PageRequest.of(page,size,Sort.by("createdBy"))));
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @CurrentUser CustomUserDetails currentUser){
+        log.info("get book liked by  user id= " +  currentUser.getId());
+
+        return ResponseEntity.ok(bookService.findBookLikeByUserId(currentUser.getId(), PageRequest.of(page,size,Sort.by("createdBy"))));
     }
     @PostMapping("/v1/like-book")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
