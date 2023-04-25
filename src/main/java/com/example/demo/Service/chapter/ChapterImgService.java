@@ -38,10 +38,12 @@ public class ChapterImgService {
 
     private final RoleUtils roleUtils;
 
-    public ChapterImgResponse searchChapterImg(long chapterId, Pageable pageable) {
-        chapterRepo.findById(chapterId).orElseThrow(
+    public ChapterImgResponse searchChapterImg(long chapterId, Pageable pageable, CustomUserDetails currentUser) {
+        Chapter chapter = chapterRepo.findById(chapterId).orElseThrow(
                 () -> new ResourceNotFoundException("chapter", "id", chapterId)
         );
+        roleUtils.checkPremium(chapter.getBook().isPremium(), currentUser);
+
         Page<ChapterImg> chapterImgs = chapterImgRepo.findByChapter_Id(chapterId, pageable);
         List<ChapterImg> content = chapterImgs.getNumberOfElements() == 0 ? Collections.emptyList() : chapterImgs.getContent();
 

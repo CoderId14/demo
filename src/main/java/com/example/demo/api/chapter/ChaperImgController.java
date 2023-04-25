@@ -35,12 +35,14 @@ public class ChaperImgController {
 
 
     @GetMapping("/v1/search/{chapterId}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<ChapterImgResponse> searchChapterImg(
+            @CurrentUser CustomUserDetails currentUser,
             @PathVariable(name = "chapterId") Long chapterId,
             @PageableDefault(sort = "imgNumber",
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable) {
-        ChapterImgResponse response = chapterImgService.searchChapterImg(chapterId, pageable);
+        ChapterImgResponse response = chapterImgService.searchChapterImg(chapterId, pageable, currentUser);
         return ResponseEntity.ok().body(response);
     }
 

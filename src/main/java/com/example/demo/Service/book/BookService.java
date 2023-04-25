@@ -171,11 +171,11 @@ public class BookService implements IBookService {
 
     public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable) {
         Page<BookLike> bookPage = bookLikeRepo.findByUserId(id, pageable);
+        PageImpl<Book> books = new PageImpl(bookPage.stream()
+                .map(BookLike::getBook)
+                .toList());
         return getBookResponsePagedResponse(
-                new PageImpl<>(bookPage
-                        .stream()
-                        .map(Book::new)
-                        .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()), pageable,true);
+                books, pageable,true);
     }
 
 
