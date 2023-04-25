@@ -44,6 +44,7 @@ public class Mapper {
                 .roles(roleSet)
                 .name(user.getName())
                 .isActive(user.getIsActive())
+                .coin(user.getCoin())
                 .createDate(user.getCreatedDate())
                 .modifyDate(user.getModifiedDate())
                 .build();

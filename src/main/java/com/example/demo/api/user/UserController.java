@@ -103,6 +103,11 @@ public class UserController {
                         user.getUser().getEmail()));
     }
 
+    @GetMapping("/v1/user-info")
+    public ResponseEntity<?> getUserInfo(@CurrentUser CustomUserDetails currentUser,
+                                         @RequestParam(value = "userId", required = false) Long userId) {
+        return ResponseEntity.ok().body(userService.getUserInfo(currentUser, userId));
+    }
 
     @PostMapping(value = "/v1/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addUser(@RequestBody @Valid SignUpRequest signUpRequest) {
@@ -152,9 +157,9 @@ public class UserController {
     }
 
     @GetMapping("/v1/get-books-liked")
-    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @RequestParam long userid){
-        log.info("get book liked by  user id= " + userid);
-        return ResponseEntity.ok(bookService.findBookLikeByUserId(userid,PageRequest.of(page,size,Sort.by("createdBy"))));
+    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @RequestParam long userId){
+        log.info("get book liked by  user id= " + userId);
+        return ResponseEntity.ok(bookService.findBookLikeByUserId(userId,PageRequest.of(page,size,Sort.by("createdBy"))));
     }
     @PostMapping("/v1/like-book")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -206,6 +211,7 @@ public class UserController {
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        cld.add(Calendar.HOUR, 7);
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 

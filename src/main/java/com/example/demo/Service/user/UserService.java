@@ -6,6 +6,7 @@ import com.example.demo.Repository.user.UserRepo;
 import com.example.demo.Service.auth.RefreshTokenService;
 import com.example.demo.Service.confirmation.ConfirmationTokenService;
 import com.example.demo.Service.email.IEmailSender;
+import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.Utils.MailBuilder;
 import com.example.demo.api.auth.request.*;
@@ -38,6 +39,7 @@ import com.example.demo.exceptions.user.TokenInvalidException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.AppUtils.isEmail;
+import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 
 @Service
 @Transactional
@@ -75,13 +78,26 @@ public class UserService implements IUserService {
 
     private final RefreshTokenService refreshTokenService;
 
-    private final UserRoleRepo userRoleRepo;
+    private final RoleUtils roleUtils;
 
     public boolean isUsernameExist(CheckUsernameRequest checkUsernameRequest){
         return userRepo.findByUsername(checkUsernameRequest.getUsername()).isPresent();
     }
     public boolean isEmailExist(CheckEmailRequest checkEmailRequest){
         return userRepo.findByEmail(checkEmailRequest.getEmail()).isPresent();
+    }
+
+    public UserResponse getUserInfo(CustomUserDetails currentUser,Long userId){
+        boolean isAdmin = currentUser.getAuthorities().contains(
+                new SimpleGrantedAuthority(roleRepo.findRoleByRoleName(ROLE_ADMIN).toString()));
+        if(!isAdmin){
+            userId = currentUser.getId();
+        }
+        Long finalUserId = userId;
+        User user = userRepo.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", finalUserId)
+        );
+        return Mapper.toUserDto(user);
     }
 
     public String getEmailbyUsername(String usernameOrEmail) {

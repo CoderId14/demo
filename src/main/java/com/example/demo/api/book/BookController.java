@@ -70,6 +70,7 @@ public class BookController {
     @GetMapping("/v1/search")
     public ResponseEntity<?> searchBook(
             @QuerydslPredicate(root = Book.class) Predicate predicate,
+            @CurrentUser CustomUserDetails currentUser,
             @PageableDefault(sort = "chapterModifiedDate",
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
@@ -86,30 +87,7 @@ public class BookController {
         }
 
         boolean isDetail = detail.equals("true");
-        PagedResponse<BookResponse> response = bookService.searchBook(predicate, pageable, isDetail);
-
-        return ResponseEntity.ok().body(response);
-    }
-    @GetMapping("/v2/search")
-    public ResponseEntity<?> searchBookv2(
-            @QuerydslPredicate(root = Book.class) Predicate predicate,
-            @PageableDefault(sort = "chapterModifiedDate",
-                    direction = Sort.Direction.DESC,
-                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
-            @RequestParam(value = "detail", required = false, defaultValue = "false") String detail
-    ) {
-//        chapterModifiedDate sort dành cho chapter
-        if (!pageable.getSort().isUnsorted()) {
-            String[] sortFields = {"chapterModifiedDate", "modifiedDate", "createdDate"}; // valid sort fields
-            for (Sort.Order order : pageable.getSort()) {
-                if (!Arrays.asList(sortFields).contains(order.getProperty())) {
-                    return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid sort field: " + order.getProperty()));
-                }
-            }
-        }
-
-        boolean isDetail = detail.equals("true");
-        PagedResponse<BookResponse> response = bookService.searchBook(predicate, pageable, isDetail);
+        PagedResponse<BookResponse> response = bookService.searchBook(predicate, pageable, currentUser, isDetail);
 
         return ResponseEntity.ok().body(response);
     }

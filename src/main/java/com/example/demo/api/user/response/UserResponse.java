@@ -19,12 +19,13 @@ public class UserResponse {
     private String email;
     @NotEmpty(message = "Username not empty")
     private String username;
-
     private String name;
     private Boolean isActive;
     private String avatar;
     private Set<ERole> roles;
-
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+
+    private long coin;
+
 }
