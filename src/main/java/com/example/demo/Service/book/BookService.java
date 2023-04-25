@@ -175,7 +175,7 @@ public class BookService implements IBookService {
                 new PageImpl<>(bookPage
                         .stream()
                         .map(Book::new)
-                        .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()), pageable,false);
+                        .collect(Collectors.toList()), bookPage.getPageable(), bookPage.getTotalElements()), pageable,true);
     }
 
 
