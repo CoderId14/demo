@@ -250,7 +250,7 @@ public class UserController {
 //        System.out.println(paymentUrl);
         return ResponseEntity.ok(paymentUrl);
     }
-    @RequestMapping("/v1/save-coin")
+    @GetMapping("/v1/save-coin")
     public ResponseEntity<?> saveCoin(HttpServletRequest request) throws Exception {
         Map<String, String[]> params = request.getParameterMap();
         HashMap<String, String> paramMap = new HashMap<>();

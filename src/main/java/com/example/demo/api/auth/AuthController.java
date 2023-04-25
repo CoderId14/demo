@@ -45,9 +45,9 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         return ResponseEntity.ok(userService.refreshToken(request));
     }
-    @PostMapping("/v1/register/confirm")
-    public String confirm(@RequestBody ConfirmationRequest token){
-        return userService.confirmToken(token.getToken());
+    @GetMapping("/v1/register/confirm")
+    public String confirm(@RequestParam String token){
+        return userService.confirmToken(token);
     }
 
 
