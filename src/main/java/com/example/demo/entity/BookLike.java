@@ -17,11 +17,11 @@ import javax.persistence.*;
 @Builder
 @Entity
 public class BookLike extends BaseEntity{
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(nullable = false,
       name = "user_id")
   private User user;
-  @ManyToOne( cascade = CascadeType.ALL)
+  @ManyToOne( cascade = CascadeType.PERSIST)
   @JoinColumn(nullable = false,
       name = "book_id")
   private Book book;
