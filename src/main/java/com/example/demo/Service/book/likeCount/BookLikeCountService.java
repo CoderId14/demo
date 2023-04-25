@@ -41,7 +41,7 @@ public class BookLikeCountService {
                 books.getContent();
 
         List<BookResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookResponse(temp.getBook(), false)));
+        contents.forEach(temp -> result.add(getBookResponse(temp.getBook(), true)));
 
         return new PagedResponse<>(result,
                 books.getNumber(),

@@ -164,7 +164,22 @@ public class BookService implements IBookService {
         Page<Book> books;
         books = bookRepo.searchBook(predicate, pageable);
         return getBookResponsePagedResponse(books, pageable, isDetail);
+    }
 
+    public PagedResponse<BookResponse> searchBookv2(Predicate predicate, Pageable pageable, boolean isDetail) {
+        Page<Book> books;
+        books = bookRepo.searchBook(predicate, pageable);
+        Map<String, Object> bookResource = new HashMap<>();
+        List<Book> contents = books.getNumberOfElements() == 0 ?
+                Collections.emptyList()
+                :
+                books.getContent();
+
+        List<BookResponse> result = new ArrayList<>();
+        contents.forEach(temp -> result.add(getBookResponse(temp, isDetail)));
+        bookResource.put("books", result);
+
+        return getBookResponsePagedResponse(books, pageable, isDetail);
     }
 
     public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable) {

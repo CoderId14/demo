@@ -33,7 +33,7 @@ public class BookRatingController {
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable
     ) {
-        PagedResponse<BookResponse> response = bookRatingService.searchBookRating(predicate, pageable);
+        PagedResponse<BookRatingResponse> response = bookRatingService.searchBookRating(predicate, pageable);
         return ResponseEntity.ok().body(response);
     }
 
