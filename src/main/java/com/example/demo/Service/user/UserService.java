@@ -244,7 +244,7 @@ public class UserService implements IUserService {
 
         String token = confirmationTokenService.generateConfirmationToken(user);
 
-        String link = "https://demo-production-627b.up.railway.app//api/auth/v1/register/confirm?token=" + token;
+        String link = "https://demo-production-627b.up.railway.app/api/auth/v1/register/confirm?token=" + token;
         emailService.send(signUpRequest.getEmail(),
                 mailBuilder.buildEmailSignUp(signUpRequest.getUsername(), link));
         return Mapper.toUserDto(user);
