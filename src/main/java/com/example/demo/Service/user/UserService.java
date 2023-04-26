@@ -14,6 +14,7 @@ import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.auth.response.TokenRefreshResponse;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
+import com.example.demo.api.user.request.UpdatePasswordRequest;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.ForgotPasswordResponse;
 import com.example.demo.api.user.response.UserResponse;
@@ -22,6 +23,7 @@ import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.constant.PremiumConstance;
 import com.example.demo.dto.Mapper;
+import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.auth.RefreshToken;
@@ -29,6 +31,7 @@ import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
 import com.example.demo.entity.user.User;
 import com.example.demo.entity.user.UserRole;
+import com.example.demo.exceptions.BadRequestException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.exceptions.auth.TokenRefreshException;
 import com.example.demo.exceptions.auth.UnauthorizedException;
@@ -175,7 +178,30 @@ public class UserService implements IUserService {
         throw new TokenInvalidException("Token invalid");
 
     }
+    public ApiResponse updatePassword(UpdatePasswordRequest request) {
+        log.info("Service: updatePassword");
+        User user;
 
+        String usernameOrEmail = request.getUsernameOrEmail();
+        if (isEmail(usernameOrEmail)) {
+            user = userRepo.findByEmail(usernameOrEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Email", usernameOrEmail)
+            );
+        } else {
+            user = userRepo.findByUsername(usernameOrEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Username", usernameOrEmail)
+            );
+        }
+
+        if (passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepo.save(user);
+            return new ApiResponse(true, "update password successfully");
+        }
+
+        throw new BadRequestException("current password not match");
+
+    }
     public ForgotPasswordResponse forgotPassword(ForgotPasswordDto forgotPasswordDto) {
         log.info("forgotPassword Service");
         User user;

@@ -8,10 +8,7 @@ import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.Utils.AppConstants;
 import com.example.demo.api.auth.request.SignUpRequest;
-import com.example.demo.api.user.request.ChangePasswordRequest;
-import com.example.demo.api.user.request.ForgotPasswordDto;
-import com.example.demo.api.user.request.LikeBookRequest;
-import com.example.demo.api.user.request.UserBookHistoryRequest;
+import com.example.demo.api.user.request.*;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.api.user.response.UserTokenResponse;
@@ -146,9 +143,14 @@ public class UserController {
                 "Send email successfully",
                 userService.forgotPassword(request))
         );
-
     }
 
+    @PutMapping("/v1/update-password")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest request) {
+        log.info("forgot password controller");
+
+        return ResponseEntity.ok().body(userService.updatePassword(request));
+    }
     @DeleteMapping("/v1")
     public ResponseEntity<?> deleteUser(@RequestParam("id") Long id) {
         log.info("Delete user id= " + id);
