@@ -128,7 +128,7 @@ public class BookController {
     )
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(
-            @ModelAttribute @RequestBody @Validated CreateBookRequest model,
+            @RequestBody @Validated CreateBookRequest model,
             @CurrentUser CustomUserDetails currentUser) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/book/v1").toUriString());
         BookResponse response = bookService.save(model, currentUser);
@@ -141,7 +141,7 @@ public class BookController {
             @RequestBody UpdateBookRequest model,
             @PathVariable("id") long id,
             @CurrentUser CustomUserDetails currentUser) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/new/" + id).toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/book/v1" + id).toUriString());
         return ResponseEntity.created(uri).body(
                 bookService.update(id, model, currentUser));
     }

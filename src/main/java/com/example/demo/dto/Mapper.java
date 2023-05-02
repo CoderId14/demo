@@ -61,7 +61,7 @@ public class Mapper {
                 .accessToken(token)
                 .username(user.getUsername())
                 .refreshToken(refreshToken)
-                .role(roleSet)
+                .roles(roleSet)
                 .build();
     }
     public static ChapterResponse getChapterResponseFromEntity(Chapter root) {
@@ -124,6 +124,7 @@ public class Mapper {
         long likeCount = Optional.ofNullable(book.getLikeCount())
                 .map(BookLikeCount::getLikeCount)
                 .orElse(0L);
+
 
         long viewCount = Optional.ofNullable(book.getViewCount())
                 .map(BookViewCount::getViewCount)

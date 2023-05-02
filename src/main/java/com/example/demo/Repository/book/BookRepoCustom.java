@@ -11,4 +11,5 @@ public interface BookRepoCustom {
 
     Page<Book> searchBook(Predicate predicate, Pageable pageable);
 
+    Long getTotalCount(Predicate predicate);
 }

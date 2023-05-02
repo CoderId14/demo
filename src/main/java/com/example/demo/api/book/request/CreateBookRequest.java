@@ -22,5 +22,5 @@ public class CreateBookRequest {
     private Set<Long> tags;
     @Builder.Default
     @NotNull
-    private boolean isPremium = false;
+    private Boolean isPremium = false;
 }

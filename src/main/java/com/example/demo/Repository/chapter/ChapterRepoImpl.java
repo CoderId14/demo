@@ -3,6 +3,7 @@ package com.example.demo.Repository.chapter;
 import com.example.demo.entity.book.QBook;
 import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.chapter.QChapter;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,17 @@ public class ChapterRepoImpl implements ChapterRepoCustom {
                 .orderBy(chapter.chapterNumber.desc())
                 .fetchFirst();
         return lastChapterNumber != null ? lastChapterNumber : 0;
+    }
+
+    @Override
+    public long findTotalChapter(Predicate predicate) {
+        JPAQuery<Chapter> queryFactory = new JPAQuery<>(em);
+        QChapter chapter = QChapter.chapter;
+        QBook book = QBook.book;
+        return queryFactory
+                .select(chapter.id.count())
+                .from(chapter)
+                .where(predicate)
+                .fetchFirst();
     }
 }

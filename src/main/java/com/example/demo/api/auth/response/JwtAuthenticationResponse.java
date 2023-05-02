@@ -15,6 +15,6 @@ public class JwtAuthenticationResponse {
 
     private String username;
 
-    private Set<ERole> role;
+    private Set<ERole> roles;
 
 }

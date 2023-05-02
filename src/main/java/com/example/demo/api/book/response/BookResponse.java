@@ -37,4 +37,5 @@ public class BookResponse {
     private double averageRating;
     private boolean isPremium;
     private boolean isLiked;
+    private Long totalChapter;
 }

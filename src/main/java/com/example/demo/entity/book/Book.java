@@ -36,7 +36,7 @@ public class Book extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "tbl_book_category",
             joinColumns = @JoinColumn(name ="book_id")
             , inverseJoinColumns = @JoinColumn(name = "category_id")
@@ -48,7 +48,7 @@ public class Book extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "tbl_book_tag",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))

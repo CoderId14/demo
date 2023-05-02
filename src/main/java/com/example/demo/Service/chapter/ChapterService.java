@@ -50,9 +50,9 @@ public class ChapterService implements IChapterService {
 
         List<ChapterResponse> chapterResponses = new ArrayList<>();
         content.forEach(category -> chapterResponses.add(getChapterResponseFromEntity(category)));
-
+        long totalChapter = chapterRepo.findTotalChapter(predicate);
         return new PagedResponse<>(chapterResponses, chapterPage.getNumber(), chapterPage.getSize(),
-                chapterPage.getTotalElements(), chapterPage.getTotalPages(), chapterPage.isLast());
+                totalChapter, chapterPage.getTotalPages(), chapterPage.isLast());
     }
 
 
@@ -97,11 +97,9 @@ public class ChapterService implements IChapterService {
 
     @Override
     public ChapterResponse updateChapter(Long id, UpdateChapterRequest request, CustomUserDetails currentUser) {
-        Book book = bookRepo.findById(request.getBookId()).
-                orElseThrow(() -> new ResourceNotFoundException("book", "id", request.getBookId()));
         Chapter chapter = chapterRepo.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("chapter", "id", id));
-        roleUtils.checkAuthorization(book.getCreatedBy(), currentUser);
+        roleUtils.checkAuthorization(chapter.getBook().getCreatedBy(), currentUser);
 
         chapter.setTitle(request.getTitle());
         chapter.setChapterNumber(request.getChapterNumber());

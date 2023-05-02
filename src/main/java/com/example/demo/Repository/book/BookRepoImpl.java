@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static com.querydsl.core.types.ExpressionUtils.count;
+
 @Service
 public class BookRepoImpl implements BookRepoCustom{
 
@@ -67,5 +69,17 @@ public class BookRepoImpl implements BookRepoCustom{
                 .fetch();
 
         return new PageImpl<>(books);
+    }
+
+    @Override
+    public Long getTotalCount(Predicate predicate) {
+        JPAQuery<Book> queryFactory = new JPAQuery<>(em);
+        QBook book = QBook.book;
+        Long totalCount = queryFactory
+                .from(book)
+                .select(count(book.id))
+                .where(predicate)
+                .fetchOne();
+        return totalCount;
     }
 }

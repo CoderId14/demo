@@ -71,7 +71,7 @@ public class BookService implements IBookService {
                 .thumbnailUrl(request.getThumbnailUrl())
                 .tags(tags)
                 .user(currentUser.getUser())
-                .isPremium(request.isPremium())
+                .isPremium(request.getIsPremium())
                 .build();
         book = bookRepo.save(book);
         return getBookResponse(book, false);
@@ -90,6 +90,7 @@ public class BookService implements IBookService {
 
         book.setTitle(request.getTitle());
         book.setContent(request.getContent());
+        book.setPremium(request.getIsPremium());
 
         if (!categories.isEmpty()) book.setCategories(categories);
         if (!tags.isEmpty()) book.setTags(tags);
@@ -119,8 +120,7 @@ public class BookService implements IBookService {
 //                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, ID, id));
 
         Page<Book> books = bookRepo.findAll(pageable);
-
-        return getBookResponsePagedResponse(books, pageable,false);
+        return getBookResponsePagedResponse(books, pageable, false);
     }
 
     private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books,Pageable pageable, boolean isDetail) {
@@ -162,10 +162,8 @@ public class BookService implements IBookService {
     }
     public PagedResponse<BookResponse> searchBook(Predicate predicate, Pageable pageable, CustomUserDetails currentUser, boolean isDetail) {
         Page<Book> books;
-        if(Objects.nonNull(currentUser)){
-
-        }
         books = bookRepo.searchBook(predicate, pageable);
+
         return getBookResponsePagedResponse(books, pageable, isDetail);
     }
 
@@ -175,13 +173,13 @@ public class BookService implements IBookService {
                 .map(BookLike::getBook)
                 .toList());
         return getBookResponsePagedResponse(
-                books, pageable,true);
+                books, pageable, true);
     }
 
 
     public PagedResponse<BookResponse> hotBooks(Pageable pageable) {
         // thống kê danh sách
         Page<Book> bookPage = bookRepo.findTop100ByLikes(pageable);
-        return getBookResponsePagedResponse(bookPage, pageable, false);
+        return getBookResponsePagedResponse(bookPage, pageable,false);
     }
 }
