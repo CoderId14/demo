@@ -72,7 +72,7 @@ public class CategoryService implements ICategoryService {
         Category category = categoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("category", "id", id));
         roleUtils.checkAuthorization(category.getCreatedBy(), currentUser);
-        category.setName(request.getName());
+        category.setName(request.getCategoryName());
         category.setDescription(request.getDescription());
         categoryRepo.save(category);
         return getCategoryResponseFromEntity(category);

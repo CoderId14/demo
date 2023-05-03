@@ -12,6 +12,6 @@ import javax.validation.constraints.NotBlank;
 public class UpdateCategoryRequest {
     private Long id;
     @NotBlank
-    private String name;
+    private String categoryName;
     private String description;
 }
