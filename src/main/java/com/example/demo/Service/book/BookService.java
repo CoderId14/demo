@@ -90,6 +90,7 @@ public class BookService implements IBookService {
 
         book.setTitle(request.getTitle());
         book.setContent(request.getContent());
+        book.setThumbnailUrl(request.getThumbnailUrl());
         book.setPremium(request.getIsPremium());
 
         if (!categories.isEmpty()) book.setCategories(categories);
