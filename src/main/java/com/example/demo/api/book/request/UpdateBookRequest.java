@@ -13,9 +13,7 @@ import java.util.Set;
 public class UpdateBookRequest {
     @NotNull
     private String title;
-
     private String content;
-
     private String thumbnailUrl;
 
     private  String shortDescription;
