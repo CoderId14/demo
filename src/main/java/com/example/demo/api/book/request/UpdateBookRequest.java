@@ -15,7 +15,6 @@ public class UpdateBookRequest {
     private String title;
     private String content;
     private String thumbnailUrl;
-
     private  String shortDescription;
 
     private Set<Long> categories;

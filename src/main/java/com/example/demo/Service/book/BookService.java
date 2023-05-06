@@ -164,7 +164,6 @@ public class BookService implements IBookService {
     public PagedResponse<BookResponse> searchBook(Predicate predicate, Pageable pageable, CustomUserDetails currentUser, boolean isDetail) {
         Page<Book> books;
         books = bookRepo.searchBook(predicate, pageable);
-
         return getBookResponsePagedResponse(books, pageable, isDetail);
     }
 

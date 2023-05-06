@@ -182,17 +182,21 @@ public class UserController {
     }
 
     @GetMapping("/v1/load-coin")
-    public ResponseEntity<?> loadCoin(@RequestParam(value = "userId") Long userId, @RequestParam(value = "coin") Long coin)
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadCoin(
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "coin") Long coin,
+            @CurrentUser CustomUserDetails currentUser)
         throws Exception {
         String vnp_Version = vnpayConfig.vnp_Version;
         String vnp_Command = vnpayConfig.vnp_Command;
         String orderType = vnpayConfig.orderType;
         long amount = coin*1000*100;
         // mã thanh toán gửi sang là duy nhất nên cần set session (UUID), lưu cái session nayf lại, nhưng lấy ra để lấy userid kiểu gì
-        String vnp_TxnRef = VnpayConfig.getRandomNumber(userId);
+        String vnp_TxnRef = VnpayConfig.getRandomNumber(currentUser.getId());
         String vnp_IpAddr = vnpayConfig.vnp_IpAddr;
         String vnp_TmnCode = vnpayConfig.vnp_TmnCode;
-        cacheConfig.put(vnp_TxnRef, userId);
+        cacheConfig.put(vnp_TxnRef, currentUser.getId());
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
@@ -299,8 +303,10 @@ public class UserController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
     @GetMapping("/v1/open-premium")
-    public ResponseEntity<?> openPremium(@RequestParam long userId){
-        userService.openPremium(userId);
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> openPremium(@RequestParam(required = false) long userId,
+                                         @CurrentUser CustomUserDetails currentUser){
+        userService.openPremium(currentUser.getId());
         return ResponseEntity.ok("Open success premium");
     }
 
