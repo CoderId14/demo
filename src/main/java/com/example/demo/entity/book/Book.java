@@ -79,6 +79,8 @@ public class Book extends BaseEntity {
     private BookRatingCount bookRatingCount;
     @Column(name = "is_premium")
     private boolean isPremium;
+
+    private boolean isNovel;
     public Book(BookLike bookLike) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(bookLike.getBook(), this);

@@ -72,6 +72,7 @@ public class BookService implements IBookService {
                 .tags(tags)
                 .user(currentUser.getUser())
                 .isPremium(request.getIsPremium())
+                .isNovel(request.getIsNovel())
                 .build();
         book = bookRepo.save(book);
         return getBookResponse(book, false);
@@ -92,6 +93,7 @@ public class BookService implements IBookService {
         book.setContent(request.getContent());
         book.setThumbnailUrl(request.getThumbnailUrl());
         book.setPremium(request.getIsPremium());
+        book.setNovel(request.getIsNovel());
 
         if (!categories.isEmpty()) book.setCategories(categories);
         if (!tags.isEmpty()) book.setTags(tags);

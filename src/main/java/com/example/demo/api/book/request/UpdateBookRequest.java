@@ -23,4 +23,8 @@ public class UpdateBookRequest {
     @Builder.Default
     @NotNull
     private Boolean isPremium = false;
+
+    @Builder.Default
+    @NotNull
+    private Boolean isNovel = false;
 }

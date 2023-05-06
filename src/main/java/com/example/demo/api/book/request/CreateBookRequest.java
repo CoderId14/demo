@@ -23,4 +23,7 @@ public class CreateBookRequest {
     @Builder.Default
     @NotNull
     private Boolean isPremium = false;
+    @Builder.Default
+    @NotNull
+    private Boolean isNovel = false;
 }

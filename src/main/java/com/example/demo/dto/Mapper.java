@@ -22,11 +22,13 @@ import com.example.demo.entity.supports.ERole;
 import com.example.demo.entity.user.User;
 import com.example.demo.entity.user.UserRole;
 import com.example.demo.exceptions.ParameterException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class Mapper {
     public static UserResponse toUserDto(User user) {
         Set<ERole> roleSet = new HashSet<>();
@@ -143,6 +145,7 @@ public class Mapper {
                     .likeCount(likeCount)
                     .averageRating(averageRating)
                     .isPremium(book.isPremium())
+                    .isNovel(book.isNovel())
                     .build();
         }
         latestChapter = book.getChapters().stream()
@@ -168,6 +171,7 @@ public class Mapper {
                 .viewCount(viewCount)
                 .averageRating(averageRating)
                 .isPremium(book.isPremium())
+                .isNovel(book.isNovel())
                 .build();
 
     }
