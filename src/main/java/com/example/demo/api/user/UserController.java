@@ -304,7 +304,7 @@ public class UserController {
     }
     @GetMapping("/v1/open-premium")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> openPremium(@RequestParam(required = false) long userId,
+    public ResponseEntity<?> openPremium(@RequestParam(required = false) Long userId,
                                          @CurrentUser CustomUserDetails currentUser){
         userService.openPremium(currentUser.getId());
         return ResponseEntity.ok("Open success premium");
