@@ -34,6 +34,8 @@ public class BookResponse {
     List<ChapterResponse> latestChapters;
     private long viewCount;
     private long likeCount;
+
+    private long reviewCount;
     private double averageRating;
     private boolean isPremium;
     private boolean isLiked;

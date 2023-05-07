@@ -61,9 +61,11 @@ public class BookRatingCountService {
 
         for(Book book: books){
             int total = 0;
+            long countRating = 0;
             List<BookRating> ratings = bookRatingRepo.findByBook_Id(book.getId());
             for (BookRating rating : ratings) {
                 total += rating.getRating();
+                countRating +=1;
             }
             double average = (double) total / ratings.size();
             if(Double.isNaN(average)){
@@ -75,6 +77,7 @@ public class BookRatingCountService {
                 ratingCount = BookRatingCount.builder()
                         .book(book)
                         .averageRating(average)
+                        .ratingCount(countRating)
                         .build();
             } else {
                 ratingCount = ratingCountOptional.get();

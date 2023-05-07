@@ -14,6 +14,7 @@ import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.BookRating;
 import com.example.demo.entity.user.User;
 import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.exceptions.user.ResourceExistsException;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -67,6 +69,11 @@ public class BookRatingService {
         }
 
         Book book = bookUtils.findBookById(request.getBookId());
+        Optional<BookRating> existBookRating = bookRatingRepo.findByUser_Id(user.getId());
+
+        if(existBookRating.isPresent()){
+            throw new ResourceExistsException("BookRating", "user", user.getId());
+        }
         BookRating bookRating = BookRating.builder()
                 .user(user)
                 .book(book)

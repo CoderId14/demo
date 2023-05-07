@@ -18,5 +18,5 @@ public class BookRatingCount extends BaseEntity {
     @JoinColumn(name = "book_id")
     private Book book;
     private double averageRating;
-
+    private Long ratingCount;
 }

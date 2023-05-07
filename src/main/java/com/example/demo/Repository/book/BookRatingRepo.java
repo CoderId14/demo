@@ -12,6 +12,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
@@ -26,6 +27,8 @@ public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
     }
 
     List<BookRating> findByBook_Id(long id);
+
+    Optional<BookRating> findByUser_Id(long id);
 
 
 }

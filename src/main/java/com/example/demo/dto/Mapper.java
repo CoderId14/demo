@@ -127,13 +127,13 @@ public class Mapper {
                 .map(BookLikeCount::getLikeCount)
                 .orElse(0L);
 
-
         long viewCount = Optional.ofNullable(book.getViewCount())
                 .map(BookViewCount::getViewCount)
                 .orElse(0L);
         double averageRating = Optional.ofNullable(book.getBookRatingCount())
                 .map(BookRatingCount::getAverageRating)
                 .orElse(0d);
+
         if(!isDetail){
             return BookResponse.builder()
                     .bookId(book.getId())
@@ -143,6 +143,7 @@ public class Mapper {
                     .thumbnail(thumbnailId)
                     .viewCount(viewCount)
                     .likeCount(likeCount)
+                    .reviewCount(book.getBookRatingCount().getRatingCount())
                     .averageRating(averageRating)
                     .isPremium(book.isPremium())
                     .isNovel(book.isNovel())
@@ -169,6 +170,7 @@ public class Mapper {
                 .latestChapters(latestChapter)
                 .likeCount(likeCount)
                 .viewCount(viewCount)
+                .reviewCount(book.getBookRatingCount().getRatingCount())
                 .averageRating(averageRating)
                 .isPremium(book.isPremium())
                 .isNovel(book.isNovel())
