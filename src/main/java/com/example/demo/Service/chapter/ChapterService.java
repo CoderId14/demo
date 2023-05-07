@@ -102,7 +102,6 @@ public class ChapterService implements IChapterService {
         roleUtils.checkAuthorization(chapter.getBook().getCreatedBy(), currentUser);
 
         chapter.setTitle(request.getTitle());
-        chapter.setChapterNumber(request.getChapterNumber());
         chapter.setContent(request.getContent());
         chapter.setDescription(request.getDescription());
         chapterRepo.save(chapter);
