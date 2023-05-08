@@ -7,6 +7,7 @@ import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.config.AppConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -33,6 +34,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     private final AppConfig appConfig;
+
+    @Value("${app.authorizedRedirectUris}")
+    private String targetUrl;
 
 
 
@@ -69,7 +73,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         claims.put("userId", customUserDetails.getId());
         String subject = customUserDetails.getUser().getEmail();
         String token = jwtManager.generateToken(claims,subject);
-        String targetUrl = "http://localhost:3000/oauth2/callback";
         CookieUtils.addCookie(response,"token",token,36000);
         return UriComponentsBuilder.fromUriString(targetUrl).queryParam("token", token).build().toUriString();
 

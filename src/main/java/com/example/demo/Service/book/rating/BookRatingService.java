@@ -86,9 +86,8 @@ public class BookRatingService {
 
     public BookRatingResponse updateBookRating(UpdateBookRatingRequest request, CustomUserDetails currentUser){
         BookRating bookRating =  bookRatingRepo.findById(request.getRatingId()).
-                orElseThrow(() -> new ResourceNotFoundException("user", "id", request.getRatingId()));
+                orElseThrow(() -> new ResourceNotFoundException("bookRating", "id", request.getRatingId()));
         roleUtils.checkAuthorization(bookRating.getCreatedBy(), currentUser);
-
         bookRating.setComment(request.getComment());
         bookRating.setRating(request.getRating());
         return getBookRatingResponse(bookRating);
@@ -96,7 +95,7 @@ public class BookRatingService {
 
     public ApiResponse deleteBookRating(long id, CustomUserDetails currentUser){
         BookRating bookRating =  bookRatingRepo.findById(id).
-                orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
+                orElseThrow(() -> new ResourceNotFoundException("bookRating", "id", id));
         roleUtils.checkAuthorization(bookRating.getCreatedBy(), currentUser);
 
         bookRatingRepo.delete(bookRating);
