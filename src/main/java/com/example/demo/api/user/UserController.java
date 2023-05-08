@@ -93,6 +93,7 @@ public class UserController {
     }
 
     @GetMapping("/v1/current-user")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity.ok(
                 new ObjectResponse(HttpStatus.OK,
