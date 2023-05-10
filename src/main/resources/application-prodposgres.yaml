@@ -21,6 +21,9 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: false
   servlet:
