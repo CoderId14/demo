@@ -1,0 +1,72 @@
+server:
+  port: 8080
+app:
+  jwt:
+    expire: 3600000
+    secret: secret
+  authorizedRedirectUris: ${AUTHORIZED_REDIRECT_URIS}
+  apiUrl: http://localhost:8080
+  front-ui: http://localhost:3000
+
+
+
+hibernate:
+  query:
+    interceptor:
+      error-level: EXCEPTION
+spring:
+  jpa:
+    #    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: '1KB'
+      max-file-size: '10MB'
+      max-request-size: '10MB'
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+  mail:
+    username: ${MAIL_ACCOUNT}
+    password: ${MAIL_PASSWORD}
+    host: smtp.gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
+            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+
+cors:
+  allowedOrigins: "*"
+
+vnp:
+  vnp_IpAddr: ${VNP_IP_ADDRESS}
+  vnp_PayUrl: ${VNP_PAY_URL}
+  vnp_Returnurl: ${VNP_RETURN_URL}
+  vnp_TmnCode: ${VNP_TMN_CODE}
+  vnp_HashSecret: ${VNP_HASH_SECRET}
+  vnp_apiUrl: ${VNP_API_URL}
+  orderType: ${VNP_ORDER_TYPE}
+  vnp_Command: ${VNP_COMMAND}
+  vnp_Version: ${VNP_VERSION}
