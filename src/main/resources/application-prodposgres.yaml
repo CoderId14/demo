@@ -24,7 +24,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: ${DB_DIALECT}
         format_sql: false
   servlet:
     multipart:
