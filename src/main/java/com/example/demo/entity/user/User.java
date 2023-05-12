@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     @Column(length = 40, nullable = false, unique = true)
     private String email;
 
-    @Column(columnDefinition = "VARCHAR(50) CHARACTER SET utf8")
+    @Column()
     private String name;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -39,7 +39,7 @@ public class User extends BaseEntity {
     @Column
     private String avatar;
 
-    @Column(columnDefinition="tinyint(1)", nullable = false)
+    @Column(nullable = false)
     private Boolean isActive;
 
     @Column
