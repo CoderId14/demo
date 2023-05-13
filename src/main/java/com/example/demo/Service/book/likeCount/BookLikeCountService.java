@@ -50,7 +50,7 @@ public class BookLikeCountService {
                 books.getTotalPages(),
                 books.isLast());
     }
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(fixedDelayString = "60000")
     public void updateLikeCount() {
         log.info("update like count");
         List<Book> books = bookRepo.findAll();

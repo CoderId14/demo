@@ -81,6 +81,23 @@ public class ChapterImgService {
                 .build();
     }
 
+    public void addBulkChapterImg(List<CreateChapterImgRequest> request, CustomUserDetails currentUser) {
+        Chapter chapter = chapterRepo.findById(request.get(0).getChapterId()).
+                orElseThrow(() -> new ResourceNotFoundException("chapter", "id", request.get(0).getChapterId()));
+        roleUtils.checkAuthorization(chapter.getCreatedBy(), currentUser);
+        List<ChapterImg> bulkData = new ArrayList<>();
+        for(int i =1; i <=request.size() ;i ++){
+            ChapterImg chapterImg = ChapterImg.builder()
+                    .id(request.get(i).getId())
+                    .chapter(chapter)
+                    .imgNumber(i)
+                    .fileUrl(request.get(i-1).getFileUrl())
+                    .build();
+            bulkData.add(chapterImg);
+        }
+        chapterImgRepo.saveAll(bulkData);
+    }
+
     public UpdateChapterImgResponse updateChapterImg(String id, UpdateChapterImgRequest request, CustomUserDetails currentUser) {
         ChapterImg chapterImg = chapterImgRepo.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("chapter", "id", id));

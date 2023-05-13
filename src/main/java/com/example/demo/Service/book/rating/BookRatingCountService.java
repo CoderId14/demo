@@ -54,7 +54,7 @@ public class BookRatingCountService {
                 books.getTotalPages(),
                 books.isLast());
     }
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(fixedDelayString = "60000")
     public void updateRatingCount() {
         log.info("update rating count");
         List<Book> books = bookRepo.findAll();

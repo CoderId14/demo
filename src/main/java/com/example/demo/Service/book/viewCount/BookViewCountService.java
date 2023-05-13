@@ -50,7 +50,7 @@ public class BookViewCountService {
                 books.getTotalPages(),
                 books.isLast());
     }
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(fixedDelayString = "60000")
     public void updateViewCount() {
         log.info("update view count");
         List<Book> books = bookRepo.findAll();
