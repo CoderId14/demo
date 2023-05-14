@@ -3,6 +3,8 @@ package com.example.demo.Service.chapter;
 import com.example.demo.Repository.chapter.ChapterImgRepo;
 import com.example.demo.Repository.chapter.ChapterRepo;
 import com.example.demo.Service.role.RoleUtils;
+import com.example.demo.api.chapter.request.ChapterImgDto;
+import com.example.demo.api.chapter.request.CreateBulkChapterImgRequest;
 import com.example.demo.api.chapter.request.CreateChapterImgRequest;
 import com.example.demo.api.chapter.request.UpdateChapterImgRequest;
 import com.example.demo.api.chapter.response.ChapterImgResponse;
@@ -42,7 +44,7 @@ public class ChapterImgService {
         Chapter chapter = chapterRepo.findById(chapterId).orElseThrow(
                 () -> new ResourceNotFoundException("chapter", "id", chapterId)
         );
-        roleUtils.checkPremium(chapter.getBook().isPremium(), currentUser);
+        roleUtils.checkPremium(chapter.getBook(), currentUser);
 
         Page<ChapterImg> chapterImgs = chapterImgRepo.findByChapter_Id(chapterId, pageable);
         List<ChapterImg> content = chapterImgs.getNumberOfElements() == 0 ? Collections.emptyList() : chapterImgs.getContent();
@@ -81,21 +83,24 @@ public class ChapterImgService {
                 .build();
     }
 
-    public void addBulkChapterImg(List<CreateChapterImgRequest> request, CustomUserDetails currentUser) {
-        Chapter chapter = chapterRepo.findById(request.get(0).getChapterId()).
-                orElseThrow(() -> new ResourceNotFoundException("chapter", "id", request.get(0).getChapterId()));
+    public boolean saveBulkChapterImg(CreateBulkChapterImgRequest request, CustomUserDetails currentUser) {
+        Chapter chapter = chapterRepo.findById(request.getChapterId()).
+                orElseThrow(() -> new ResourceNotFoundException("chapter", "id", request.getChapterId()));
         roleUtils.checkAuthorization(chapter.getCreatedBy(), currentUser);
+        chapterImgRepo.deleteAll();
         List<ChapterImg> bulkData = new ArrayList<>();
-        for(int i =1; i <=request.size() ;i ++){
+        List<ChapterImgDto> listImg = request.getListImg();
+        for(int i =1; i <=listImg.size() ;i ++){
             ChapterImg chapterImg = ChapterImg.builder()
-                    .id(request.get(i).getId())
+                    .id(listImg.get(i- 1).getId())
                     .chapter(chapter)
                     .imgNumber(i)
-                    .fileUrl(request.get(i-1).getFileUrl())
+                    .fileUrl(listImg.get(i-1).getFileUrl())
                     .build();
             bulkData.add(chapterImg);
         }
         chapterImgRepo.saveAll(bulkData);
+        return true;
     }
 
     public UpdateChapterImgResponse updateChapterImg(String id, UpdateChapterImgRequest request, CustomUserDetails currentUser) {

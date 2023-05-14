@@ -2,6 +2,7 @@ package com.example.demo.api.chapter;
 
 import com.example.demo.Service.chapter.ChapterImgService;
 import com.example.demo.Utils.AppConstants;
+import com.example.demo.api.chapter.request.CreateBulkChapterImgRequest;
 import com.example.demo.api.chapter.request.CreateChapterImgRequest;
 import com.example.demo.api.chapter.request.UpdateChapterImgRequest;
 import com.example.demo.api.chapter.response.ChapterImgResponse;
@@ -55,10 +56,18 @@ public class ChaperImgController {
         CreateChapterImgResponse response = chapterImgService.addChapterImg(request, currentUser);
         return ResponseEntity.created(uri).body(response);
     }
+    @PostMapping("/v1/saveBulk")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> saveBulkChapterImg(@Validated @RequestBody CreateBulkChapterImgRequest request,
+                                           @CurrentUser CustomUserDetails currentUser) {
 
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/chapterImg/v1/saveBulk").toUriString());
+        boolean response = chapterImgService.saveBulkChapterImg(request, currentUser);
+        return ResponseEntity.created(uri).body(response);
+    }
     @GetMapping("/v1/{id}")
     public ResponseEntity<?> getChapterImg(
-            @QuerydslPredicate(root = ChapterImg.class) Predicate predicate) {
+            @QuerydslPredicate(root = ChapterImg.class) Predicate predicate, @PathVariable String id) {
         ImgChapter response = chapterImgService.getChapterImg(predicate);
 
         return ResponseEntity.ok().body(response);

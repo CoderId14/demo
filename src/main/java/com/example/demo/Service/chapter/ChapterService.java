@@ -62,7 +62,7 @@ public class ChapterService implements IChapterService {
                 () -> new ResourceNotFoundException("chapter", "id", id)
         );
 
-        roleUtils.checkPremium(chapter.getBook().isPremium(), currentUser);
+        roleUtils.checkPremium(chapter.getBook(), currentUser);
 
         if (currentUser != null) {
             userHistoryService.addUserBookHistory(CreateUserBookHistoryRequest.builder()
