@@ -19,6 +19,7 @@ public class SignUpRequest {
     @NotEmpty(message = "Username not empty")
     private String username;
 
+    private String name;
     @Size(min = 4, max = 16, message = "Password must contain atleast 4 character and not exceed 16 character")
     private String password;
 }

@@ -35,7 +35,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<ConfirmationToken> confirmationToken;
-    @Lob
+
     @Column
     private String avatar;
 

@@ -12,9 +12,11 @@ import com.example.demo.Utils.MailBuilder;
 import com.example.demo.api.auth.request.*;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.auth.response.TokenRefreshResponse;
+import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.example.demo.api.user.request.UpdatePasswordRequest;
+import com.example.demo.api.user.request.UpdateUserRequest;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.ForgotPasswordResponse;
 import com.example.demo.api.user.response.UserResponse;
@@ -23,10 +25,12 @@ import com.example.demo.auth.JwtManager;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.constant.PremiumConstance;
 import com.example.demo.dto.Mapper;
+import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.auth.RefreshToken;
+import com.example.demo.entity.book.Book;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
 import com.example.demo.entity.user.User;
@@ -39,8 +43,11 @@ import com.example.demo.exceptions.user.AccountActiveException;
 import com.example.demo.exceptions.user.InsufficientEx;
 import com.example.demo.exceptions.user.ResourceExistsException;
 import com.example.demo.exceptions.user.TokenInvalidException;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,6 +60,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.AppUtils.isEmail;
+import static com.example.demo.dto.Mapper.getBookResponse;
 import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 
 @Service
@@ -60,6 +68,7 @@ import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService implements IUserService {
+    private final UserRoleRepo userRoleRepo;
 
     private final AppConstants appConstant;
 
@@ -83,17 +92,18 @@ public class UserService implements IUserService {
 
     private final RoleUtils roleUtils;
 
-    public boolean isUsernameExist(CheckUsernameRequest checkUsernameRequest){
+    public boolean isUsernameExist(CheckUsernameRequest checkUsernameRequest) {
         return userRepo.findByUsername(checkUsernameRequest.getUsername()).isPresent();
     }
-    public boolean isEmailExist(CheckEmailRequest checkEmailRequest){
+
+    public boolean isEmailExist(CheckEmailRequest checkEmailRequest) {
         return userRepo.findByEmail(checkEmailRequest.getEmail()).isPresent();
     }
 
-    public UserResponse getUserInfo(CustomUserDetails currentUser,Long userId){
+    public UserResponse getUserInfo(CustomUserDetails currentUser, Long userId) {
         boolean isAdmin = currentUser.getAuthorities().contains(
                 new SimpleGrantedAuthority(roleRepo.findRoleByRoleName(ROLE_ADMIN).toString()));
-        if(!isAdmin){
+        if (!isAdmin) {
             userId = currentUser.getId();
         }
         Long finalUserId = userId;
@@ -139,12 +149,66 @@ public class UserService implements IUserService {
                 .username(signUpRequest.getUsername())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .email(signUpRequest.getEmail())
+                .name(signUpRequest.getName())
                 .isActive(true)
                 .userRoles(new HashSet<>(Collections.singletonList(userRole)))
                 .build();
         userRole.setUser(user);
         userRepo.save(user);
         return Mapper.toUserDto(user);
+    }
+    public PagedResponse<UserResponse> searchUser(Predicate predicate, Pageable pageable, CustomUserDetails currentUser) {
+        Page<User> users;
+        users = userRepo.findAll(predicate, pageable);
+        List<User> contents = users.getNumberOfElements() == 0 ?
+                Collections.emptyList()
+                :
+                users.getContent();
+
+        List<UserResponse> result = new ArrayList<>();
+        contents.forEach(temp -> result.add(Mapper.toUserDto(temp)));
+
+        return new PagedResponse<>(result,
+                users.getNumber(),
+                users.getSize(),
+                users.getTotalElements(),
+                users.getTotalPages(),
+                users.isLast());
+    }
+    public boolean updateUser(UpdateUserRequest request) {
+        User user = userRepo.findById(request.getUserId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", request.getUserId())
+        );
+
+        user.setName(request.getName());
+        user.setAvatar(request.getAvatar());
+        user.setIsActive(request.getIsActive());
+
+        Set<UserRole> oldUserRoles = user.getUserRoles();
+
+        userRoleRepo.deleteAll(oldUserRoles);
+        user.getUserRoles().clear();
+        // Add new user roles
+        for (ERole roleName : request.getRoles()) {
+            Role role = roleRepo.findRoleByRoleName(roleName).orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
+            UserRole userRole = UserRole.builder()
+                    .role(role)
+                    .validUntil(LocalDateTime.now().plusYears(10))
+                    .build();
+            userRole.setUser(user);
+            user.getUserRoles().add(userRole);
+        }
+
+        userRepo.save(user);
+        return true;
+    }
+
+    public boolean deleteUser(long id){
+        User user = userRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", id)
+        );
+        userRepo.delete(user);
+        return true;
     }
 
     public ChangePasswordResponse updatePasswordByToken(ChangePasswordRequest changePasswordRequest) {
@@ -178,6 +242,7 @@ public class UserService implements IUserService {
         throw new TokenInvalidException("Token invalid");
 
     }
+
     public ApiResponse updatePassword(UpdatePasswordRequest request) {
         log.info("Service: updatePassword");
         User user;
@@ -202,6 +267,7 @@ public class UserService implements IUserService {
         throw new BadRequestException("current password not match");
 
     }
+
     public ForgotPasswordResponse forgotPassword(ForgotPasswordDto forgotPasswordDto) {
         log.info("forgotPassword Service");
         User user;
@@ -309,7 +375,7 @@ public class UserService implements IUserService {
     public TokenRefreshResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
         String requestRefreshToken = tokenRefreshRequest.getRefreshToken();
         Optional<RefreshToken> refreshToken = refreshTokenService.findByToken(requestRefreshToken);
-        if(refreshToken.isEmpty()){
+        if (refreshToken.isEmpty()) {
             throw new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!");
         }
         refreshTokenService.verifyExpiration(refreshToken.get());
@@ -333,16 +399,7 @@ public class UserService implements IUserService {
         return jwtManager.generateToken(claims, subject);
     }
 
-    public Boolean delete(Long id) {
-        log.info("User service: Delete user id= " + id);
-        User user = userRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Id", "id", id)
-        );
 
-        userRepo.delete(user);
-        log.info("User service: Delete successfully id= " + id);
-        return true;
-    }
 
     public UserTokenResponse getUserFromToken(String token) {
         log.info("Service: Get user from token: " + token);
@@ -378,23 +435,25 @@ public class UserService implements IUserService {
         );
         user.setIsActive(true);
     }
+
     public void loadCoin(Long userid, Long coin) {
         User user = userRepo.findById(userid).orElseThrow(
-            () -> new UsernameNotFoundException("Username not found")
+                () -> new UsernameNotFoundException("Username not found")
         );
-        Long currentCoin = user.getCoin()+coin;
+        Long currentCoin = user.getCoin() + coin;
         user.setCoin(currentCoin);
         userRepo.save(user);
     }
+
     public void openPremium(Long userid) {
         User user = userRepo.findById(userid).orElseThrow(
-            () -> new UsernameNotFoundException("Username not found")
+                () -> new UsernameNotFoundException("Username not found")
         );
         Long userCoin = user.getCoin();
-        if (userCoin < PremiumConstance.price){
+        if (userCoin < PremiumConstance.price) {
             throw new InsufficientEx("account not enough coin");
         }
-        user.setCoin(userCoin-PremiumConstance.price);
+        user.setCoin(userCoin - PremiumConstance.price);
         //chỗ này set roles, xem hộ đoạn set role với Hiếu nhé
 //        Đã set nhé
         Role userVipRole = roleRepo.findRoleByRoleName(ERole.ROLE_USER_VIP)

@@ -16,12 +16,17 @@ import com.example.demo.auth.CurrentUser;
 import com.example.demo.auth.user.CustomUserDetails;
 import com.example.demo.config.CacheConfig;
 import com.example.demo.config.VnpayConfig;
+import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ObjectResponse;
+import com.example.demo.entity.chapter.Chapter;
+import com.example.demo.entity.user.User;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -112,6 +117,30 @@ public class UserController {
         UserResponse userResponse = userService.addUser(signUpRequest);
         return ResponseEntity.ok(userResponse);
     }
+    @GetMapping(value = "/v1/search")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> searchUser(@QuerydslPredicate(root = User.class) Predicate predicate,
+                                        @PageableDefault(sort = AppConstants.CREATED_DATE,
+                                                direction = Sort.Direction.DESC,
+                                                size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
+                                        @CurrentUser CustomUserDetails currentUser) {
+        PagedResponse<UserResponse> userResponse = userService.searchUser(predicate, pageable, currentUser);
+        return ResponseEntity.ok(userResponse);
+    }
+    @PutMapping(value = "/v1", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+        boolean userResponse = userService.updateUser(request);
+        return ResponseEntity.ok(userResponse);
+    }
+
+    @DeleteMapping(value = "/v1/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+        boolean userResponse = userService.deleteUser(id);
+        return ResponseEntity.ok(userResponse);
+    }
+
 
     //    2
     @GetMapping("/v1/forgot-password")
@@ -151,12 +180,6 @@ public class UserController {
         log.info("forgot password controller");
 
         return ResponseEntity.ok().body(userService.updatePassword(request));
-    }
-    @DeleteMapping("/v1")
-    public ResponseEntity<?> deleteUser(@RequestParam("id") Long id) {
-        log.info("Delete user id= " + id);
-        userService.delete(id);
-        return ResponseEntity.ok("Delete user id = " + id);
     }
 
     @GetMapping("/v1/get-books-liked")
