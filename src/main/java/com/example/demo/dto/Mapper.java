@@ -136,6 +136,9 @@ public class Mapper {
         long reviewCount = Optional.ofNullable(book.getBookRatingCount())
                 .map(BookRatingCount::getRatingCount)
                 .orElse(0L);
+        Long chapterCount = Long.valueOf(Optional.ofNullable(book.getChapters())
+                .map(List::size)
+                .orElse(0));
         if(!isDetail){
             return BookResponse.builder()
                     .bookId(book.getId())
@@ -149,6 +152,7 @@ public class Mapper {
                     .averageRating(averageRating)
                     .isPremium(book.isPremium())
                     .isNovel(book.isNovel())
+                    .totalChapter(chapterCount)
                     .build();
         }
         latestChapter = book.getChapters().stream()
@@ -176,6 +180,7 @@ public class Mapper {
                 .averageRating(averageRating)
                 .isPremium(book.isPremium())
                 .isNovel(book.isNovel())
+                .totalChapter(chapterCount)
                 .build();
 
     }

@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 public class BookLikeCount extends BaseEntity {
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "book_id")
     private Book book;
 
