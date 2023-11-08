@@ -18,9 +18,13 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
+      jdbc:
+        lob:
+          non_contextual_creation: true
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
 
   servlet:
     multipart:
@@ -30,13 +34,14 @@ spring:
       max-request-size: '10MB'
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: hieu
-    url: jdbc:mysql://localhost:3306/demo
+    password: ywjFsfb1tiSN0wnFjc53dWMLxZxhsjvX
+    url: jdbc:postgresql://dpg-cjmaou7jbvhs738heavg-a.singapore-postgres.render.com/demo_52ri_4keg
+    driver-class-name: org.postgresql.Driver
   mail:
     username: danghieu14th@gmail.com
-    password: cvvmbqonqrzhcyrx
+    password: ylxlulxapibydfrf
     host: smtp.gmail.com
     properties:
       mail:

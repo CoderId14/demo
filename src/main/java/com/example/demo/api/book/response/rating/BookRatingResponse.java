@@ -16,6 +16,7 @@ public class BookRatingResponse extends AbstractDTO {
     private long bookId;
     private String comment;
     private int rating;
+    private long ratingId;
     private long userId;
     private String name;
 }

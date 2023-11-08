@@ -6,6 +6,7 @@ import com.example.demo.dto.response.ErrorResponse;
 import com.example.demo.exceptions.auth.TokenRefreshException;
 import com.example.demo.exceptions.auth.UnauthorizedException;
 import com.example.demo.exceptions.user.AccountActiveException;
+import com.example.demo.exceptions.user.InsufficientEx;
 import com.example.demo.exceptions.user.ResourceExistsException;
 import com.example.demo.exceptions.user.TokenInvalidException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,11 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InsufficientEx.class)
+    public ResponseEntity<?> resolveException(InsufficientEx ex) {
+        return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
+    }
     @ExceptionHandler(TokenInvalidException.class)
     public ResponseEntity<?> resolveException(TokenInvalidException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);

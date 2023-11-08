@@ -91,7 +91,6 @@ public class BookController {
 
         return ResponseEntity.ok().body(response);
     }
-
     @GetMapping("/test1")
     public List<Book> findAllByRsql(@RequestParam(value = "search") String search) {
         Node rootNode = new RSQLParser().parse(search);

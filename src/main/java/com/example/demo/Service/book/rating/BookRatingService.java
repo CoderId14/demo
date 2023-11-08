@@ -108,6 +108,7 @@ public class BookRatingService {
                 .userId(user.getId())
                 .bookId(bookRating.getBook().getId())
                 .name(user.getName())
+                .ratingId(bookRating.getId())
                 .comment(bookRating.getComment())
                 .rating(bookRating.getRating())
                 .createdBy(bookRating.getCreatedBy())
