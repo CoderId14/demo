@@ -15,5 +15,6 @@ public interface IBookService {
 
     ApiResponse delete(long id, CustomUserDetails currentUser);
 
-    PagedResponse<BookResponse> getAllBooks(Pageable pageable);
+
+    PagedResponse<BookResponse> getAllBooks(CustomUserDetails user, Pageable pageable);
 }

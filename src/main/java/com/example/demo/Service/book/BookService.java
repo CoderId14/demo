@@ -18,7 +18,6 @@ import com.example.demo.entity.BookLike;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Tag;
 import com.example.demo.entity.book.Book;
-import com.example.demo.entity.user.User;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.demo.dto.Mapper.getBookResponse;
 
@@ -47,6 +45,7 @@ public class BookService implements IBookService {
     private final BookUtils bookUtils;
 
     private final RoleUtils roleUtils;
+
     private final BookLikeRepo bookLikeRepo;
 
 
@@ -116,17 +115,17 @@ public class BookService implements IBookService {
     }
 
     @Override
-    public PagedResponse<BookResponse> getAllBooks(Pageable pageable) {
+    public PagedResponse<BookResponse> getAllBooks(CustomUserDetails user,Pageable pageable) {
         AppUtils.validatePageNumberAndSize(pageable.getPageNumber(), pageable.getPageSize());
 
 //        CategoryEntity category = categoryRepository.findById(id)
 //                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, ID, id));
 
         Page<Book> books = bookRepo.findAll(pageable);
-        return getBookResponsePagedResponse(books, pageable, false);
+        return getBookResponsePagedResponse(books, user.getId(), pageable, false);
     }
 
-    private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books,Pageable pageable, boolean isDetail) {
+    private PagedResponse<BookResponse> getBookResponsePagedResponse(Page<Book> books, Long userId, Pageable pageable, boolean isDetail) {
         List<Book> contents = books.getNumberOfElements() == 0 ?
                 Collections.emptyList()
                 :
@@ -134,6 +133,13 @@ public class BookService implements IBookService {
 
         List<BookResponse> result = new ArrayList<>();
         contents.forEach(temp -> result.add(getBookResponse(temp, isDetail)));
+        if(userId != null){
+            bookLikeRepo.findByUserIdAndBookIdIn(userId, contents.stream().map(Book::getId).toList())
+                    .forEach(bookLike -> result.stream()
+                            .filter(response -> response.getBookId() == bookLike.getBook().getId())
+                            .findFirst()
+                            .ifPresent(response -> response.setLiked(true)));
+        }
         if(isDetail){
             for (Sort.Order order : pageable.getSort()) {
                 if(order.getProperty().equals("chapterModifiedDate")){
@@ -166,7 +172,8 @@ public class BookService implements IBookService {
     public PagedResponse<BookResponse> searchBook(Predicate predicate, Pageable pageable, CustomUserDetails currentUser, boolean isDetail) {
         Page<Book> books;
         books = bookRepo.searchBook(predicate, pageable);
-        return getBookResponsePagedResponse(books, pageable, isDetail);
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return getBookResponsePagedResponse(books, userId, pageable, isDetail);
     }
 
     public PagedResponse<BookResponse> findBookLikeByUserId(long id, Pageable pageable) {
@@ -175,13 +182,13 @@ public class BookService implements IBookService {
                 .map(BookLike::getBook)
                 .toList());
         return getBookResponsePagedResponse(
-                books, pageable, true);
+                books, id, pageable, true);
     }
 
 
-    public PagedResponse<BookResponse> hotBooks(Pageable pageable) {
+    public PagedResponse<BookResponse> hotBooks(CustomUserDetails user, Pageable pageable) {
         // thống kê danh sách
         Page<Book> bookPage = bookRepo.findTop100ByLikes(pageable);
-        return getBookResponsePagedResponse(bookPage, pageable,false);
+        return getBookResponsePagedResponse(bookPage, user.getId(),pageable,false);
     }
 }

@@ -71,11 +71,11 @@ public class Book extends BaseEntity {
     private List<UserBookHistory> userBookHistories;
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookLike> bookLikes;
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private BookViewCount viewCount;
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private BookLikeCount likeCount;
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private BookRatingCount bookRatingCount;
     @Column(name = "is_premium")
     private boolean isPremium;

@@ -1,6 +1,5 @@
 package com.example.demo.Repository;
 
-import com.example.demo.criteria.BookPredicateBuilder;
 import com.example.demo.entity.BookLike;
 import com.example.demo.entity.QBookLike;
 import com.querydsl.core.types.dsl.StringPath;
@@ -14,6 +13,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookLikeRepo extends JpaRepository<BookLike, Long>,
@@ -40,6 +40,7 @@ public interface BookLikeRepo extends JpaRepository<BookLike, Long>,
     bindings.excluding(root.modifiedBy);
   }
   Page<BookLike> findByUserId(long id,Pageable pageable);
-  Optional<BookLike> findByUserIdAndAndBookId(long userid, long bookid);
+  Optional<BookLike> findByUserIdAndAndBookId(Long userId, Long bookId);
 
+    List<BookLike> findByUserIdAndBookIdIn(long userId, List<Long> list);
 }

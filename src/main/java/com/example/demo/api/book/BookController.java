@@ -61,9 +61,10 @@ public class BookController {
     public ResponseEntity<?> getAllBooks(
             @PageableDefault(sort = "createdDate",
                     direction = Sort.Direction.DESC,
-                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable
+                    size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable,
+            @CurrentUser CustomUserDetails user
     ) {
-        PagedResponse<BookResponse> response = bookService.getAllBooks(pageable);
+        PagedResponse<BookResponse> response = bookService.getAllBooks(user, pageable);
         return ResponseEntity.ok().body(response);
     }
 

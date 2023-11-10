@@ -2,22 +2,23 @@ package com.example.demo.Service.attachment;
 
 
 import com.example.demo.Repository.AttachmentRepo;
-import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.attachment.response.AttachmentResponse;
+import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.Attachment;
 import com.example.demo.exceptions.BadRequestException;
 import com.example.demo.exceptions.ResourceNotFoundException;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.*;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AttachmentService implements IAttachmentService {
@@ -25,15 +26,41 @@ public class AttachmentService implements IAttachmentService {
 
     public AttachmentService(AttachmentRepo attachmentRepository){
         this.attachmentRepository = attachmentRepository;
-        try{
-            Path storageFolder = FileSystems.getDefault().getPath("upload");
-            Files.createDirectories(storageFolder);
-        }catch (IOException e){
-            throw new RuntimeException("Cannot initialize storage", e);
-        }
+    }
+    public String generateFileName(String originalFileName) {
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        return UUID.randomUUID() + extension;
     }
 
+    public String uploadFile(MultipartFile multipartFile, String path){
+        String objectName = generateFileName(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        StorageOptions storageOptions = null;
+        String bucketName = "spring-boot-demo-357108.appspot.com";
+        try {
+            storageOptions = StorageOptions.newBuilder()
+                    .setProjectId("spring-boot-demo-357108")
+                    .setCredentials(GoogleCredentials.fromStream(new ClassPathResource("firebase_admin.json").getInputStream()))
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Storage storage = storageOptions.getService();
+        BlobId blobId = BlobId.of(bucketName, objectName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(multipartFile.getContentType())
+                .build();
 
+        try {
+            Blob blob = storage.create(blobInfo, multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("UPLOAD FILE" + multipartFile.getName() + " " + multipartFile.getSize() + " octet");
+        return getPublicUrl(bucketName, objectName);
+    }
+    public String getPublicUrl(String bucketName, String objectName) {
+        return "https://storage.cloud.google.com/" +bucketName + "/" + objectName;
+    }
     public AttachmentResponse saveAttachment(MultipartFile file) {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         try {

@@ -3,7 +3,6 @@ package com.example.demo.Repository.book;
 import com.example.demo.criteria.BookPredicateBuilder;
 import com.example.demo.entity.book.Book;
 import com.example.demo.entity.book.QBook;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +58,5 @@ public interface BookRepo extends JpaRepository<Book, Long>,
 
     @Query("SELECT COUNT(bl) FROM BookLike bl WHERE bl.book.id = :bookId")
     Long getLikeCountForBook(@Param("bookId") Long bookId);
-
 
 }

@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.api.book.response.rating.BookRatingResponse.fromDTO;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -50,7 +52,7 @@ public class BookRatingService {
                 bookRatings.getContent();
 
         List<BookRatingResponse> result = new ArrayList<>();
-        contents.forEach(temp -> result.add(getBookRatingResponse(temp)));
+        contents.forEach(temp -> result.add(fromDTO(temp)));
 
         return new PagedResponse<>(result,
                 bookRatings.getNumber(),
@@ -81,7 +83,7 @@ public class BookRatingService {
                 .comment(request.getComment())
                 .build();
         bookRating = bookRatingRepo.save(bookRating);
-        return getBookRatingResponse(bookRating);
+        return fromDTO(bookRating);
     }
 
     public BookRatingResponse updateBookRating(UpdateBookRatingRequest request, CustomUserDetails currentUser){
@@ -90,7 +92,7 @@ public class BookRatingService {
         roleUtils.checkAuthorization(bookRating.getCreatedBy(), currentUser);
         bookRating.setComment(request.getComment());
         bookRating.setRating(request.getRating());
-        return getBookRatingResponse(bookRating);
+        return fromDTO(bookRating);
     }
 
     public ApiResponse deleteBookRating(long id, CustomUserDetails currentUser){
@@ -100,22 +102,6 @@ public class BookRatingService {
 
         bookRatingRepo.delete(bookRating);
         return new ApiResponse(true, "delete book rating id = " + id +" successfully");
-    }
-    private static BookRatingResponse getBookRatingResponse(BookRating bookRating) {
-        User user = bookRating.getUser();
-        return BookRatingResponse.builder()
-                .id(bookRating.getId())
-                .userId(user.getId())
-                .bookId(bookRating.getBook().getId())
-                .name(user.getName())
-                .ratingId(bookRating.getId())
-                .comment(bookRating.getComment())
-                .rating(bookRating.getRating())
-                .createdBy(bookRating.getCreatedBy())
-                .createdDate(bookRating.getCreatedDate())
-                .modifiedBy(bookRating.getModifiedBy())
-                .modifiedDate(bookRating.getModifiedDate())
-                .build();
     }
 
 

@@ -42,4 +42,5 @@ public class BookResponse {
     private boolean isNovel;
 
     private Long totalChapter;
+
 }

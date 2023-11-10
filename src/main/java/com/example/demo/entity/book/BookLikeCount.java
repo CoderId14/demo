@@ -6,7 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Table(name = "tbl_book_view_count")
+@Table(name = "tbl_book_like_count")
 @Getter
 @Setter
 @NoArgsConstructor

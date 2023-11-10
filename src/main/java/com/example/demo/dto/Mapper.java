@@ -9,7 +9,6 @@ import com.example.demo.api.chapter.response.ChapterResponse;
 import com.example.demo.api.tag.response.TagResponse;
 import com.example.demo.api.user.response.UserResponse;
 import com.example.demo.auth.user.CustomUserDetails;
-import com.example.demo.entity.Attachment;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.Tag;
@@ -118,8 +117,6 @@ public class Mapper {
     }
 
     public static BookResponse getBookResponse(Book book, boolean isDetail) {
-        Optional<Attachment> thumbnail = Optional.ofNullable(book.getThumbnail());
-        String thumbnailId = thumbnail.map(Attachment::getId).orElse(null);
         String thumbnailUrl = book.getThumbnailUrl();
 
         List<ChapterResponse> latestChapter;
@@ -145,7 +142,6 @@ public class Mapper {
                     .title(book.getTitle())
                     .author(book.getUser().getName())
                     .thumbnailUrl(thumbnailUrl)
-                    .thumbnail(thumbnailId)
                     .viewCount(viewCount)
                     .likeCount(likeCount)
                     .reviewCount(reviewCount)
@@ -171,7 +167,6 @@ public class Mapper {
                 .tags(tagResponses)
                 .shortDescription(book.getShortDescription())
                 .author(book.getUser().getName())
-                .thumbnail(thumbnailId)
                 .thumbnailUrl(thumbnailUrl)
                 .latestChapters(latestChapter)
                 .likeCount(likeCount)

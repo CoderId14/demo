@@ -3,10 +3,12 @@ package com.example.demo.api.attachment;
 import com.example.demo.Service.attachment.AttachmentService;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.api.attachment.response.AttachmentResponse;
+import com.example.demo.dto.response.ObjectResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +25,13 @@ public class AttachmentController {
 
     @PostMapping("/v1/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file")MultipartFile file){
-        AttachmentResponse response =  attachmentService.saveAttachment(file);
-        String downloadURL ="";
-        downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("api/attachment/download/")
-                .path(response.getId())
-                .toUriString();
+        String response =  attachmentService.uploadFile(file, null);
 
-        return ResponseEntity.created(URI.create(downloadURL)).body(
-                response
-        );
+        return ResponseEntity.ok().body(ObjectResponse.builder()
+                .status(HttpStatus.OK)
+                .message("success")
+                .responseData(response)
+                .build());
     }
     @GetMapping("/v1/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileId){
