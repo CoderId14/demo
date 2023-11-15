@@ -83,6 +83,7 @@ public class CategoryService implements ICategoryService {
         Category category = categoryRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("category", "id", id));
         roleUtils.checkAuthorization(category.getCreatedBy(), currentUser);
+        categoryRepo.delete(category);
         return new ApiResponse(Boolean.TRUE, "You successfully deleted category", HttpStatus.CREATED);
 
     }

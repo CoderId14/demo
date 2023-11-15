@@ -4,8 +4,6 @@ import com.example.demo.entity.supports.ERole;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -16,6 +14,9 @@ public class UpdateUserRequest {
     private Long userId;
     @NotNull
     private String name;
+    private String email;
+    private String password;
+
     private Boolean isActive;
     private String avatar;
     @NotNull

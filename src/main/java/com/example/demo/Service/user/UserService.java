@@ -12,7 +12,6 @@ import com.example.demo.Utils.MailBuilder;
 import com.example.demo.api.auth.request.*;
 import com.example.demo.api.auth.response.JwtAuthenticationResponse;
 import com.example.demo.api.auth.response.TokenRefreshResponse;
-import com.example.demo.api.book.response.BookResponse;
 import com.example.demo.api.user.request.ChangePasswordRequest;
 import com.example.demo.api.user.request.ForgotPasswordDto;
 import com.example.demo.api.user.request.UpdatePasswordRequest;
@@ -30,7 +29,6 @@ import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.entity.ConfirmationToken;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.auth.RefreshToken;
-import com.example.demo.entity.book.Book;
 import com.example.demo.entity.supports.AuthProvider;
 import com.example.demo.entity.supports.ERole;
 import com.example.demo.entity.user.User;
@@ -60,7 +58,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.demo.Utils.AppUtils.isEmail;
-import static com.example.demo.dto.Mapper.getBookResponse;
 import static com.example.demo.entity.supports.ERole.ROLE_ADMIN;
 
 @Service
@@ -181,9 +178,12 @@ public class UserService implements IUserService {
         );
 
         user.setName(request.getName());
+        user.setEmail(request.getEmail());
         user.setAvatar(request.getAvatar());
         user.setIsActive(request.getIsActive());
-
+        if(request.getPassword() != null && !request.getPassword().isEmpty()){
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         Set<UserRole> oldUserRoles = user.getUserRoles();
 
         userRoleRepo.deleteAll(oldUserRoles);

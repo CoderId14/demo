@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resolveException(InsufficientEx ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
+
     @ExceptionHandler(TokenInvalidException.class)
     public ResponseEntity<?> resolveException(TokenInvalidException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
@@ -75,18 +76,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resolveException(ParameterException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> resolveException(AccessDeniedException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<?> resolveException (MissingServletRequestParameterException ex) {
+    public ResponseEntity<?> resolveException(MissingServletRequestParameterException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getMessage()), new HttpHeaders(), BAD_REQUEST);
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<?> resolveException (MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<?> resolveException(MethodArgumentTypeMismatchException ex) {
         return new ResponseEntity<>(getBody(BAD_REQUEST, ex, ex.getName() + " invalid"), new HttpHeaders(), BAD_REQUEST);
     }
+
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> resolveException(BindException ex) {
@@ -117,6 +122,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleTokenRefreshException(TokenRefreshException ex) {
         return new ResponseEntity<>(getBody(FORBIDDEN, ex, ex.getMessage()), new HttpHeaders(), FORBIDDEN);
     }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> exception(Exception ex) {
         return new ResponseEntity<>(getBody(INTERNAL_SERVER_ERROR, ex, ex.getMessage()), new HttpHeaders(), INTERNAL_SERVER_ERROR);

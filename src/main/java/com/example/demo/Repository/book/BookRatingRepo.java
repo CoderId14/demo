@@ -30,5 +30,8 @@ public interface BookRatingRepo extends JpaRepository<BookRating, Long>,
 
     Optional<BookRating> findByUser_Id(long id);
 
+    Optional<BookRating> findByBook_User_IdAndBook_Id(long userId, long bookId);
+
+
 
 }

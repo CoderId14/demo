@@ -71,7 +71,7 @@ public class BookRatingService {
         }
 
         Book book = bookUtils.findBookById(request.getBookId());
-        Optional<BookRating> existBookRating = bookRatingRepo.findByUser_Id(user.getId());
+        Optional<BookRating> existBookRating = bookRatingRepo.findByBook_User_IdAndBook_Id(user.getId(), request.getBookId());
 
         if(existBookRating.isPresent()){
             throw new ResourceExistsException("BookRating", "user", user.getId());

@@ -18,7 +18,6 @@ import com.example.demo.config.CacheConfig;
 import com.example.demo.config.VnpayConfig;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.dto.response.ObjectResponse;
-import com.example.demo.entity.chapter.Chapter;
 import com.example.demo.entity.user.User;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -80,13 +79,13 @@ public class UserController {
             @CurrentUser CustomUserDetails user) {
         roleUtils.checkAuthorization(user.getUsername(), user);
         UserBookHistoryRequest request;
-        if(userId != null){
-             request = UserBookHistoryRequest.builder()
+        if (userId != null) {
+            request = UserBookHistoryRequest.builder()
                     .userId(userId)
                     .page(pageable.getPageNumber())
                     .size(pageable.getPageSize())
                     .build();
-        } else{
+        } else {
             request = UserBookHistoryRequest.builder()
                     .userId(user.getId())
                     .page(pageable.getPageNumber())
@@ -117,6 +116,7 @@ public class UserController {
         UserResponse userResponse = userService.addUser(signUpRequest);
         return ResponseEntity.ok(userResponse);
     }
+
     @GetMapping(value = "/v1/search")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> searchUser(@QuerydslPredicate(root = User.class) Predicate predicate,
@@ -127,6 +127,7 @@ public class UserController {
         PagedResponse<UserResponse> userResponse = userService.searchUser(predicate, pageable, currentUser);
         return ResponseEntity.ok(userResponse);
     }
+
     @PutMapping(value = "/v1", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateUserRequest request) {
@@ -134,7 +135,7 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @DeleteMapping(value = "/v1/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/v1/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
         boolean userResponse = userService.deleteUser(id);
@@ -184,22 +185,23 @@ public class UserController {
 
     @GetMapping("/v1/get-books-liked")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @CurrentUser CustomUserDetails currentUser){
-        log.info("get book liked by  user id= " +  currentUser.getId());
+    public ResponseEntity<?> getBookLike(@RequestParam int page, @RequestParam int size, @CurrentUser CustomUserDetails currentUser) {
+        log.info("get book liked by  user id= " + currentUser.getId());
 
-        return ResponseEntity.ok(bookService.findBookLikeByUserId(currentUser.getId(), PageRequest.of(page,size,Sort.by("createdBy"))));
+        return ResponseEntity.ok(bookService.findBookLikeByUserId(currentUser.getId(), PageRequest.of(page, size, Sort.by("createdBy"))));
     }
+
     @PostMapping("/v1/like-book")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> likeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser){
+    public ResponseEntity<?> likeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser) {
         long userId = currentUser.getId();
         bookLikeService.liked(userId, request.getBookId());
-         return ResponseEntity.ok("Liked success book = " + request.getBookId());
+        return ResponseEntity.ok("Liked success book = " + request.getBookId());
     }
 
     @PostMapping("/v1/unLike-book")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> unLikeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser){
+    public ResponseEntity<?> unLikeBook(@RequestBody @Validated LikeBookRequest request, @CurrentUser CustomUserDetails currentUser) {
         long userId = currentUser.getId();
         bookLikeService.unLiked(userId, request.getBookId());
         return ResponseEntity.ok("unLike success book = " + request.getBookId());
@@ -211,11 +213,11 @@ public class UserController {
             @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(value = "coin") Long coin,
             @CurrentUser CustomUserDetails currentUser)
-        throws Exception {
+            throws Exception {
         String vnp_Version = vnpayConfig.vnp_Version;
         String vnp_Command = vnpayConfig.vnp_Command;
         String orderType = vnpayConfig.orderType;
-        long amount = coin*1000*100;
+        long amount = coin * 1000 * 100;
         // mã thanh toán gửi sang là duy nhất nên cần set session (UUID), lưu cái session nayf lại, nhưng lấy ra để lấy userid kiểu gì
         String vnp_TxnRef = VnpayConfig.getRandomNumber(currentUser.getId());
         String vnp_IpAddr = vnpayConfig.vnp_IpAddr;
@@ -258,16 +260,16 @@ public class UserController {
         Iterator itr = fieldNames.iterator();
         while (itr.hasNext()) {
             String fieldName = (String) itr.next();
-            String fieldValue = (String) vnp_Params.get(fieldName);
+            String fieldValue = vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 //Build query
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
                 query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
@@ -276,14 +278,16 @@ public class UserController {
         }
         String queryUrl = query.toString();
         String vnp_SecureHash = VnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret, hashData.toString());
-        System.out.println("hashdata is: "+ hashData.toString());
+        System.out.println("hashdata is: " + hashData);
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = vnpayConfig.vnp_PayUrl + "?" + queryUrl;
 //        System.out.println(paymentUrl);
         return ResponseEntity.ok(paymentUrl);
     }
+
     @GetMapping("/v1/save-coin")
-    public ResponseEntity<?> saveCoin(HttpServletRequest request) throws Exception {
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> saveCoin(HttpServletRequest request, @CurrentUser CustomUserDetails currenUser) throws Exception {
         Map<String, String[]> params = request.getParameterMap();
         HashMap<String, String> paramMap = new HashMap<>();
         Set<String> keySets = params.keySet();
@@ -300,16 +304,16 @@ public class UserController {
         Iterator itr = fieldNames.iterator();
         while (itr.hasNext()) {
             String fieldName = (String) itr.next();
-            String fieldValue = (String) paramMap.get(fieldName);
+            String fieldValue = paramMap.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 //Build query
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
                 query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
@@ -317,19 +321,20 @@ public class UserController {
             }
         }
 
-        if(VnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret,hashData.toString()).equals(vnp_SecureHash)==false){
+        if (!VnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret, hashData.toString()).equals(vnp_SecureHash)) {
             return ResponseEntity.ok("70");
         }
         Long userId = cacheConfig.get(paramMap.get("vnp_TxnRef"));
-        Long coin = Long.valueOf(paramMap.get("vnp_Amount"))/(100*1000);
-        userService.loadCoin(userId,coin);
+        Long coin = Long.valueOf(paramMap.get("vnp_Amount")) / (100 * 1000);
+        userService.loadCoin(currenUser.getId(), coin);
         cacheConfig.remove(paramMap.get("vnp_TxnRef"));
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
     @GetMapping("/v1/open-premium")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> openPremium(@RequestParam(required = false) Long userId,
-                                         @CurrentUser CustomUserDetails currentUser){
+                                         @CurrentUser CustomUserDetails currentUser) {
         userService.openPremium(currentUser.getId());
         return ResponseEntity.ok("Open success premium");
     }

@@ -41,7 +41,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   mail:
     username: danghieu14th@gmail.com
-    password: ylxlulxapibydfrf
+    password: ${MAIL_PASSWORD}
     host: smtp.gmail.com
     properties:
       mail:

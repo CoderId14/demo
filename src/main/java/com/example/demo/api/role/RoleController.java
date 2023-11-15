@@ -1,8 +1,8 @@
 package com.example.demo.api.role;
 
-import com.example.demo.Service.chapter.ChapterService;
+import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Utils.AppConstants;
-import com.example.demo.api.chapter.response.ChapterResponse;
+import com.example.demo.api.role.response.RoleResponse;
 import com.example.demo.dto.PagedResponse;
 import com.example.demo.entity.Role;
 import com.querydsl.core.types.Predicate;
@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/role")
 @RequiredArgsConstructor
 public class RoleController {
-    private final ChapterService chapterService;
+    private final RoleUtils roleUtils;
 
 
     @GetMapping("/v1/search")
-    public ResponseEntity<PagedResponse<ChapterResponse>> searchChapter(
+    public ResponseEntity<PagedResponse<RoleResponse>> searchChapter(
             @QuerydslPredicate(root = Role.class) Predicate predicate,
             @PageableDefault(sort = AppConstants.CREATED_DATE,
                     direction = Sort.Direction.DESC,
                     size = AppConstants.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        PagedResponse<ChapterResponse> response = chapterService.searchChapter(predicate, pageable);
+        PagedResponse<RoleResponse> response = roleUtils.searchRole(pageable);
         return ResponseEntity.ok().body(response);
     }
 
