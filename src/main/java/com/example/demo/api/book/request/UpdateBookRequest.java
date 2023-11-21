@@ -20,6 +20,8 @@ public class UpdateBookRequest {
     private Set<Long> categories;
 
     private Set<Long> tags;
+
+    private Long author;
     @Builder.Default
     @NotNull
     private Boolean isPremium = false;

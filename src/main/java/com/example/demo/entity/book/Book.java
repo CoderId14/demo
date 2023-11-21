@@ -77,6 +77,8 @@ public class Book extends BaseEntity {
     private BookLikeCount likeCount;
     @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private BookRatingCount bookRatingCount;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<BookRating> bookRatings;
     @Column(name = "is_premium")
     private boolean isPremium;
 

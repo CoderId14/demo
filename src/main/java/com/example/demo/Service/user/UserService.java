@@ -125,35 +125,44 @@ public class UserService implements IUserService {
     }
 
     //    Test
-    public UserResponse addUser(SignUpRequest signUpRequest) {
+    public UserResponse addUser(AddUserRequest request) {
 
-        if (userRepo.existsByUsername(signUpRequest.getUsername())) {
-            throw new ResourceExistsException("User", "Username", signUpRequest.getUsername());
+        if (userRepo.existsByUsername(request.getUsername())) {
+            throw new ResourceExistsException("User", "Username", request.getUsername());
         }
-        if (userRepo.existsByEmail(signUpRequest.getEmail())) {
-            throw new ResourceExistsException("User", "Email", signUpRequest.getEmail());
+        if (userRepo.existsByEmail(request.getEmail())) {
+            throw new ResourceExistsException("User", "Email", request.getEmail());
         }
 
-        Role defaultRole = roleRepo.findRoleByRoleName(ERole.ROLE_USER)
-                .orElseGet(() -> roleRepo.save(Role.builder().roleName(ERole.ROLE_USER).build()));
+        Set<Role> roles = new HashSet<>();
 
-        UserRole userRole = UserRole.builder()
-                .role(defaultRole)
-                .validUntil(LocalDateTime.now().plusYears(10))
-                .build();
+        request.getRoles().stream().map(
+                role ->
+                        roleRepo.findRoleByRoleName(ERole.valueOf(role.toUpperCase())).get()).forEach(roles::add);
+        Set<UserRole> userRoles = new HashSet<>();
+        roles.forEach(
+                role -> {
+                    UserRole userRole = UserRole.builder()
+                            .role(role)
+                            .validUntil(LocalDateTime.now().plusYears(10))
+                            .build();
+                    userRoles.add(userRole);
+                }
+        );
 
         User user = User.builder()
-                .username(signUpRequest.getUsername())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .email(signUpRequest.getEmail())
-                .name(signUpRequest.getName())
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .name(request.getName())
                 .isActive(true)
-                .userRoles(new HashSet<>(Collections.singletonList(userRole)))
+                .userRoles(userRoles)
                 .build();
-        userRole.setUser(user);
+        userRoles.forEach(userRole -> userRole.setUser(user));
         userRepo.save(user);
         return Mapper.toUserDto(user);
     }
+
     public PagedResponse<UserResponse> searchUser(Predicate predicate, Pageable pageable, CustomUserDetails currentUser) {
         Page<User> users;
         users = userRepo.findAll(predicate, pageable);
@@ -172,6 +181,7 @@ public class UserService implements IUserService {
                 users.getTotalPages(),
                 users.isLast());
     }
+
     public boolean updateUser(UpdateUserRequest request) {
         User user = userRepo.findById(request.getUserId()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", request.getUserId())
@@ -181,7 +191,7 @@ public class UserService implements IUserService {
         user.setEmail(request.getEmail());
         user.setAvatar(request.getAvatar());
         user.setIsActive(request.getIsActive());
-        if(request.getPassword() != null && !request.getPassword().isEmpty()){
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         Set<UserRole> oldUserRoles = user.getUserRoles();
@@ -203,7 +213,7 @@ public class UserService implements IUserService {
         return true;
     }
 
-    public boolean deleteUser(long id){
+    public boolean deleteUser(long id) {
         User user = userRepo.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", id)
         );
@@ -398,7 +408,6 @@ public class UserService implements IUserService {
         String subject = userDetails.getUsername();
         return jwtManager.generateToken(claims, subject);
     }
-
 
 
     public UserTokenResponse getUserFromToken(String token) {

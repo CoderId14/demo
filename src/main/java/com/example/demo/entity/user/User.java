@@ -2,7 +2,6 @@ package com.example.demo.entity.user;
 
 import com.example.demo.entity.BaseEntity;
 import com.example.demo.entity.ConfirmationToken;
-import com.example.demo.entity.Role;
 import com.example.demo.entity.supports.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -32,6 +31,8 @@ public class User extends BaseEntity {
 
     @Column()
     private String name;
+    @Column(name = "phone_number" , length = 20)
+    private String phoneNumber;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<ConfirmationToken> confirmationToken;

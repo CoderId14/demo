@@ -20,6 +20,7 @@ public class CreateBookRequest {
     private String content;
     private Set<Long> categories;
     private Set<Long> tags;
+    private Long author;
     @Builder.Default
     @NotNull
     private Boolean isPremium = false;

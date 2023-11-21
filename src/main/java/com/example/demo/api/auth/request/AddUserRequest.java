@@ -7,6 +7,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,12 +15,14 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
-public class SignUpRequest {
+public class AddUserRequest {
     @NotEmpty(message = "Email not empty")
     private String email;
     @NotEmpty(message = "Username not empty")
     private String username;
     private String name;
+
+    private Set<String> roles;
     @Size(min = 4, max = 16, message = "Password must contain atleast 4 character and not exceed 16 character")
     private String password;
 }

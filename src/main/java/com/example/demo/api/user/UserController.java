@@ -7,7 +7,7 @@ import com.example.demo.Service.role.RoleUtils;
 import com.example.demo.Service.user.UserHistoryService;
 import com.example.demo.Service.user.UserService;
 import com.example.demo.Utils.AppConstants;
-import com.example.demo.api.auth.request.SignUpRequest;
+import com.example.demo.api.auth.request.AddUserRequest;
 import com.example.demo.api.user.request.*;
 import com.example.demo.api.user.response.ChangePasswordResponse;
 import com.example.demo.api.user.response.UserResponse;
@@ -112,8 +112,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/v1/addUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addUser(@RequestBody @Valid SignUpRequest signUpRequest) {
-        UserResponse userResponse = userService.addUser(signUpRequest);
+    public ResponseEntity<?> addUser(@RequestBody @Valid AddUserRequest request) {
+        UserResponse userResponse = userService.addUser(request);
         return ResponseEntity.ok(userResponse);
     }
 
