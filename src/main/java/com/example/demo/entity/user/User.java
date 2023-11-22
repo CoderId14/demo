@@ -2,6 +2,7 @@ package com.example.demo.entity.user;
 
 import com.example.demo.entity.BaseEntity;
 import com.example.demo.entity.ConfirmationToken;
+import com.example.demo.entity.book.BookWriterRequest;
 import com.example.demo.entity.supports.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -56,4 +57,7 @@ public class User extends BaseEntity {
     @ToString.Exclude
     @JsonIgnore
     private Set<UserRole> userRoles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookWriterRequest> bookWriterRequest;
 }
