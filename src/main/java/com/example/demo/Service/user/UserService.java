@@ -335,6 +335,7 @@ public class UserService implements IUserService {
         User user = User.builder()
                 .username(signUpRequest.getUsername())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .name(signUpRequest.getName())
                 .email(signUpRequest.getEmail())
                 .isActive(false)
                 .userRoles(new HashSet<>(Collections.singletonList(userRole)))

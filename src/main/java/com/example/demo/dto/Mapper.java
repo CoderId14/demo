@@ -149,6 +149,7 @@ public class Mapper {
                     .isPremium(book.isPremium())
                     .isNovel(book.isNovel())
                     .totalChapter(chapterCount)
+                    .isActive(book.getIsActive())
                     .build();
         }
         latestChapter = book.getChapters().stream()
@@ -176,6 +177,7 @@ public class Mapper {
                 .isPremium(book.isPremium())
                 .isNovel(book.isNovel())
                 .totalChapter(chapterCount)
+                .isActive(book.getIsActive())
                 .build();
 
     }

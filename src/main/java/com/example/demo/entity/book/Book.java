@@ -61,9 +61,6 @@ public class Book extends BaseEntity {
     @EqualsAndHashCode.Exclude
     private List<Chapter> chapters = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "thumbnail", referencedColumnName = "id")
-    private Attachment thumbnail;
     @Column(columnDefinition = "TEXT")
     private String thumbnailUrl;
 
@@ -79,10 +76,14 @@ public class Book extends BaseEntity {
     private BookRatingCount bookRatingCount;
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookRating> bookRatings;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<BookWriterRequest> bookWriterRequests;
     @Column(name = "is_premium")
     private boolean isPremium;
 
     private boolean isNovel;
+
+    private Boolean isActive;
     public Book(BookLike bookLike) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(bookLike.getBook(), this);

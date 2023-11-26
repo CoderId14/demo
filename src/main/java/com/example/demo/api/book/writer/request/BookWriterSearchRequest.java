@@ -1,7 +1,7 @@
 package com.example.demo.api.book.writer.request;
 
 
-import com.example.demo.Service.book.writer.dto.request.BookWriterRequestInput;
+import com.example.demo.Service.book.writer.dto.request.BookWriterSearchInput;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,8 +17,8 @@ public class BookWriterSearchRequest {
     private Integer size;
     private String sortBy;
 
-    public BookWriterRequestInput toInput() {
-        return BookWriterRequestInput.builder()
+    public BookWriterSearchInput toInput() {
+        return BookWriterSearchInput.builder()
                 .id(this.id)
                 .bookId(this.bookId)
                 .userId(this.userId)

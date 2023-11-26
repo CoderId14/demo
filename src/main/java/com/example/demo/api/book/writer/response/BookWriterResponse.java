@@ -1,7 +1,7 @@
 package com.example.demo.api.book.writer.response;
 
 
-import com.example.demo.Repository.book.writer.dto.BookWriterDTO;
+import com.example.demo.Service.book.writer.dto.response.BookWriterSearchResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public class BookWriterResponse {
 
     private Long bookId;
     private Long userId;
-    private String username;
+    private String fullName;
     private String title;
 
     private String description;
@@ -22,13 +22,13 @@ public class BookWriterResponse {
 
     private String status;
 
-    public static BookWriterResponse from(BookWriterDTO input){
+    public static BookWriterResponse from(BookWriterSearchResponse input){
         return BookWriterResponse.builder()
                 .id(input.getId())
                 .bookId(input.getBookId())
                 .userId(input.getUserId())
-                .username(input.getUsername())
-                .title(input.getTitle())
+                .fullName(input.getFullName())
+                .title(input.getBookName())
                 .description(input.getDescription())
                 .cover(input.getCover())
                 .status(input.getStatus())

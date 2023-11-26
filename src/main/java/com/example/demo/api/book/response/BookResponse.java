@@ -40,7 +40,7 @@ public class BookResponse {
     private boolean isPremium;
     private boolean isLiked;
     private boolean isNovel;
-
+    private boolean isActive;
     private Long totalChapter;
 
 }

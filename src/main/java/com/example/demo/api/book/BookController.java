@@ -126,7 +126,7 @@ public class BookController {
                     MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE}
     )
-    @PreAuthorize("hasRole('ROLE_WRITER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(
             @RequestBody @Validated CreateBookRequest model,
             @CurrentUser CustomUserDetails currentUser) {
@@ -147,7 +147,7 @@ public class BookController {
     }
 
     @DeleteMapping("/v1/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_WRITER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteBook(
             @PathVariable(name = "id") long id,
             @CurrentUser CustomUserDetails currentUser) {

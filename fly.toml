@@ -1,0 +1,29 @@
+# fly.toml file generated for reading-demo on 2023-05-02T22:19:47+07:00
+
+app = "reading-demo"
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
+primary_region = "sin"
+processes = []
+
+[[services]]
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+[env]
+MYSQL_DATABASE = "some_db"
+MYSQL_USER = "non_root_user"

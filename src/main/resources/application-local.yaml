@@ -36,8 +36,8 @@ spring:
   datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: ywjFsfb1tiSN0wnFjc53dWMLxZxhsjvX
-    url: jdbc:postgresql://dpg-cjmaou7jbvhs738heavg-a.singapore-postgres.render.com/demo_52ri_4keg
+    password: Ycdi8mzpijz5P6UFgoA33DpEpsEUBPJj
+    url: jdbc:postgresql://dpg-clgn9fef27hc739lneeg-a.singapore-postgres.render.com/demo_52ri_4keg_8tq3
     driver-class-name: org.postgresql.Driver
   mail:
     username: danghieu14th@gmail.com

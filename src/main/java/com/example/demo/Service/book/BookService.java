@@ -81,12 +81,12 @@ public class BookService implements IBookService {
                 .content(request.getContent())
                 .categories(categories)
                 .shortDescription(request.getShortDescription())
-                .thumbnail(attachment.orElse(null))
                 .thumbnailUrl(request.getThumbnailUrl())
                 .tags(tags)
                 .user(author)
                 .isPremium(request.getIsPremium())
                 .isNovel(request.getIsNovel())
+                .isActive(true)
                 .build();
 
         book = bookRepo.save(book);
@@ -119,6 +119,7 @@ public class BookService implements IBookService {
         book.setThumbnailUrl(request.getThumbnailUrl());
         book.setPremium(request.getIsPremium());
         book.setNovel(request.getIsNovel());
+        book.setIsActive(request.getIsActive());
         if(currentUser.getAuthorities().contains("ROLE_ADMIN")){
             book.setUser(author);
         }

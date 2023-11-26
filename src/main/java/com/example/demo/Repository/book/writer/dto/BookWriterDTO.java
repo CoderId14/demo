@@ -7,7 +7,7 @@ public interface BookWriterDTO {
 
     Long getUserId();
 
-    String getUsername();
+    String getFullName();
 
     String getTitle();
 

@@ -21,7 +21,7 @@ public interface BookWriterRepo extends JpaRepository<BookWriterRequest, Long>{
                 b.short_description as description,
                 b.thumbnail_url as cover,
                 bwr.status as status,
-                u.username as username
+                u.name as fullName
             FROM
                 tbl_book_writer_request bwr
             INNER JOIN tbl_book b ON
